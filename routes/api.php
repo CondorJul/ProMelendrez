@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\API\AutenticarController;
+use App\Http\Controllers\API\v1\AuthController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\v1\BusinessController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\v1\CategoryController;
+use App\Http\Controllers\API\v1\TellerController;
 use App\Http\Controllers\API\v1\PruebaController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +26,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('test', [TestController::class, 'index']);
 
-
-Route::get('v1/categories', [CategoryController::class, 'index']);
-Route::post('v1/categories', [CategoryController::class, 'store']);
+/*Categoria */
+Route::get('v1/categories/{id}', [TellerController::class, 'find']);
+Route::get('v1/categories', [TellerController::class, 'index']);
+Route::post('v1/categories', [TellerController::class, 'store']);
+Route::put('v1/categories', [TellerController::class, 'update']);
+Route::delete('v1/categories/{id}', [TellerController::class, 'destroy']);
+Route::get('/v1/categories/search-by-code/{code}', [TellerController::class, 'searchByCode']);
 
 
 
@@ -41,4 +46,24 @@ Route::delete('v1/prueba/{prueba}', [PruebaController::class, 'destroy']);*/
 
 Route::apiResource('v1/prueba', PruebaController::class);
 
-Route::post('registro', [AutenticarController::class, 'register']);
+Route::post('registro', [AuthController::class, 'register']);
+
+
+/*Autenticación*/
+Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
+//Route::post('v1/auth/signin', [AutenticarController::class, 'sign']);
+
+
+/*Users */
+Route::get('v1/users',[AuthController::class, 'index']);
+Route::post('v1/users/add-user-with-person', [AuthController::class, 'addUserWithPerson']);
+Route::post('v1/users/exist-email', [AuthController::class, 'existEmail']);
+Route::put('v1/users/upd-user-with-person', [AuthController::class, 'updUserWithPerson']);
+
+/* Ventanilla*/
+Route::get('v1/tellers/{id}', [TellerController::class, 'find']);
+Route::get('v1/tellers', [TellerController::class, 'index']);
+Route::post('v1/tellers', [TellerController::class, 'store']);
+Route::put('v1/tellers', [TellerController::class, 'update']);
+Route::delete('v1/tellers/{id}', [TellerController::class, 'destroy']);
+Route::get('/v1/tellers/search-by-code/{code}', [TellerController::class, 'searchByCode']);

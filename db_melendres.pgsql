@@ -1,5 +1,31 @@
+/*Tablas generales*/
+CREATE TABLE "person"(
+    "perId" SERIAL PRIMARY KEY,
+    "perKindDoc" VARCHAR(5),
+    "perNumberDoc" varchar(20),
+    "perName" VARCHAR,
+    "perAddress" VARCHAR,
+
+    "perTel" varchar(10),
+    "perEmail" varchar(50),
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+insert into "person" ("perKindDoc",  "perNumberDoc",  "perName"   )
+            values (1,'admin', 'admin' )
+
+/*OTRA TABLA GENERAL ES LA TABLA USERS*/
 
 /*Start*/
+CREATE TABLE "headquarters"(
+    "hqId" SERIAL PRIMARY KEY,
+    "hqName" varchar(100),
+    "hqRuc" varchar(12),
+    "hqAddress"  varchar(100)
+);
+insert into "headquarters"("hqName") values('Pasco');
+
 
 CREATE TABLE "category"(
     "catId" SERIAL PRIMARY KEY,
@@ -9,27 +35,68 @@ CREATE TABLE "category"(
     "catDescription" varchar,
 
     "catAuth" varchar(10) DEFAULT 'Ninguno', /*DNI, RUC*/
+    /*Categoria Padre*/
     "catIdParent" INTEGER,
+
+    /*Id foraneo de Sede*/
+    "hqId" INTEGER, 
 
     "updated_at" timestamp,
     "created_at" timestamp,
-    FOREIGN KEY ("catIdParent") REFERENCES category("catId")
+
+    /*referencias*/
+    FOREIGN KEY ("catIdParent") REFERENCES category("catId"),
+    FOREIGN KEY ("hqId") REFERENCES headquarters("hqId")
 );
 
 CREATE TABLE "teller"(
     "tellId" SERIAL PRIMARY KEY,
-
+    
+    /*datos generales*/
     "tellCode" varchar(10),
-    "tellName" varchar(50)
+    "tellName" varchar(50), 
+    
+    /*datos de control*/
+    "tellMaxInWait" int, 
+    "tellState" int DEFAULT 1, /*1=Activo , 2=Inactivo*/
+    
+
+    /*Id foraneo de Sede*/
+    "hqId" INTEGER, 
+    /*Id de usuario*/
+    "userId" bigint,
+
+    /*variables de tiempo*/
+    "updated_at" timestamp,
+    "created_at" timestamp,
+
+    FOREIGN KEY ("userId") REFERENCES users(id),
+
+    FOREIGN KEY ("hqId") REFERENCES headquarters("hqId")
+
 );
 
 
+CREATE TABLE d_category_teller(
+    "dCatTellId" SERIAL PRIMARY KEY, 
 
-CREATE TABLE "appointmentTemp"(
+    "catId" INTEGER, 
+    "tellId" INTEGER, 
+
+    "updated_at" timestamp,
+    "created_at" timestamp,
+
+    FOREIGN KEY ("catId") REFERENCES category("catId"),
+    FOREIGN KEY ("tellId") REFERENCES teller("tellId")
+
+);
+
+
+CREATE TABLE "appointment_temp"(
     /*Para sacar cita*/
     "apptmId" SERIAL PRIMARY KEY,
     "apptmTicketCode" varchar(10) /*catCode+'01' */,
-    "apptmDateTImePrint" timestamp,
+    "apptmDateTimePrint" timestamp,
     "apptmSendFrom" varchar(10), /*web, totem, whatsApp*/
 
     /*datos del cliente*/
@@ -37,7 +104,7 @@ CREATE TABLE "appointmentTemp"(
     "perId" int,
     "bussId" int,
     /*EL nro de documento y nombre del cliente viaja a esta tabla para un acceso rapido*/
-    "apptmNumberDOcClient" VARCHAR(12),/*RUC, DNI, ETC*/
+    "apptmNumberDocClient" VARCHAR(12),/*RUC, DNI, ETC*/
     "apptmNameClient" varchar(50),
 
     /*id de ventanilla y id de categoria*/
@@ -60,21 +127,6 @@ CREATE TABLE "appointmentTemp"(
 CREATE TABLE appointment(
 
 );
-
-CREATE TABLE "person"(
-    "perId" SERIAL PRIMARY KEY,
-    "perKindDoc" VARCHAR(1),
-    "perNumberDoc" varchar(20),
-    "perName" VARCHAR,
-    "perAddress" VARCHAR,
-
-    "perTel" varchar(10),
-    "perEmail" varchar(50),
-
-    "updated_at" timestamp,
-    "created_at" timestamp
-);
-
 
 CREATE TABLE "bussines"(
     "bussId" SERIAL PRIMARY KEY,
@@ -125,12 +177,7 @@ create table controlExercise(
 )
 
 
-
-
-
-
-
-
+/*Tablas de practica*/
 insert into test1('CampoUnO', campoDos) values('casa', 'algo mas')
 create table test1(
     "CampoUnO" varchar(10),

@@ -2,38 +2,38 @@
 
 namespace App\Http\Controllers\API\v1;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\category\AddCategoryRequest;
-use App\Http\Requests\category\UpdCategoryRequest;
-use App\Models\Category;
+use App\Http\Requests\teller\AddTellerRequest;
+use App\Http\Requests\teller\UpdTellerRequest;
+use Illuminate\Http\Request;
+use App\Models\Teller;
 
-class CategoryController extends Controller
+class TellerController extends Controller
 {
-    /**
+       /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
 
     public function find($id){
-        return Category::find($id);
+        return Teller::find($id);
     }
 
     public function searchByCode($code){
-        return Category::where('catCode', $code)->first();
+        return Teller::where('tellCode', $code)->first();
     }
 
     public function index()
     {
         /*return response()->json([
             'status'=>200,
-            'data'=>Category::all(),
+            'data'=>Teller::all(),
             'message'=>'Obtenido correctamente'
         ], 200);*/
 
-        return Category::all();
-        /*Category::create(["catCode"=>'34',
+        return Teller::all();
+        /*Teller::create(["catCode"=>'34',
     "catName"=>"fjasdfjñlasd"]);*/
     }
 
@@ -43,17 +43,14 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(AddCategoryRequest $request)
+    public function store(AddTellerRequest $request)
     {
-         $category=Category::create($request->all());
+         $teller=Teller::create($request->all());
         return response()->json([
             'res'=>true,
             'msg'=>'Guardado correctamente',
-            'data'=>Category::where('id', $category->catId)->get()
-
-
-
-        ]);
+            'data'=>Teller::where('tellId', $teller->catId)->get()
+        ],200);
        // return $request;
     }
 
@@ -75,22 +72,19 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdCategoryRequest $request)
+    public function update(UpdTellerRequest $request)
     {
-        /*$category=Category::where('catId', $request->catId)
+        /*$teller=Teller::where('catId', $request->catId)
             ->update($request->all());*/
-        $category=Category::where('catId', $request->catId)->first();
-        $category->catCode=$request->catCode;
-        $category->catName=$request->catName;
-        $category->catNameLong=$request->catNameLong;
-        $category->catDescription=$request->catDescription;
-        $category->catAuth=$request->catAuth;
-        $category->catIdParent=$request->catIdParent;
-        $category->save();
+        $teller=Teller::where('tellId', $request->tellId)->first();
+        $teller->tellCode=$request->tellCode;
+        $teller->tellName=$request->tellName;
+        
+        $teller->save();
         return response()->json([
             'res' => true,
-            'msg' => 'Categoria actualizada con exito',
-            'data'=>Category::where('catId', $category->catId)->get()
+            'msg' => 'Actualizado correctamente',
+            'data'=>Teller::where('tellId', $teller->catId)->get()
         ], 200);
     }
 
@@ -101,7 +95,7 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {   $category=Category::destroy($id);
+    {   $teller=Teller::destroy($id);
         return response()->json([
             'res' => true,
             'msg' => 'Eliminado correctamente.',
