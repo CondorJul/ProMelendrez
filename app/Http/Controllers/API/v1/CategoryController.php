@@ -16,11 +16,13 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function find($id){
+    public function find($id)
+    {
         return Category::find($id);
     }
 
-    public function searchByCode($code){
+    public function searchByCode($code)
+    {
         return Category::where('catCode', $code)->first();
     }
 
@@ -45,16 +47,16 @@ class CategoryController extends Controller
      */
     public function store(AddCategoryRequest $request)
     {
-         $category=Category::create($request->all());
+        $category = Category::create($request->all());
         return response()->json([
-            'res'=>true,
-            'msg'=>'Guardado correctamente',
-            'data'=>Category::where('catId', $category->catId)->get()
+            'res' => true,
+            'msg' => 'Guardado correctamente',
+            'data' => Category::where('catId', $category->catId)->get()
 
 
 
         ]);
-       // return $request;
+        // return $request;
     }
 
     /**
@@ -79,18 +81,18 @@ class CategoryController extends Controller
     {
         /*$category=Category::where('catId', $request->catId)
             ->update($request->all());*/
-        $category=Category::where('catId', $request->catId)->first();
-        $category->catCode=$request->catCode;
-        $category->catName=$request->catName;
+        $category = Category::where('catId', $request->catId)->first();
+        $category->catCode = $request->catCode;
+        $category->catName = $request->catName;
         //$category->catNameLong=$request->catNameLong;
-        $category->catDescription=$request->catDescription;
-        $category->catAuth=$request->catAuth;
-        $category->catIdParent=$request->catIdParent;
+        $category->catDescription = $request->catDescription;
+        $category->catAuth = $request->catAuth;
+        $category->catIdParent = $request->catIdParent;
         $category->save();
         return response()->json([
             'res' => true,
             'msg' => 'Categoria actualizada con exito',
-            'data'=>Category::where('catId', $category->catId)->get()
+            'data' => Category::where('catId', $category->catId)->get()
         ], 200);
     }
 
@@ -101,11 +103,12 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {   $category=Category::destroy($id);
+    {
+        $category = Category::destroy($id);
         return response()->json([
             'res' => true,
             'msg' => 'Eliminado correctamente.',
-            'data'=>[]
+            'data' => []
         ], 200);
     }
 }

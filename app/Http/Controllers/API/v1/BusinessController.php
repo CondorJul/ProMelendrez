@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\business\ExistRucRequest;
+use App\Http\Resources\bussinesResource;
 use Illuminate\Http\Request;
 use App\Models\Business;
 
@@ -15,7 +17,11 @@ class BusinessController extends Controller
      */
     public function index()
     {
-        Business::all();
+        return bussinesResource::collection(Business::all())
+            ->additional(['msg' => "lista", 'res' => true])
+            ->response()
+            ->setStatusCode(200);
+        //return Business::all();
     }
 
     /**
@@ -61,5 +67,10 @@ class BusinessController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function existRuc(ExistRucRequest $request)
+    {
+        return $user = Business::where('bussRUC', $request->bussRUC)->first();
     }
 }

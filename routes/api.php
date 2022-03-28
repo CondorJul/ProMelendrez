@@ -4,14 +4,11 @@ use App\Http\Controllers\API\v1\AuthController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\v1\AppointmentTempController;
 use App\Http\Controllers\API\v1\BusinessController;
+use App\Http\Controllers\API\v1\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\TellerController;
 use App\Http\Controllers\API\v1\PruebaController;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\API\v1\CategoryController;
-use App\Models\AppointmentTemp;
-use Monolog\Handler\RotatingFileHandler;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,7 +56,7 @@ Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
 
 
 /*Users */
-Route::get('v1/users',[AuthController::class, 'index']);
+Route::get('v1/users', [AuthController::class, 'index']);
 Route::post('v1/users/add-user-with-person', [AuthController::class, 'addUserWithPerson']);
 Route::post('v1/users/exist-email', [AuthController::class, 'existEmail']);
 Route::put('v1/users/upd-user-with-person', [AuthController::class, 'updUserWithPerson']);
@@ -84,3 +81,7 @@ Route::delete('/v1/tellers/{id}/detach-category/{catId}', [TellerController::cla
 /*appointment_temp */
 Route::post('v1/appointment-temps', [AppointmentTempController::class, 'store']);
 
+
+/* Bussines*/
+Route::get('v1/bussines', [BusinessController::class, 'index']);
+Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
