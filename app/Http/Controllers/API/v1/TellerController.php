@@ -49,7 +49,7 @@ class TellerController extends Controller
         return response()->json([
             'res'=>true,
             'msg'=>'Guardado correctamente',
-            'data'=>Teller::where('tellId', $teller->catId)->get()
+            'data'=>Teller::where('tellId', $teller->tellId)->get()
         ],200);
        // return $request;
     }
@@ -84,7 +84,31 @@ class TellerController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Actualizado correctamente',
-            'data'=>Teller::where('tellId', $teller->catId)->get()
+            'data'=>Teller::where('tellId', $teller->tellId)->get()
+        ], 200);
+    }
+
+    public function updState($id, Request $request){
+        $teller=Teller::find($id);
+        $teller->tellState=$request->tellState;
+        $teller->save();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data'=>Teller::where('tellId', $teller->tellId)->get()
+        ], 200);
+    }
+
+    public function updUser($id, Request $request){
+        $teller=Teller::find($id);
+        $teller->userId=$request->userId;
+        $teller->save();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data'=>Teller::where('tellId', $teller->tellId)->get()
         ], 200);
     }
 
@@ -102,4 +126,37 @@ class TellerController extends Controller
             'data'=>[]
         ], 200);
     }
+
+
+    /*muchos a muchos  */
+    public function attachCategory($id, Request $request){
+        $teller=Teller::find($id);
+        $teller->categories()->attach($request->catId);
+        return response()->json([
+            'res' => true,
+            'msg' => 'Agregado correctamente',
+            'data'=>Teller::find($id)->categories
+        ], 200);
+    }
+
+    public function detachCategory($id, $catId){
+        $teller=Teller::find($id);
+        $teller->categories()->detach($catId);
+        return response()->json([
+            'res' => true,
+            'msg' => 'Eliminado correctamente',
+            'data'=>Teller::find($id)->categories
+        ], 200);
+    }
+
+    public function getCategories($id){
+         return response()->json([
+            'res' => true,
+            'msg' => 'Leido correctamente',
+            'data'=>Teller::find($id)->categories
+        ], 200);
+           
+    }
+    //continuar
+
 }

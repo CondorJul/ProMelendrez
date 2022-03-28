@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
 
 class Teller extends Model
 {
@@ -18,4 +19,11 @@ class Teller extends Model
         'hqId',
         'userId'
     ];
+
+    public function categories(){
+        
+        return $this->belongsToMany(Category::class,'d_category_teller', 'tellId','catId' );
+    }
+
+    
 }

@@ -49,7 +49,7 @@ class CategoryController extends Controller
         return response()->json([
             'res'=>true,
             'msg'=>'Guardado correctamente',
-            'data'=>Category::where('id', $category->catId)->get()
+            'data'=>Category::where('catId', $category->catId)->get()
 
 
 
@@ -82,7 +82,7 @@ class CategoryController extends Controller
         $category=Category::where('catId', $request->catId)->first();
         $category->catCode=$request->catCode;
         $category->catName=$request->catName;
-        $category->catNameLong=$request->catNameLong;
+        //$category->catNameLong=$request->catNameLong;
         $category->catDescription=$request->catDescription;
         $category->catAuth=$request->catAuth;
         $category->catIdParent=$request->catIdParent;

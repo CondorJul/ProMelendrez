@@ -33,8 +33,9 @@ CREATE TABLE "category"(
     "catName" VARCHAR,
     "catNameLong" varchar,
     "catDescription" varchar,
-
-    "catAuth" varchar(10) DEFAULT 'Ninguno', /*DNI, RUC*/
+    "catTelReq" int DEFAULT 2, /*1=SI, 2=NO*/
+    "catLinkBus" int DEFAULT 2,  /*1=si, 2="no" */
+    "catAuth" int DEFAULT 1, /*1=NINGUNO, 2=DNI, 3=RUC, 4=CUALQUIERA*/
     /*Categoria Padre*/
     "catIdParent" INTEGER,
 
@@ -48,6 +49,8 @@ CREATE TABLE "category"(
     FOREIGN KEY ("catIdParent") REFERENCES category("catId"),
     FOREIGN KEY ("hqId") REFERENCES headquarters("hqId")
 );
+
+
 
 CREATE TABLE "teller"(
     "tellId" SERIAL PRIMARY KEY,
@@ -96,11 +99,11 @@ CREATE TABLE "appointment_temp"(
     /*Para sacar cita*/
     "apptmId" SERIAL PRIMARY KEY,
     "apptmTicketCode" varchar(10) /*catCode+'01' */,
-    "apptmDateTimePrint" timestamp,
+    "apptmDateTimePrint" timestamp DEFAULT now() ,
     "apptmSendFrom" varchar(10), /*web, totem, whatsApp*/
 
     /*datos del cliente*/
-    "apptKindClient" varchar(10), /*P=Persona N=Negocio*/
+    "apptKindClient" varchar(5), /*P=Persona N=Negocio*/
     "perId" int,
     "bussId" int,
     /*EL nro de documento y nombre del cliente viaja a esta tabla para un acceso rapido*/
@@ -111,7 +114,7 @@ CREATE TABLE "appointment_temp"(
     "tellId" integer,
 
     "catId" integer,
-
+    "apptmNro" int,
     /*Transfer*/
     apptmTransfer int,
     apptmTel varchar(12),
@@ -121,8 +124,21 @@ CREATE TABLE "appointment_temp"(
     catNameLOng varchar,
 
     /*atencion en ventanilla*/
-    apptmState varchar(10) /*En espera, Atendido, Cancelado*/
+    apptmState varchar(10), /*En espera, Atendido, Cancelado*/
+
+     "updated_at" timestamp,
+    "created_at" timestamp,
+    
+    FOREIGN KEY ("catId") REFERENCES category("catId"),
+    FOREIGN KEY ("tellId") REFERENCES teller("tellId")
+
 );
+
+
+ALTER TABLE appointment_temp ALTER COLUMN created_at SET DEFAULT now();
+
+
+insert into appointment_temp("catId", "apptmNumberDocClient") values(42, '70224418')
 
 CREATE TABLE appointment(
 
@@ -184,3 +200,148 @@ create table test1(
     campoDos varchar(23)
 )
 
+
+
+/*TRIGGERS*/
+CREATE FUNCTION tf_b_i_category() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+AS $$
+DECLARE 
+    _catNameLong varchar;
+BEGIN
+
+    select "catNameLong" INTO _catNameLong FROM category WHERE "catId"=NEW."catIdParent";
+    IF _catNameLong is not null THEN
+        NEW."catNameLong":=CONCAT(_catNameLong,'/',NEW."catName");
+    END IF;
+
+    IF _catNameLong is null THEN
+        NEW."catNameLong":=CONCAT('/',NEW."catName");
+    END IF;
+
+RETURN NEW;
+END;
+$$
+/*
+
+drop TRIGGER t_b_i_category on category;
+drop FUNCTION tf_b_i_category;*/
+
+
+
+CREATE TRIGGER t_b_i_category
+   BEFORE INSERT
+   ON category
+   FOR EACH ROW
+   EXECUTE PROCEDURE tf_b_i_category(); 
+
+
+
+/*Funcion y triger update*/
+CREATE FUNCTION tf_b_u_category() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+AS $$
+DECLARE 
+    _catNameLong varchar;
+BEGIN
+
+    IF COALESCE(NEW."catIdParent",-1)<>COALESCE(OLD."catIdParent" ,-1) OR NEW."catName"<>OLD."catName" THEN
+
+            select "catNameLong" INTO _catNameLong FROM category WHERE "catId"=NEW."catIdParent";
+        IF _catNameLong is not null THEN
+            NEW."catNameLong":=CONCAT(_catNameLong,'/',NEW."catName");
+        END IF;
+
+        IF _catNameLong is null THEN
+            NEW."catNameLong":=CONCAT('/',NEW."catName");
+        END IF;
+        
+        UPDATE category set "catNameLong"=replace("catNameLong",  OLD."catNameLong", NEW."catNameLong") where "catNameLong" LIKE concat(OLD."catNameLong",'%') AND "catId"<>OLD."catId";
+    END IF;
+RETURN NEW;
+END;
+$$
+
+
+
+CREATE TRIGGER t_b_u_category
+   BEFORE UPDATE
+   ON category
+   FOR EACH ROW
+   EXECUTE PROCEDURE tf_b_u_category(); 
+
+
+/*
+drop TRIGGER t_b_U_category on category;
+drop FUNCTION tf_b_U_category;*/
+
+
+
+/*TRIGGERS*/
+CREATE FUNCTION tf_b_i_appointment_temp() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+AS $$
+DECLARE 
+    _catNameLong varchar;
+    _o decimal;
+    _tellId INTEGER;
+    _maxApptmNro int;
+    
+BEGIN
+
+    IF NEW."tellId" is null THEN
+        /*seleccioamos aleatoriamente un ventanilla*/
+        select random() AS o, teller."tellId" INTO _o, _tellId from teller 
+            INNER JOIN d_category_teller 
+                on teller."tellId"=d_category_teller."tellId"
+            INNER JOIN category
+                on d_category_teller."catId"=category."catId" 
+                and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%')  ORDER BY o ASC;
+
+        /*Verificamos que exi*/
+        NEW."tellId":=_tellId;         
+    END IF;
+    /*Generamos el codigo */
+    select COALESCE(max("apptmNro"), 0) into _maxApptmNro from appointment_temp where "catId"=NEW."catId";
+    NEW."apptmNro"=_maxApptmNro+1;
+
+RETURN NEW;
+END;
+$$
+
+
+/*
+drop TRIGGER t_b_i_appointment_temp on appointment_temp;
+drop FUNCTION tf_b_i_appointment_temp;*/
+
+
+
+CREATE TRIGGER t_b_i_appointment_temp
+   BEFORE INSERT
+   ON appointment_temp
+   FOR EACH ROW
+   EXECUTE PROCEDURE tf_b_i_appointment_temp(); 
+
+/*
+select * from teller
+
+select * from category 
+    inner join d_category_teller 
+        on category."catId"=d_category_teller."catId"
+    inner join teller 
+        on d_category_teller."tellId" =teller."tellId" 
+
+teller on teller.tellId=d_category_teller
+
+select * from category
+    where  (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%') 
+      
+select random() AS o, teller."tellId" from teller 
+    INNER JOIN d_category_teller 
+        on teller."tellId"=d_category_teller."tellId"
+    INNER JOIN category
+        on d_category_teller."catId"=category."catId" 
+        and (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%')  ORDER BY o ASC*/

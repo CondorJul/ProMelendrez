@@ -55,11 +55,13 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function find(Request $request, $id){
-        $user=User::where('id', $id)->with('person')->get();
+    public function find($id){
+        $user=User::where('id', $id)->with('person')->get()->first();
         return response()->json([
-            $user
-        ], ($user)?204:200);
+            'res' => true,
+            'msg' => 'Selección correcta',
+            "data"=> $user
+        ], ($user)?200:204);
     }
 
     public function existEmail(ExistEmailRequest $request){
