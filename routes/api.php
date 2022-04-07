@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\TellerController;
 use App\Http\Controllers\API\v1\PruebaController;
+use App\Models\Teller;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,8 @@ Route::put('v1/users/upd-user-with-person', [AuthController::class, 'updUserWith
 Route::get('v1/users/{id}', [AuthController::class, 'find']);
 
 /* Ventanilla*/
+Route::get('/v1/tellers/get-join-person', [TellerController::class, 'getJoinPerson']);
+
 Route::get('v1/tellers/{id}', [TellerController::class, 'find']);
 Route::get('v1/tellers', [TellerController::class, 'index']);
 Route::post('v1/tellers', [TellerController::class, 'store']);
@@ -72,6 +75,7 @@ Route::get('/v1/tellers/search-by-code/{code}', [TellerController::class, 'searc
 Route::put('/v1/tellers/{id}/upd-user', [TellerController::class, 'updUser']);
 Route::put('/v1/tellers/{id}/upd-state', [TellerController::class, 'updState']);
 
+
 /*pivot categories */
 Route::get('/v1/tellers/{id}/get-categories', [TellerController::class, 'getCategories']);
 Route::put('/v1/tellers/{id}/attach-category', [TellerController::class, 'attachCategory']);
@@ -79,7 +83,26 @@ Route::delete('/v1/tellers/{id}/detach-category/{catId}', [TellerController::cla
 /** */
 
 /*appointment_temp */
+Route::get('v1/appointment-temps/get-all-by', [AppointmentTempController::class, 'getAllBy']);
 Route::post('v1/appointment-temps', [AppointmentTempController::class, 'store']);
+Route::get('v1/appointment-temps', [AppointmentTempController::class, 'index']);
+Route::get('v1/appointment-temps/get-attention-pending-by-teller/{tellId}', [AppointmentTempController::class, 'getAttentionPendingByTeller']);
+Route::get('v1/appointment-temps/get-attention-no-pending', [AppointmentTempController::class, 'getAttentionNoPending']);
+Route::get('v1/appointment-temps/get-all', [AppointmentTempController::class, 'getAll']);
+
+
+
+Route::put('v1/appointment-temps/start-call-by-teller', [AppointmentTempController::class, 'startCallByTeller']);
+Route::put('v1/appointment-temps/{apptmId}/undo-call', [AppointmentTempController::class, 'undoCall']);
+Route::put('v1/appointment-temps/{apptmId}/call-again', [AppointmentTempController::class, 'callAgain']);
+Route::put('v1/appointment-temps/{apptmId}/finalize-call', [AppointmentTempController::class, 'finalizeCall']);
+Route::put('v1/appointment-temps/{apptmId}/transfer-call-to-teller', [AppointmentTempController::class, 'transferCallToTeller']);
+
+
+
+
+Route::put('v1/appointment-temps/{ids}/teller/', [AppointmentTempController::class, 'updateTeller']);
+
 
 
 /* Bussines*/

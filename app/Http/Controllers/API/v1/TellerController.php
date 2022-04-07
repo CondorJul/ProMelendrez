@@ -7,6 +7,7 @@ use App\Http\Requests\teller\AddTellerRequest;
 use App\Http\Requests\teller\UpdTellerRequest;
 use Illuminate\Http\Request;
 use App\Models\Teller;
+use Illuminate\Support\Facades\DB;
 
 class TellerController extends Controller
 {
@@ -157,6 +158,15 @@ class TellerController extends Controller
         ], 200);
            
     }
-    //continuar
+
+    //continuar inner join
+    public function getJoinPerson(){
+        /*DB::raw('select teller.*, person.*  from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"')*/
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Leido Correctamente',
+            'data'=>DB::select('select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending"  from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"')
+        ]);
+    }
 
 }

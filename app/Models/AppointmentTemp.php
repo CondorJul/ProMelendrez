@@ -23,7 +23,21 @@ class AppointmentTemp extends Model
         'apptmNumberDocClient',
 
         'catId',
-        'tellId'
+        'tellId',
 
+        'apptmState',
+        'apptmDateStartAttention',
+        'apptmNroCalls',
+
+        'apptmTransfer'
     ];
+
+    public function teller(){
+        return $this->belongsTo(Teller::class, 'tellId', 'tellId');
+    }   
+
+    public function category(){
+        return $this->belongsTo(Category::class, 'catId', 'catId');
+    }   
+
 }

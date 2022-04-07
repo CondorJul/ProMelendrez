@@ -103,7 +103,7 @@ CREATE TABLE "appointment_temp"(
     "apptmSendFrom" varchar(10), /*web, totem, whatsApp*/
 
     /*datos del cliente*/
-    "apptKindClient" varchar(5), /*P=Persona N=Negocio*/
+    "apptKindClient"  int, /*2=Persona 1=Negocio*/
     "perId" int,
     "bussId" int,
     /*EL nro de documento y nombre del cliente viaja a esta tabla para un acceso rapido*/
@@ -114,17 +114,22 @@ CREATE TABLE "appointment_temp"(
     "tellId" integer,
 
     "catId" integer,
+    "catCode" varchar(10),
     "apptmNro" int,
     /*Transfer*/
-    apptmTransfer int,
-    apptmTel varchar(12),
+    "apptmTransfer" int,
+    "apptmTel" varchar(12),
+    "apptmEmail" varchar(50),
+    "apptmComment" varchar(200),
 
     /*Posiblemente en la siguiente tabla original*/
-    tellNameLong varchar,
-    catNameLOng varchar,
+    "tellNameLong" varchar,
 
     /*atencion en ventanilla*/
-    apptmState varchar(10), /*En espera, Atendido, Cancelado*/
+    "apptmState" int default 1, /*En espera=1, En atención=2, Atendido=3, 4=no atendido 5=cancelado*/
+    "apptmNroCalls" int default 0,
+    "apptmDateStartAttention" timestamp,
+    "apptmDateFinishAttention"  timestamp,
 
      "updated_at" timestamp,
     "created_at" timestamp,
@@ -140,9 +145,13 @@ ALTER TABLE appointment_temp ALTER COLUMN created_at SET DEFAULT now();
 
 insert into appointment_temp("catId", "apptmNumberDocClient") values(42, '70224418')
 
+
+
 CREATE TABLE appointment(
 
 );
+
+
 
 CREATE TABLE "bussines"(
     "bussId" SERIAL PRIMARY KEY,
@@ -176,7 +185,8 @@ CREATE TABLE "bussines"(
     "bussKindBookAcc" char(2), /*TIpo de libro = Electronico y computarizado, */
 
     "bussObservation" text,
-
+    
+    "tellId" integer,
     "perId" INTEGER,
     FOREIGN KEY ("perId") REFERENCES person("perId"),
 
@@ -186,6 +196,8 @@ CREATE TABLE "bussines"(
     "updated_at" timestamp,
     "created_at" timestamp
 );
+
+insert into bussines( "bussName", "bussRUC") values('RIcardo Solis','10702244191')
 
 create table controlExercise(
 
@@ -285,32 +297,69 @@ CREATE FUNCTION tf_b_i_appointment_temp()
    LANGUAGE PLPGSQL
 AS $$
 DECLARE 
+    /**/
     _catNameLong varchar;
     _o decimal;
     _tellId INTEGER;
+    _tellState int;
     _maxApptmNro int;
+    _nroCallPending int;
+
+    /*Categoria*/
+    _catId integer;
+    _catCode varchar(10);
+    _catLinkBus int;
     
 BEGIN
 
+
+    /*Obtenemos algunos datos de categoria*/
+    select "catCode", "catLinkBus" INTO _catCode, _catLinkBus from category where "catId"=NEW."catId";
+    NEW."catCode"=_catCode;
+    /*si esta vinculado a busi*/
+    
+    
     IF NEW."tellId" is null THEN
         /*seleccioamos aleatoriamente un ventanilla*/
-        select random() AS o, teller."tellId" INTO _o, _tellId from teller 
+        /*select random() AS o, teller."tellId" INTO _o, _tellId from teller 
             INNER JOIN d_category_teller 
                 on teller."tellId"=d_category_teller."tellId"
             INNER JOIN category
                 on d_category_teller."catId"=category."catId" 
-                and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%')  ORDER BY o ASC;
+                and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%') and teller."tellState"=1  ORDER BY o ASC;*/
+        IF _catLinkBus=1 THEN 
+            select "tellState", "tellId" into _tellState, _tellId   from teller where "tellId"=(select "tellId" from bussines where "bussId"=NEW."bussId");   
+            IF _tellState=1 THEN
+                NEW."tellId"=_tellId;
+            END IF;
+        END IF;
 
-        /*Verificamos que exi*/
-        NEW."tellId":=_tellId;         
+        IF NEW."tellId" is null  THEN
+            SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending into _o, _tellId, _nroCallPending from (select random() AS o, teller."tellId"  from teller 
+                INNER JOIN d_category_teller 
+                    on teller."tellId"=d_category_teller."tellId"
+                INNER JOIN category
+                    on d_category_teller."catId"=category."catId" where
+                    (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1/*Activo*/ )  f
+                
+                LEFT JOIN (select  "tellId",count(*) AS "nroCallPending" from appointment_temp  where "apptmState"='1'/*ACTIVO*/GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroCallPending ASC, o ASC limit 1;
+            
+            /*Verificamos que exi*/
+            IF _tellId IS NULL THEN
+                RAISE EXCEPTION '<msg>Lo sentimos, en este momento no disponemos de ventanillas para este servicio.<msg>';
+            END  IF;
+            NEW."tellId":=_tellId;   
+        END IF;
     END IF;
     /*Generamos el codigo */
-    select COALESCE(max("apptmNro"), 0) into _maxApptmNro from appointment_temp where "catId"=NEW."catId";
+    select COALESCE(max("apptmNro"), 0) into _maxApptmNro from appointment_temp where "catId"=NEW."catId" and CAST(created_at as date)=CAST(now() AS date);
     NEW."apptmNro"=_maxApptmNro+1;
 
 RETURN NEW;
 END;
 $$
+
+
 
 
 /*
@@ -345,3 +394,37 @@ select random() AS o, teller."tellId" from teller
     INNER JOIN category
         on d_category_teller."catId"=category."catId" 
         and (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%')  ORDER BY o ASC*/
+
+
+/*
+        select random() AS o, teller."tellId",*  from teller 
+            INNER JOIN d_category_teller 
+                on teller."tellId"=d_category_teller."tellId"
+            INNER JOIN category
+                on d_category_teller."catId"=category."catId" where
+                 (select "catNameLong" from category where "catId"=5) like concat("catNameLong",'%') and teller."tellState"=1 ORDER BY o ASC;
+
+select  count(*) AS nro_call_pending from appointment_temp  where "apptmState"='1'GROUP BY "tellId"
+
+
+     SELECT * from (select random() AS o, teller."tellId"  from teller 
+            INNER JOIN d_category_teller 
+                on teller."tellId"=d_category_teller."tellId"
+            INNER JOIN category
+                on d_category_teller."catId"=category."catId" where
+                 (select "catNameLong" from category where "catId"=5) like concat("catNameLong",'%') and teller."tellState"=1  ORDER BY o ASC)  f
+            
+             LEFT JOIN (select  "tellId",count(*) AS nro_call_pending from appointment_temp  where "apptmState"='1' GROUP BY "tellId")  s on f."tellId"=s."tellId"
+
+
+
+                and (select "catNameLong" from category where "catId"=5) like concat("catNameLong",'%') and teller."tellState"=1  ORDER BY o ASC;
+
+
+*/
+
+select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1
+
+
+      select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
+select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from appointment_temp where "tellId"=teller."tellId") from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
