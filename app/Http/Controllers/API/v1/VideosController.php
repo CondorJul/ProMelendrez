@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\person\ExistDNIRequest;
-use App\Models\Person;
+use App\Http\Requests\videos\addVideosRequest;
+use App\Models\Videos;
 use Illuminate\Http\Request;
 
-class PersonController extends Controller
+class VideosController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class PersonController extends Controller
      */
     public function index()
     {
-        //
+        return Videos::all();
     }
 
     /**
@@ -25,9 +25,14 @@ class PersonController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(addVideosRequest $request)
     {
-        //
+        $videos = Videos::create($request->all());
+        return response()->json([
+            'res' => true,
+            'msg' => 'Guardado correctamente',
+            'data' => Videos::where('vidId', $videos->vidId)->get()
+        ], 200);
     }
 
     /**
@@ -62,10 +67,5 @@ class PersonController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function existDni(ExistDNIRequest $request)
-    {
-        return $user = Person::where('perNumberDoc', $request->perNumberDoc)->first();
     }
 }
