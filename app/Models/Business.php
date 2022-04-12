@@ -32,4 +32,9 @@ class Business extends Model
         'bussObservation',
         'perId'
     ];
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'perId', 'perId');
+    }
 }

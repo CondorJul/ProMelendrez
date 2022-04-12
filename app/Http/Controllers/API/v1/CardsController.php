@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\person\ExistDNIRequest;
-use App\Models\Person;
+use App\Models\Cards;
 use Illuminate\Http\Request;
 
-class PersonController extends Controller
+class CardsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +26,12 @@ class PersonController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $cards = Cards::create($request->all());
+        return response()->json([
+            'res' => true,
+            'msg' => 'Guardado correctamente',
+            'data' => Cards::where('cardId', $cards->cardId)->get()
+        ], 200);
     }
 
     /**
@@ -62,10 +66,5 @@ class PersonController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function existDni(ExistDNIRequest $request)
-    {
-        return $user = Person::where('perNumberDoc', $request->perNumberDoc)->first();
     }
 }

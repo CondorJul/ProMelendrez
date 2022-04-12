@@ -4,13 +4,16 @@ use App\Http\Controllers\API\v1\AuthController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\v1\AppointmentTempController;
 use App\Http\Controllers\API\v1\BusinessController;
+use App\Http\Controllers\API\v1\CardsController;
 use App\Http\Controllers\API\v1\CategoryController;
+use App\Http\Controllers\API\v1\PersonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\TellerController;
 use App\Http\Controllers\API\v1\PruebaController;
 use App\Models\Teller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\API\v1\VideosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,11 +39,6 @@ Route::post('v1/categories', [CategoryController::class, 'store']);
 Route::put('v1/categories', [CategoryController::class, 'update']);
 Route::delete('v1/categories/{id}', [CategoryController::class, 'destroy']);
 Route::get('/v1/categories/search-by-code/{code}', [CategoryController::class, 'searchByCode']);
-
-
-Route::get('v1/business/search', [BusinessController::class, 'search']);
-Route::get('v1/business', [BusinessController::class, 'index']);
-
 
 /*Route::get('v1/prueba', [PruebaController::class, 'index']);
 Route::post('v1/prueba', [PruebaController::class, 'store']);
@@ -114,3 +112,15 @@ Route::put('v1/appointment-temps/{ids}/teller/', [AppointmentTempController::cla
 /* Bussines*/
 Route::get('v1/bussines', [BusinessController::class, 'index']);
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
+Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
+Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson']);
+
+/* Person*/
+Route::post('v1/person/exist-dni', [PersonController::class, 'existDni']);
+
+/* Videos */
+Route::get('v1/videos', [VideosController::class, 'index']);
+Route::post('v1/videos/add-videos', [VideosController::class, 'store']);
+
+/* Cards */
+Route::post('v1/cards/add-cards', [CardsController::class, 'store']);

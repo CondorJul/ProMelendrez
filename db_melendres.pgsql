@@ -40,7 +40,7 @@ CREATE TABLE "category"(
     "catIdParent" INTEGER,
 
     /*Id foraneo de Sede*/
-    "hqId" INTEGER, 
+    "hqId" INTEGER,
 
     "updated_at" timestamp,
     "created_at" timestamp,
@@ -54,18 +54,18 @@ CREATE TABLE "category"(
 
 CREATE TABLE "teller"(
     "tellId" SERIAL PRIMARY KEY,
-    
+
     /*datos generales*/
     "tellCode" varchar(10),
-    "tellName" varchar(50), 
-    
+    "tellName" varchar(50),
+
     /*datos de control*/
-    "tellMaxInWait" int, 
+    "tellMaxInWait" int,
     "tellState" int DEFAULT 1, /*1=Activo , 2=Inactivo*/
-    
+
 
     /*Id foraneo de Sede*/
-    "hqId" INTEGER, 
+    "hqId" INTEGER,
     /*Id de usuario*/
     "userId" bigint,
 
@@ -81,10 +81,10 @@ CREATE TABLE "teller"(
 
 
 CREATE TABLE d_category_teller(
-    "dCatTellId" SERIAL PRIMARY KEY, 
+    "dCatTellId" SERIAL PRIMARY KEY,
 
-    "catId" INTEGER, 
-    "tellId" INTEGER, 
+    "catId" INTEGER,
+    "tellId" INTEGER,
 
     "updated_at" timestamp,
     "created_at" timestamp,
@@ -131,9 +131,9 @@ CREATE TABLE "appointment_temp"(
     "apptmDateStartAttention" timestamp,
     "apptmDateFinishAttention"  timestamp,
 
-     "updated_at" timestamp,
+    "updated_at" timestamp,
     "created_at" timestamp,
-    
+
     FOREIGN KEY ("catId") REFERENCES category("catId"),
     FOREIGN KEY ("tellId") REFERENCES teller("tellId")
 
@@ -143,7 +143,7 @@ CREATE TABLE "appointment_temp"(
 ALTER TABLE appointment_temp ALTER COLUMN created_at SET DEFAULT now();
 
 
-insert into appointment_temp("catId", "apptmNumberDocClient") values(42, '70224418')
+insert into appointment_temp("catId", "apptmNumberDocClient") values(42, '70224418');
 
 
 
@@ -185,7 +185,7 @@ CREATE TABLE "bussines"(
     "bussKindBookAcc" char(2), /*TIpo de libro = Electronico y computarizado, */
 
     "bussObservation" text,
-    
+
     "tellId" integer,
     "perId" INTEGER,
     FOREIGN KEY ("perId") REFERENCES person("perId"),
@@ -215,11 +215,11 @@ create table test1(
 
 
 /*TRIGGERS*/
-CREATE FUNCTION tf_b_i_category() 
-   RETURNS TRIGGER 
+CREATE FUNCTION tf_b_i_category()
+   RETURNS TRIGGER
    LANGUAGE PLPGSQL
 AS $$
-DECLARE 
+DECLARE
     _catNameLong varchar;
 BEGIN
 
@@ -246,16 +246,16 @@ CREATE TRIGGER t_b_i_category
    BEFORE INSERT
    ON category
    FOR EACH ROW
-   EXECUTE PROCEDURE tf_b_i_category(); 
+   EXECUTE PROCEDURE tf_b_i_category();
 
 
 
 /*Funcion y triger update*/
-CREATE FUNCTION tf_b_u_category() 
-   RETURNS TRIGGER 
+CREATE FUNCTION tf_b_u_category()
+   RETURNS TRIGGER
    LANGUAGE PLPGSQL
 AS $$
-DECLARE 
+DECLARE
     _catNameLong varchar;
 BEGIN
 
@@ -269,7 +269,7 @@ BEGIN
         IF _catNameLong is null THEN
             NEW."catNameLong":=CONCAT('/',NEW."catName");
         END IF;
-        
+
         UPDATE category set "catNameLong"=replace("catNameLong",  OLD."catNameLong", NEW."catNameLong") where "catNameLong" LIKE concat(OLD."catNameLong",'%') AND "catId"<>OLD."catId";
     END IF;
 RETURN NEW;
@@ -282,7 +282,7 @@ CREATE TRIGGER t_b_u_category
    BEFORE UPDATE
    ON category
    FOR EACH ROW
-   EXECUTE PROCEDURE tf_b_u_category(); 
+   EXECUTE PROCEDURE tf_b_u_category();
 
 
 /*
@@ -292,12 +292,11 @@ drop FUNCTION tf_b_U_category;*/
 
 
 /*TRIGGERS*/
-CREATE FUNCTION tf_b_i_appointment_temp() 
-   RETURNS TRIGGER 
+CREATE FUNCTION tf_b_i_appointment_temp()
+   RETURNS TRIGGER
    LANGUAGE PLPGSQL
 AS $$
-DECLARE 
-    /**/
+DECLARE
     _catNameLong varchar;
     _o decimal;
     _tellId INTEGER;
@@ -309,45 +308,55 @@ DECLARE
     _catId integer;
     _catCode varchar(10);
     _catLinkBus int;
-    
+
+
 BEGIN
     /*Obtenemos algunos datos de categoria*/
     select "catCode", "catLinkBus" INTO _catCode, _catLinkBus from category where "catId"=NEW."catId";
     NEW."catCode"=_catCode;
     /*si esta vinculado a busi*/
-    
-    
+
+
     IF NEW."tellId" is null THEN
         /*seleccioamos aleatoriamente un ventanilla*/
-        /*select random() AS o, teller."tellId" INTO _o, _tellId from teller 
-            INNER JOIN d_category_teller 
+        /*select random() AS o, teller."tellId" INTO _o, _tellId from teller
+            INNER JOIN d_category_teller
                 on teller."tellId"=d_category_teller."tellId"
             INNER JOIN category
-                on d_category_teller."catId"=category."catId" 
+                on d_category_teller."catId"=category."catId"
                 and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%') and teller."tellState"=1  ORDER BY o ASC;*/
-        IF _catLinkBus=1 THEN 
-            select "tellState", "tellId" into _tellState, _tellId   from teller where "tellId"=(select "tellId" from bussines where "bussId"=NEW."bussId");   
+        IF _catLinkBus=1 THEN
+            select "tellState", "tellId" into _tellState, _tellId   from teller where "tellId"=(select "tellId" from bussines where "bussId"=NEW."bussId");
             IF _tellState=1 THEN
                 NEW."tellId"=_tellId;
             END IF;
         END IF;
 
         IF NEW."tellId" is null  THEN
-            SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending into _o, _tellId, _nroCallPending from (select random() AS o, teller."tellId"  from teller 
-                INNER JOIN d_category_teller 
+            SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending into _o, _tellId, _nroCallPending from (select random() AS o, teller."tellId"  from teller
+                INNER JOIN d_category_teller
                     on teller."tellId"=d_category_teller."tellId"
                 INNER JOIN category
                     on d_category_teller."catId"=category."catId" where
                     (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1/*Activo*/ )  f
-                
+
                 LEFT JOIN (select  "tellId",count(*) AS "nroCallPending" from appointment_temp  where "apptmState"='1'/*ACTIVO*/GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroCallPending ASC, o ASC limit 1;
-            
+
             /*Verificamos que exi*/
             IF _tellId IS NULL THEN
                 RAISE EXCEPTION '<msg>Lo sentimos, en este momento no disponemos de ventanillas para este servicio.<msg>';
             END  IF;
-            NEW."tellId":=_tellId;   
+            NEW."tellId":=_tellId;
         END IF;
+        select random() AS o, teller."tellId" INTO _o, _tellId from teller
+            INNER JOIN d_category_teller
+                on teller."tellId"=d_category_teller."tellId"
+            INNER JOIN category
+                on d_category_teller."catId"=category."catId"
+                and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%')  ORDER BY o ASC;
+
+        /*Verificamos que exi*/
+        NEW."tellId":=_tellId;
     END IF;
     /*Generamos el codigo */
     select COALESCE(max("apptmNro"), 0) into _maxApptmNro from appointment_temp where "catId"=NEW."catId" and CAST(created_at as date)=CAST(now() AS date);
@@ -370,33 +379,33 @@ CREATE TRIGGER t_b_i_appointment_temp
    BEFORE INSERT
    ON appointment_temp
    FOR EACH ROW
-   EXECUTE PROCEDURE tf_b_i_appointment_temp(); 
+   EXECUTE PROCEDURE tf_b_i_appointment_temp();
 
 /*
 select * from teller
 
-select * from category 
-    inner join d_category_teller 
+select * from category
+    inner join d_category_teller
         on category."catId"=d_category_teller."catId"
-    inner join teller 
-        on d_category_teller."tellId" =teller."tellId" 
+    inner join teller
+        on d_category_teller."tellId" =teller."tellId"
 
 teller on teller.tellId=d_category_teller
 
 select * from category
-    where  (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%') 
-      
-select random() AS o, teller."tellId" from teller 
-    INNER JOIN d_category_teller 
+    where  (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%')
+
+select random() AS o, teller."tellId" from teller
+    INNER JOIN d_category_teller
         on teller."tellId"=d_category_teller."tellId"
     INNER JOIN category
-        on d_category_teller."catId"=category."catId" 
+        on d_category_teller."catId"=category."catId"
         and (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%')  ORDER BY o ASC*/
 
 
 /*
-        select random() AS o, teller."tellId",*  from teller 
-            INNER JOIN d_category_teller 
+        select random() AS o, teller."tellId",*  from teller
+            INNER JOIN d_category_teller
                 on teller."tellId"=d_category_teller."tellId"
             INNER JOIN category
                 on d_category_teller."catId"=category."catId" where
@@ -405,13 +414,13 @@ select random() AS o, teller."tellId" from teller
 select  count(*) AS nro_call_pending from appointment_temp  where "apptmState"='1'GROUP BY "tellId"
 
 
-     SELECT * from (select random() AS o, teller."tellId"  from teller 
-            INNER JOIN d_category_teller 
+     SELECT * from (select random() AS o, teller."tellId"  from teller
+            INNER JOIN d_category_teller
                 on teller."tellId"=d_category_teller."tellId"
             INNER JOIN category
                 on d_category_teller."catId"=category."catId" where
                  (select "catNameLong" from category where "catId"=5) like concat("catNameLong",'%') and teller."tellState"=1  ORDER BY o ASC)  f
-            
+
              LEFT JOIN (select  "tellId",count(*) AS nro_call_pending from appointment_temp  where "apptmState"='1' GROUP BY "tellId")  s on f."tellId"=s."tellId"
 
 
@@ -428,14 +437,36 @@ select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapse
 select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from appointment_temp where "tellId"=teller."tellId") from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
 
 
-SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending from (select random() AS o, teller."tellId"  from teller 
-                INNER JOIN d_category_teller 
+SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending from (select random() AS o, teller."tellId"  from teller
+                INNER JOIN d_category_teller
                     on teller."tellId"=d_category_teller."tellId"
                 INNER JOIN category
                     on d_category_teller."catId"=category."catId" where
                     (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1/*Activo*/ )  f
-                
+
                 LEFT JOIN (select  "tellId",count(*) AS "nroCallPending" from appointment_temp  where "apptmState"='1'/*ACTIVO*/GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroCallPending ASC, o ASC limit 1;
-            
+
 
             select * from category
+        on d_category_teller."catId"=category."catId"
+        and (select "catNameLong" from category where "catId"=42) like concat("catNameLong",'%')  ORDER BY o ASC*/
+
+CREATE TABLE videos(
+    "vidId" SERIAL PRIMARY KEY,
+    "vidName" VARCHAR(200),
+    "vidLink" VARCHAR(500),
+    "vidState" char(5), /*Habilitado, Deshabilitado*/
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+
+CREATE TABLE cards(
+    "cardId" SERIAL PRIMARY KEY,
+    "cardName" VARCHAR(200),
+    "cardPhrases" VARCHAR(500),
+    "cardState" char(5), /*Habilitado, Deshabilitado*/
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
