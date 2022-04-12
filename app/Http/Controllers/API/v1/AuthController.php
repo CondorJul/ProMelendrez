@@ -54,6 +54,16 @@ class AuthController extends Controller
             'data'=>User::where('id', $user->id)->with('person')->get()
         ], 200);
     }
+    public function changePassword(Request $request, $id ){
+        $user=User::where('id', $id)
+        ->update(['password'=>bcrypt($request->newPassword)]);
+        
+        return response()->json([
+            'res' => true,
+            'msg' => 'Contraseña actualizada correctamente',
+            "data"=> $user
+        ],200);
+    }
 
     public function find($id){
         $user=User::where('id', $id)->with('person')->get()->first();
@@ -85,7 +95,7 @@ class AuthController extends Controller
 
 
     public function signIn(SignInRequest $request){
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->with('person')->with('tellers')->first();
  
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -101,6 +111,7 @@ class AuthController extends Controller
             'user'=>$user
         ]);
     }
+
     public function signOut(Request $request){
         $request->user()->currentAccessToken()->delete();
         return response()->json([

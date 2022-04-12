@@ -46,5 +46,8 @@ class User extends Authenticatable
         return $this->belongsTo(Person::class, 'perId', 'perId');
     }    
 
+    public function tellers(){
+        return $this->hasMany(Teller::class, 'userId', 'id');
+    }
 
 }

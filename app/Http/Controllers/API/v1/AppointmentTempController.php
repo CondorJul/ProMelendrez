@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\appointment_temp\AddAppointmentTempRequest;
 use App\Models\AppointmentTemp;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AppointmentTempController extends Controller
@@ -33,9 +35,15 @@ class AppointmentTempController extends Controller
             array_push($params,$request->tellId );
         } 
  
-        if($request->catId){
+        if($request->catId>0){
             $queryWhere.='and "catId"=?';
             array_push($params,$request->catId );
+        }
+
+        if($request->apptmState){
+            $queryWhere.='and "apptmState"=?';
+            array_push($params,$request->apptmState );
+            
         }
 
         $data=AppointmentTemp::select()
@@ -43,7 +51,7 @@ class AppointmentTempController extends Controller
             ->addSelect(DB::raw(' EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" '))
             ->with('teller')
             ->with('category')
-            ->whereRaw('"apptmState"=1 '.$queryWhere,[$params])
+            ->whereRaw(' 1=1 '.$queryWhere,[$params])
             //->where('apptmState', 1)
             ->orderBy("elapsedSeconds", 'DESC')
             
@@ -91,7 +99,7 @@ class AppointmentTempController extends Controller
             ->addSelect(DB::raw(' EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" '))
             ->with('teller')
             ->with('category')
-            ->where('apptmId', 1)
+            ->where('apptmId', $a->apptmId)
             ->get()//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateStartAttention") as "elapsedSecondsStartAttention", EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmId"=? order by "elapsedSeconds" DESC limit 1',[$a->apptmId])
         ],200);
     }
@@ -223,6 +231,35 @@ class AppointmentTempController extends Controller
         ],200);
     }
 
+    public function getNroTotal(Request $request){
+      $params=[];
+        $queryWhere='';
+        if($request->apptmState>0){
+            $queryWhere.='and "apptmState"=?';
+            array_push($params,$request->apptmState );
+        } 
+        if($request->tellId>0){
+            $queryWhere.='and "tellId"=?';
+            array_push($params,$request->tellId );
+        } 
+        if(!empty($queryWhere)){
+            $queryWhere=' where 1=1 '.$queryWhere;
+        }
+
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Leido correctamente.',
+            'data'=>DB::select('select count(*) as "nroTotal" from appointment_temp  ')
+
+        ],200); 
+/*
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Leido correctamente.',
+            'data'=>User::with('tellers')->get()
+
+        ],200);*/
+    }
 
 
 

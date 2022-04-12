@@ -73,4 +73,19 @@ class BusinessController extends Controller
     {
         return $user = Business::where('bussRUC', $request->bussRUC)->first();
     }
+    /*Añadido por Ricardo */
+    public function search(Request $request){
+        $l='%';
+        if($request->like){
+            $l='%'.$request->like.'%';
+        }
+
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Listado correctamente',
+            'data'=>Business::whereRaw(' "bussRUC" like ? or "bussName" like ? or "bussEmail" like ? ' ,[$l,$l,$l])
+                ->limit(50)
+                ->get()
+        ],200);
+    }
 }

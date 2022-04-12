@@ -311,8 +311,6 @@ DECLARE
     _catLinkBus int;
     
 BEGIN
-
-
     /*Obtenemos algunos datos de categoria*/
     select "catCode", "catLinkBus" INTO _catCode, _catLinkBus from category where "catId"=NEW."catId";
     NEW."catCode"=_catCode;
@@ -428,3 +426,16 @@ select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapse
 
       select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
 select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from appointment_temp where "tellId"=teller."tellId") from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
+
+
+SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending from (select random() AS o, teller."tellId"  from teller 
+                INNER JOIN d_category_teller 
+                    on teller."tellId"=d_category_teller."tellId"
+                INNER JOIN category
+                    on d_category_teller."catId"=category."catId" where
+                    (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1/*Activo*/ )  f
+                
+                LEFT JOIN (select  "tellId",count(*) AS "nroCallPending" from appointment_temp  where "apptmState"='1'/*ACTIVO*/GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroCallPending ASC, o ASC limit 1;
+            
+
+            select * from category

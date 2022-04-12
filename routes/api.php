@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\TellerController;
 use App\Http\Controllers\API\v1\PruebaController;
 use App\Models\Teller;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,8 +38,9 @@ Route::delete('v1/categories/{id}', [CategoryController::class, 'destroy']);
 Route::get('/v1/categories/search-by-code/{code}', [CategoryController::class, 'searchByCode']);
 
 
-
+Route::get('v1/business/search', [BusinessController::class, 'search']);
 Route::get('v1/business', [BusinessController::class, 'index']);
+
 
 /*Route::get('v1/prueba', [PruebaController::class, 'index']);
 Route::post('v1/prueba', [PruebaController::class, 'store']);
@@ -55,11 +57,13 @@ Route::post('registro', [AuthController::class, 'register']);
 Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
 //Route::post('v1/auth/signin', [AutenticarController::class, 'sign']);
 
+/* */
 
 /*Users */
 Route::get('v1/users', [AuthController::class, 'index']);
 Route::post('v1/users/add-user-with-person', [AuthController::class, 'addUserWithPerson']);
 Route::post('v1/users/exist-email', [AuthController::class, 'existEmail']);
+Route::put('v1/users/{id}/change-password', [AuthController::class, 'changePassword']);
 Route::put('v1/users/upd-user-with-person', [AuthController::class, 'updUserWithPerson']);
 Route::get('v1/users/{id}', [AuthController::class, 'find']);
 
@@ -83,6 +87,8 @@ Route::delete('/v1/tellers/{id}/detach-category/{catId}', [TellerController::cla
 /** */
 
 /*appointment_temp */
+
+Route::get('v1/appointment-temps/get-nro-total', [AppointmentTempController::class, 'getNroTotal']);
 Route::get('v1/appointment-temps/get-all-by', [AppointmentTempController::class, 'getAllBy']);
 Route::post('v1/appointment-temps', [AppointmentTempController::class, 'store']);
 Route::get('v1/appointment-temps', [AppointmentTempController::class, 'index']);
