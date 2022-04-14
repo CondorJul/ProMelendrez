@@ -234,22 +234,20 @@ class AppointmentTempController extends Controller
     public function getNroTotal(Request $request){
       $params=[];
         $queryWhere='';
-        if($request->apptmState>0){
+        if($request->apptmState){
             $queryWhere.='and "apptmState"=?';
             array_push($params,$request->apptmState );
         } 
-        if($request->tellId>0){
+        if($request->tellId){
             $queryWhere.='and "tellId"=?';
             array_push($params,$request->tellId );
         } 
-        if(!empty($queryWhere)){
-            $queryWhere=' where 1=1 '.$queryWhere;
-        }
+     
 
         return response()->json([
             'res'=>true,
             'msg'=>'Leido correctamente.',
-            'data'=>DB::select('select count(*) as "nroTotal" from appointment_temp  ')
+            'data'=>DB::select('select count(*) as "nroTotal" from appointment_temp  where 1=1 '.$queryWhere, $params)
 
         ],200); 
 /*
