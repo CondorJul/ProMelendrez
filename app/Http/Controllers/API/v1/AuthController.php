@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\auth\AddUserWithPersonRequest;
+use App\Http\Requests\auth\ChangePassworWithAuthdRequest;
 use App\Http\Requests\auth\ExistEmailRequest;
 use App\Http\Requests\auth\SignInRequest;
 use App\Http\Requests\auth\RegisterRequest;
@@ -19,7 +20,7 @@ class AuthController extends Controller
  
     /**Gestion de de usuario  */
     public function index(){
-        return User::with('person')->get();
+        return User::with('person')->with('roles')->get();
     }
 
     public function addUserWithPerson(AddUserWithPersonRequest $request)
@@ -31,27 +32,41 @@ class AuthController extends Controller
         $user->perId=$person->perId;
         $user->password = bcrypt($request->password);
         $user->save();
+
+        $r=array();
+        foreach($request->roles as $t){
+            array_push($r, $t['name']);
+        }
+        $user->syncRoles($r);
+        
         return response()->json([
             'res' => true,
             'msg' => 'Usuario registrado con exito',
-            'data'=>User::where('id', $user->id)->with('person')->get()
+            'data'=>User::where('id', $user->id)->with('person')->with('roles')->get()
         ], 200);
     }
 
     public function updUserWithPerson(UpdUserWithPersonRequest $request){
-      
-       
+  
         $person = Person::where('perId', $request->person['perId'])
             ->update($request->person);
+
     
         $user = User::where('id',$request->id)->first();
         $user->name = $request->person['perName'];
         $user->email = $request->email;
         $user->save();
+
+        $r=array();
+        foreach($request->roles as $t){
+            array_push($r, $t['name']);
+        }
+        $user->syncRoles($r);
+
         return response()->json([
             'res' => true,
             'msg' => 'Usuario actualizado con exito',
-            'data'=>User::where('id', $user->id)->with('person')->get()
+            'data'=>User::where('id', $user->id)->with('person')->with('roles')->get()
         ], 200);
     }
     public function changePassword(Request $request, $id ){
@@ -66,7 +81,7 @@ class AuthController extends Controller
     }
 
     public function find($id){
-        $user=User::where('id', $id)->with('person')->get()->first();
+        $user=User::where('id', $id)->with('person')->with('roles')->get()->first();
         return response()->json([
             'res' => true,
             'msg' => 'Selección correcta',
@@ -96,6 +111,7 @@ class AuthController extends Controller
 
     public function signIn(SignInRequest $request){
         $user = User::where('email', $request->email)->with('person')->with('tellers')->first();
+
  
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -104,6 +120,11 @@ class AuthController extends Controller
         }
      
         $token=$user->createToken($request->email)->plainTextToken;
+        $permissions=[];
+        foreach($user->getPermissionsViaRoles() as $p){
+            $permissions[$p->name]=$p;
+        }
+        $user['permissions']=$permissions;
 
         return  response()->json([
             'res'=>true,
@@ -117,6 +138,24 @@ class AuthController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Token Eliminado Correctamente.'
+        ], 200);
+    }
+
+    public function changePasswordWithAuth(ChangePassworWithAuthdRequest $request){
+        $user=User::where('id', $request->user()->id)->first();
+
+        if (! $user || ! Hash::check($request->passwordOld, $user->password)) {
+            throw ValidationException::withMessages([
+                'msg' => ['La contraseña actual es incorrecta.'],
+            ]);
+        }        
+        
+        $user->password = bcrypt($request->passwordNew);
+        $user->save();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Contraseña cambiado correctamente.'
         ], 200);
     }
 

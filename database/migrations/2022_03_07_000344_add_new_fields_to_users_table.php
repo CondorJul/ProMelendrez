@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('birthday')->after('contact');
             $table->tinyInteger('status')->default(1)->after('birthday');
             */
+            $table->tinyInteger('status')->default(1);
             $table->integer('perId')->after('password');
         });
     }

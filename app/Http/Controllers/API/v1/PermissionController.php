@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Test;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 
 
-class TestController extends Controller
+class PermissionController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        //return Test::all();   
-
-        return ['user'=>auth('sanctum')->user()->with('permissions')];
-        
-        
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Listado correctamente',
+            'data'=>Permission::all()
+        ],200);  
     }
 
     /**

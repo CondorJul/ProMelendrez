@@ -20,7 +20,7 @@ class CategoryController extends Controller
     {
         return Category::find($id);
     }
-
+   
     public function searchByCode($code)
     {
         return Category::where('catCode', $code)->first();
@@ -38,6 +38,12 @@ class CategoryController extends Controller
         /*Category::create(["catCode"=>'34',
     "catName"=>"fjasdfjñlasd"]);*/
     }
+
+    public function allByHQ(Request $request)
+    {
+        return Category::where('hqId', $request->hqId)->get();
+    }
+
 
     /**
      * Store a newly created resource in storage.
