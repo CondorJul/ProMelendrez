@@ -30,6 +30,10 @@ class AppointmentTempController extends Controller
         
         $params=[];
         $queryWhere='';
+
+        $queryWhere.='and "hqId" = ?';
+        array_push($params, (empty($request->hqId))?0:$request->hqId);
+
         if($request->tellId>0){
             $queryWhere.='and "tellId"=?';
             array_push($params,$request->tellId );
@@ -201,6 +205,7 @@ class AppointmentTempController extends Controller
                 ->with('teller')
                 ->with('category')
                 ->where('apptmState','>', 1)
+                ->where('hqId','=', $request->hqId)
                 ->orderBy( 'apptmDateStartAttention' ,'DESC' )
                 ->limit($request->limit)
                 ->get()

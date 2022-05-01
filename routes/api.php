@@ -2,18 +2,23 @@
 
 use App\Http\Controllers\API\v1\AuthController;
 use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\v1\AppointmentController;
 use App\Http\Controllers\API\v1\AppointmentTempController;
 use App\Http\Controllers\API\v1\BusinessController;
 use App\Http\Controllers\API\v1\CardsController;
 use App\Http\Controllers\API\v1\CategoryController;
+use App\Http\Controllers\API\v1\DashboardController;
 use App\Http\Controllers\API\v1\PersonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\TellerController;
 use App\Http\Controllers\API\v1\PruebaController;
+use App\Http\Controllers\API\v1\RoleController;
+use App\Http\Controllers\API\v1\PermissionController;
 use App\Models\Teller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\API\v1\VideosController;
+use App\Http\Controllers\API\v1\HeadquarterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,9 +35,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('test', [TestController::class, 'index']);
+
+Route::get('test', [TestController::class, 'index'])->middleware(['auth:sanctum', 'can:/permissions']);;
+
 
 /*Categoria */
+Route::get('v1/categories/all-by-hq', [CategoryController::class, 'allByHQ']);
 Route::get('v1/categories/{id}', [CategoryController::class, 'find']);
 Route::get('v1/categories', [CategoryController::class, 'index']);
 Route::post('v1/categories', [CategoryController::class, 'store']);
@@ -53,6 +61,8 @@ Route::post('registro', [AuthController::class, 'register']);
 
 /*Autenticación*/
 Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
+Route::put('v1/auth/change-password-with-auth',[AuthController::class, 'changePasswordWithAuth'])->middleware(['auth:sanctum']);;
+
 //Route::post('v1/auth/signin', [AutenticarController::class, 'sign']);
 
 /* */
@@ -67,10 +77,14 @@ Route::get('v1/users/{id}', [AuthController::class, 'find']);
 
 /* Ventanilla*/
 Route::get('/v1/tellers/get-join-person', [TellerController::class, 'getJoinPerson']);
+Route::get('/v1/tellers/get-join-person-by-hq', [TellerController::class, 'getJoinPersonByHQ']);
 
+Route::get('v1/tellers/all-by-hq', [TellerController::class, 'allByHQ']);
 Route::get('v1/tellers/{id}', [TellerController::class, 'find']);
 Route::get('v1/tellers', [TellerController::class, 'index']);
 Route::post('v1/tellers', [TellerController::class, 'store']);
+Route::get('v1/tellers', [TellerController::class, 'index']);
+
 Route::put('v1/tellers', [TellerController::class, 'update']);
 Route::delete('v1/tellers/{id}', [TellerController::class, 'destroy']);
 Route::get('/v1/tellers/search-by-code/{code}', [TellerController::class, 'searchByCode']);
@@ -124,3 +138,40 @@ Route::post('v1/videos/add-videos', [VideosController::class, 'store']);
 
 /* Cards */
 Route::post('v1/cards/add-cards', [CardsController::class, 'store']);
+
+
+Route::group(['middleware'=>['auth:sactum']], function(){
+    
+});
+
+
+Route::get('v1/roles', [RoleController::class, 'index']);
+Route::get('v1/roles/{roleName}/permissions', [RoleController::class, 'getPermissions']);
+Route::put('v1/roles/{roleName}/sync-permissions', [RoleController::class, 'syncPermissions']);
+
+
+Route::post('v1/roles', [RoleController::class, 'store']);
+Route::put('v1/roles/{id}', [RoleController::class, 'update']);
+Route::delete('v1/roles/{id}', [RoleController::class, 'delete']);
+
+Route::get('v1/permissions', [PermissionController::class, 'index']);
+
+
+/*Headquarter */
+Route::get('/v1/headquarters', [HeadquarterController::class, 'index']);
+Route::get('/v1/headquarters/search-by-name/{name}', [HeadquarterController::class, 'searchByName']);
+
+Route::post('/v1/headquarters', [HeadquarterController::class, 'store']);
+Route::put('/v1/headquarters/{id}', [HeadquarterController::class, 'update']);
+Route::delete('/v1/headquarters/{id}', [HeadquarterController::class, 'destroy']);
+
+
+/*Dashboard */
+Route::get('/v1/dashboard/counter-cards', [DashboardController::class, 'getCounterCards']);
+
+
+
+/*Appointment */
+Route::get('/v1/appointments/get-all-by', [AppointmentController::class, 'getAllBy']);
+Route::get('/v1/appointments/getTellers', [AppointmentController::class, 'getTellers']);
+Route::get('/v1/appointments/getCategories', [AppointmentController::class, 'getCategories']);

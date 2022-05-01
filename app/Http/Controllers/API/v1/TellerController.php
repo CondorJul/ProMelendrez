@@ -40,6 +40,19 @@ class TellerController extends Controller
     "catName"=>"fjasdfjñlasd"]);*/
     }
 
+    public function allByHQ(Request $request)
+    {
+        /*return response()->json([
+            'status'=>200,
+            'data'=>Teller::all(),
+            'message'=>'Obtenido correctamente'
+        ], 200);*/
+
+        return Teller::where('hqId', $request->hqId)->get();
+        /*Teller::create(["catCode"=>'34',
+    "catName"=>"fjasdfjñlasd"]);*/
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -176,4 +189,15 @@ class TellerController extends Controller
         ]);
     }
 
+    public function getJoinPersonByHQ(Request $request){
+        /*DB::raw('select teller.*, person.*  from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"')*/
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Leido Correctamente',
+            'data'=>DB::select('select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending"  from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId" where teller."hqId"=?',[$request->hqId])
+        ]);
+    }
+
+
+    
 }

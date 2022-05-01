@@ -14,7 +14,7 @@ class Category extends Model
     protected $fillable = [
         'catCode', 'catName', 'catLinkBus',
         'catNameLong', 'catDescription',
-        'catAuth', 'catIdParent'
+        'catAuth', 'catIdParent', 'hqId'
     ];
 
     public function tellers(){
