@@ -4,7 +4,7 @@ namespace App\Http\Requests\videos;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class addVideosRequest extends FormRequest
+class updVideosRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class addVideosRequest extends FormRequest
     public function rules()
     {
         return [
-            'vidName' => 'required',
-            'vidLink' => 'required',
-            'vidState' => 'required'
+            "vidName" => "required",
+            "vidLink" => "required",
+            "vidState" => "required"
         ];
     }
 }

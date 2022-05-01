@@ -121,6 +121,13 @@ Route::post('v1/person/exist-dni', [PersonController::class, 'existDni']);
 /* Videos */
 Route::get('v1/videos', [VideosController::class, 'index']);
 Route::post('v1/videos/add-videos', [VideosController::class, 'store']);
+Route::put('v1/videos/upd-videos', [VideosController::class, 'update']);
+Route::delete('v1/videos/{vidId}', [VideosController::class, 'destroy']);
+Route::delete('v1/videos/stateVideo/{vidId}', [VideosController::class, 'stateVideo']);
 
 /* Cards */
+Route::get('v1/cards', [CardsController::class, 'index']);
 Route::post('v1/cards/add-cards', [CardsController::class, 'store']);
+Route::put('v1/cards/upd_cards', [CardsController::class, 'update']);
+Route::delete('v1/cards/{cardId}', [CardsController::class, 'destroy']);
+Route::delete('v1/cards/stateCards/{cardId}', [CardsController::class, 'stateCards']);

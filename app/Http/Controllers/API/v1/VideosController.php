@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\videos\addVideosRequest;
+use App\Http\Requests\videos\updVideosRequest;
 use App\Models\Videos;
 use Illuminate\Http\Request;
 
@@ -53,9 +54,18 @@ class VideosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(updVideosRequest $request)
     {
-        //
+        $videos = Videos::where('vidId', $request->vidId)->first();
+        $videos->vidName = $request->vidName;
+        $videos->vidLink = $request->vidLink;
+        $videos->vidState = $request->vidState;
+        $videos->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Video Actualizado correctamente',
+            'data' => Videos::where('vidId', $request->vidId)->get()
+        ], 200);
     }
 
     /**
@@ -66,6 +76,22 @@ class VideosController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $a = Videos::whereIn('vidId', explode(',', $id),)->delete();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Eliminado correctamente.',
+            'data' => $a
+        ], 200);
+    }
+
+    public function stateVideo($id)
+    {
+        $videos = Videos::where('vidId', $id)->first();
+        $videos->vidState = $videos->vidState == 1 ? "2" : "1";
+        $videos->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado Correctamente.',
+        ], 200);
     }
 }

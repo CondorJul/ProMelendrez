@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\cards\updCardsRequest;
 use App\Models\Cards;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class CardsController extends Controller
      */
     public function index()
     {
-        //
+        return Cards::all();
     }
 
     /**
@@ -52,9 +53,18 @@ class CardsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(updCardsRequest $request)
     {
-        //
+        $cards = Cards::where('cardId', $request->cardId)->first();
+        $cards->cardName = $request->cardName;
+        $cards->cardPhrases = $request->cardPhrases;
+        $cards->cardState = $request->cardState;
+        $cards->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Tarjeta Actualizado correctamente',
+            'data' => Cards::where('cardId', $request->cardId)->get()
+        ], 200);
     }
 
     /**
@@ -65,6 +75,22 @@ class CardsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $a = Cards::where('cardId', $id)->delete();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Eliminado correctamente.',
+            'data' => $a
+        ], 200);
+    }
+
+    public function stateCards($id)
+    {
+        $cards = Cards::where('cardId', $id)->first();
+        $cards->cardState = $cards->cardState == 1 ? "2" : "1";
+        $cards->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado Correctamente.',
+        ], 200);
     }
 }

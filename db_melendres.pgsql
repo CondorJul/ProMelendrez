@@ -433,7 +433,7 @@ select  count(*) AS nro_call_pending from appointment_temp  where "apptmState"='
 select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1
 
 
-      select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
+select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
 select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending" from appointment_temp where "tellId"=teller."tellId") from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId"
 
 
