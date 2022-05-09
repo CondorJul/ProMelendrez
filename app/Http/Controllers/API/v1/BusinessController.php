@@ -118,4 +118,15 @@ class BusinessController extends Controller
             'data' => Business::where('bussId', $business->bussId)->with('person')->get()
         ], 200);
     }
+
+    public function viewBusinessPerson($id)
+    {
+        //Business::with('person')->get();
+        $a = Business::where('bussId', $id)->get();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Correcto.',
+            'data' => $a
+        ], 200);
+    }
 }
