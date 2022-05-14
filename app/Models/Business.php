@@ -19,6 +19,8 @@ class Business extends Model
         'bussSunatPass',
         'bussCodeSend',
         'bussCodeRNP',
+        'bussAfpUser',
+        'bussAfpPass',
         'bussDateMembership',
         'bussDateStartedAct',
         'bussState',

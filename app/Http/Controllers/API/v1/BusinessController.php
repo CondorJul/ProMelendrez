@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\business\AddBusinessWithPersonRequest;
 use App\Http\Requests\business\ExistFileNumberRequest;
 use App\Http\Requests\business\ExistRucRequest;
-use App\Http\Resources\bussinesResource;
+use App\Http\Requests\business\updAdiDataRequest;
+use App\Http\Requests\business\updAfiDataRequest;
+use App\Http\Requests\business\updBussDataRequest;
+use App\Http\Requests\business\updPerDataRequest;
 use Illuminate\Http\Request;
 use App\Models\Business;
 use App\Models\Person;
@@ -122,11 +125,78 @@ class BusinessController extends Controller
     public function viewBusinessPerson($id)
     {
         //Business::with('person')->get();
-        $a = Business::where('bussId', $id)->get();
+        return Business::with('person')->where('bussId', $id)->get();
+    }
+
+    public function updateBusinessData(updBussDataRequest $request)
+    {
+        $bussData = Business::where('bussId', $request->bussId)->first();
+        $bussData->bussKind = $request->business['bussKind'];
+        $bussData->bussName = $request->business['bussName'];
+        $bussData->bussRUC = $request->business['bussRUC'];
+        $bussData->bussAddress = $request->business['bussAddress'];
+        $bussData->bussFileKind = $request->business['bussFileKind'];
+        $bussData->bussFileNumber = $request->business['bussFileNumber'];
+        $bussData->bussState = $request->business['bussState'];
+        $bussData->save();
         return response()->json([
             'res' => true,
-            'msg' => 'Correcto.',
-            'data' => $a
+            'msg' => 'Datos de Negocio Actualizado',
+            'data' => Business::where('bussId', $request->bussId)->get()
+        ], 200);
+    }
+
+    public function updatePersonData(updPerDataRequest $request)
+    {
+        $business = Business::where('bussId', $request->bussId)->first();
+        $person = new Person();
+        $person->perKindDoc = $request->person['perKindDoc'];
+        $person->perName = $request->person['perName'];
+        $person->perNumberDoc = $request->person['perNumberDoc'];
+        $person->perAddress = $request->person['perAddress'];
+        $person->perTel = $request->person['perTel'];
+        $person->perEmail = $request->person['perEmail'];
+        $person->perId = $business->perId;
+        $person->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Datos de Persona Actualizado',
+            'data' => Business::where('bussId', $request->bussId)->with('person')->get()
+        ], 200);
+    }
+
+    public function updateAfiliationData(updAfiDataRequest $request)
+    {
+        $afiData = Business::where('bussId', $request->bussId)->first();
+        $afiData->bussSunatUser = $request->afiliation['bussSunatUser'];
+        $afiData->bussSunatPass = $request->afiliation['bussSunatPass'];
+        $afiData->bussCodeSend = $request->afiliation['bussCodeSend'];
+        $afiData->bussCodeRNP = $request->afiliation['bussCodeRNP'];
+        $afiData->bussAfpUser = $request->afiliation['bussAfpUser'];
+        $afiData->bussAfpPass = $request->afiliation['bussAfpPass'];
+        $afiData->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Datos de Afiliacion Actualizado',
+            'data' => Business::where('bussId', $request->bussId)->get()
+        ], 200);
+    }
+
+    public function updateAditionalData(updAdiDataRequest $request)
+    {
+        $adiData = Business::where('bussId', $request->bussId)->first();
+        $adiData->bussDateMembership = $request->aditional['bussDateMembership'];
+        $adiData->bussDateStartedAct = $request->aditional['bussDateStartedAct'];
+        $adiData->bussRegime = $request->aditional['bussRegime'];
+        $adiData->bussKindBookAcc = $request->aditional['bussKindBookAcc'];
+        $adiData->bussTel = $request->aditional['bussTel'];
+        $adiData->bussEmail = $request->aditional['bussEmail'];
+        $adiData->bussObservation = $request->aditional['bussObservation'];
+        $adiData->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Datos Adicionales Actualizado',
+            'data' => Business::where('bussId', $request->bussId)->get()
         ], 200);
     }
 }

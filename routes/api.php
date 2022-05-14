@@ -61,7 +61,7 @@ Route::post('registro', [AuthController::class, 'register']);
 
 /*Autenticación*/
 Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
-Route::put('v1/auth/change-password-with-auth',[AuthController::class, 'changePasswordWithAuth'])->middleware(['auth:sanctum']);;
+Route::put('v1/auth/change-password-with-auth', [AuthController::class, 'changePasswordWithAuth'])->middleware(['auth:sanctum']);;
 
 //Route::post('v1/auth/signin', [AutenticarController::class, 'sign']);
 
@@ -128,6 +128,11 @@ Route::get('v1/bussines', [BusinessController::class, 'index']);
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
 Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
 Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson']);
+Route::get('/v1/business/{bussId}', [BusinessController::class, 'viewBusinessPerson']);
+Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusinessData']);
+Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData']);
+Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData']);
+Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData']);
 
 /* Person*/
 Route::post('v1/person/exist-dni', [PersonController::class, 'existDni']);
@@ -147,8 +152,7 @@ Route::delete('v1/cards/{cardId}', [CardsController::class, 'destroy']);
 Route::delete('v1/cards/stateCards/{cardId}', [CardsController::class, 'stateCards']);
 
 
-Route::group(['middleware'=>['auth:sactum']], function(){
-    
+Route::group(['middleware' => ['auth:sactum']], function () {
 });
 
 

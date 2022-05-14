@@ -11,10 +11,10 @@ class Person extends Model
     protected $primaryKey = 'perId';
     protected $table = 'person';
     protected $fillable = [
-        'perKindDoc', 
+        'perKindDoc',
         'perNumberDoc',
         'perName',
-        'perAadress',
+        'perAddress',
         'perTel',
         'perEmail'
     ];
