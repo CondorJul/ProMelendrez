@@ -125,7 +125,7 @@ Route::get('v1/appointment-temps/get-all', [AppointmentTempController::class, 'g
 
 
 
-Route::put('v1/appointment-temps/start-call-by-teller', [AppointmentTempController::class, 'startCallByTeller'])->middleware(['cors']);
+Route::put('v1/appointment-temps/start-call-by-teller', [AppointmentTempController::class, 'startCallByTeller']);
 
 Route::put('v1/appointment-temps/{apptmId}/undo-call', [AppointmentTempController::class, 'undoCall']);
 Route::put('v1/appointment-temps/{apptmId}/call-again', [AppointmentTempController::class, 'callAgain']);
@@ -135,7 +135,7 @@ Route::put('v1/appointment-temps/{apptmId}/transfer-call-to-teller', [Appointmen
 
 
 
-Route::put('v1/appointment-temps/{ids}/teller/', [AppointmentTempController::class, 'updateTeller']);
+Route::put('v1/appointment-temps/{ids}/teller', [AppointmentTempController::class, 'updateTeller']);
 
 
 
