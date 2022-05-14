@@ -334,4 +334,27 @@ class AppointmentTempController extends Controller
             'data'=> $a,
         ],200);
     }
+
+    public function migrateTickets(Request $request){
+        $day='yesterday';  
+        if(filter_var($request->migrateToday, FILTER_VALIDATE_BOOLEAN)){
+            $day='today';
+        }
+      
+
+        $a=AppointmentTemp::select()
+        ->addSelect(DB::raw("'".$day."'::date as d"))
+        ->addSelect(DB::raw("date(created_at)"))
+        ->where('hqId',$request->hqId)
+            ->where('apptmState','>','2')
+            ->where(DB::raw("date(created_at)"),'<=',DB::raw("'".$day."'::date;"))
+            ->delete();
+
+            return  response()->json([
+                'res'=>true,
+                'msg'=>'Se han migrado '.$a.' registros.',
+                'data'=>[]
+            ],200);;
+
+    }
 }
