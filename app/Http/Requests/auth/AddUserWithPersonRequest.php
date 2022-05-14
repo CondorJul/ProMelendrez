@@ -25,6 +25,8 @@ class AddUserWithPersonRequest extends FormRequest
     {
         return [
             'email' => 'required|email|unique:users,email',
+//            'name' => 'required|email|unique:users,email',
+
             'password' => 'required',
             'person.perKindDoc'=> 'required', 
             'person.perNumberDoc'=>'required',

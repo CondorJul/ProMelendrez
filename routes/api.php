@@ -30,6 +30,18 @@ use App\Http\Controllers\API\v1\HeadquarterController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/storage-link-public', function(){
+    $target = storage_path('app/public');
+    $link = public_path('/storage');
+    symlink($target, $link);
+    echo "symbolic link created successfully";
+});
+Route::get('/storage-link-profile-images', function(){
+    $target = storage_path('app/private/profile-images');
+    $link = public_path('/strg/api/s/profile-images');
+    symlink($target, $link);
+    echo "symbolic link created successfully";
+});
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -62,6 +74,7 @@ Route::post('registro', [AuthController::class, 'register']);
 /*Autenticación*/
 Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
 Route::put('v1/auth/change-password-with-auth', [AuthController::class, 'changePasswordWithAuth'])->middleware(['auth:sanctum']);;
+Route::post('v1/auth/upload-profile-image-with-auth',[AuthController::class, 'uploadProfileImageWithAuth'])->middleware(['auth:sanctum']);;
 
 //Route::post('v1/auth/signin', [AutenticarController::class, 'sign']);
 
@@ -99,6 +112,8 @@ Route::delete('/v1/tellers/{id}/detach-category/{catId}', [TellerController::cla
 /** */
 
 /*appointment_temp */
+Route::delete('v1/appointment-temps/migrate-tickets', [AppointmentTempController::class, 'migrateTickets']);
+
 
 Route::get('v1/appointment-temps/get-nro-total', [AppointmentTempController::class, 'getNroTotal']);
 Route::get('v1/appointment-temps/get-all-by', [AppointmentTempController::class, 'getAllBy']);
@@ -120,6 +135,7 @@ Route::put('v1/appointment-temps/{apptmId}/transfer-call-to-teller', [Appointmen
 
 
 Route::put('v1/appointment-temps/{ids}/teller/', [AppointmentTempController::class, 'updateTeller']);
+
 
 
 

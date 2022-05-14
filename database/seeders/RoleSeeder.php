@@ -34,12 +34,12 @@ class RoleSeeder extends Seeder
     Permission::create(['name_to_see' => 'Eliminar cliente', 'name'=>'SI_CLIENTS_DEL', 'guard_name'=>'web' ])->syncRoles([$roleA,$roleC]);
     
     /*Linea de espera*/
-    Permission::create(['name_to_see' => 'Atención', 'name'=>'SI_CALLS_SEE',  'guard_name'=>'web' ])->syncRoles([$roleA,$roleC]);;
-    Permission::create(['name_to_see' => 'Tickets',  'name'=>'SI_TICKETS_SEE', 'guard_name'=>'web'])->syncRoles([$roleA,$roleC]);;
-    Permission::create(['name_to_see' => 'Ventanillas',  'name'=>'SI_TELLERS_SEE', 'guard_name'=>'web'])->syncRoles([$roleC]);;
-    Permission::create(['name_to_see' => 'Categorias',  'name'=>'SI_CATEGORIES_SEE', 'guard_name'=>'web'])->syncRoles([$roleA,$roleC]);;
-    Permission::create(['name_to_see' => 'Videos',  'name'=>'SI_VIDEOS_SEE', 'guard_name'=>'web'])->syncRoles([$roleA,$roleC]);;
-    Permission::create(['name_to_see' => 'Tarjetas',  'name'=>'SI_CARDS_SEE', 'guard_name'=>'web'])->syncRoles([$roleC]);;
+    Permission::create(['name_to_see' => 'Atención', 'name'=>'SI_CALLS_SEE',  'guard_name'=>'web' ])->syncRoles([$roleSA,$roleA,$roleC]);;
+    Permission::create(['name_to_see' => 'Tickets',  'name'=>'SI_TICKETS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA, $roleA,$roleC]);;
+    Permission::create(['name_to_see' => 'Ventanillas',  'name'=>'SI_TELLERS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA, $roleC]);;
+    Permission::create(['name_to_see' => 'Categorias',  'name'=>'SI_CATEGORIES_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA, $roleA,$roleC]);;
+    Permission::create(['name_to_see' => 'Videos',  'name'=>'SI_VIDEOS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA,$roleA,$roleC]);;
+    Permission::create(['name_to_see' => 'Tarjetas',  'name'=>'SI_CARDS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA, $roleA,$roleC]);;
 
     /*Reportes*/
     Permission::create(['name_to_see' => 'Reporte de linea de espera',  'name'=>'SI_REPORT_WAITING_LINE','guard_name'=>'web'])->syncRoles([$roleA,$roleC]);;
@@ -52,10 +52,11 @@ class RoleSeeder extends Seeder
     Permission::create(['name_to_see' => 'Eliminar sedes', 'name'=>'SI_HEADQUARTER_DEL', 'guard_name'=>'web' ])->syncRoles([$roleSA]);
     
     /*Usuarios */
-    Permission::create(['name_to_see' => 'Ver usuario', 'name'=>'SI_USERS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA,$roleA ]);
-    /*Permission::create(['name_to_see' => 'Crear Usuario'])->syncRoles([$roleSA,$roleA ]);
-    Permission::create(['name_to_see' => 'Editar Usuario'])->syncRoles([$roleSA,$roleA ]);
-    Permission::create(['name_to_see' => 'Eliminar Usuario'])->syncRoles([$roleSA,$roleA ]);*/
+    Permission::create(['name_to_see' => 'Ver usuario', 'name'=>'SI_USERS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA]);
+    Permission::create(['name_to_see' => 'Crear Usuario', 'name'=>'SI_USERS_ADD', 'guard_name'=>'web'])->syncRoles([$roleSA ]);
+    Permission::create(['name_to_see' => 'Editar Usuario', 'name'=>'SI_USERS_UPD', 'guard_name'=>'web'])->syncRoles([$roleSA]);
+    Permission::create(['name_to_see' => 'Eliminar Usuario', 'name'=>'SI_USERS_DEL', 'guard_name'=>'web'])->syncRoles([$roleSA]);
+
     Permission::create(['name_to_see' => 'Ver permisos', 'name'=>'SI_PERMISSIONS_SEE', 'guard_name'=>'web'])->syncRoles([$roleSA]);
    
     Permission::create(['name_to_see' => 'Añadir permisos', 'name'=>'SI_PERMISSIONS_ADD', 'guard_name'=>'web'])->syncRoles([$roleSA]);
@@ -73,8 +74,8 @@ class RoleSeeder extends Seeder
     
     User::create([
         "name" => "p",
-        "email" => "admin@melendres.com",
-        "password" => bcrypt("1234"),
+        "email" => "holding.melendres@gmail.com",
+        "password" => bcrypt("Melendres10"),
         "perId"=>1,
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')

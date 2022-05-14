@@ -22,6 +22,7 @@ return new class extends Migration
             $table->tinyInteger('status')->default(1)->after('birthday');
             */
             $table->tinyInteger('status')->default(1);
+            $table->string('img',50)->nullable();
             $table->integer('perId')->after('password');
         });
     }
