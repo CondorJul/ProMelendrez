@@ -133,14 +133,15 @@ class AppointmentTempController extends Controller
         $a->update([
             'apptmState'=>$request->apptmState,/*Atendido */
             'apptmDateFinishAttention'=>DB::raw('now()'), 
-            'apptmComment'=>$request->apptmComment
-            //"apptmTel" varchar(12),
-            //"apptmEmail" varchar(50),
+            'apptmComment'=>$request->apptmComment,
+            'apptmNameClient'=>$request->apptmNameClient,
+            'apptmTel' =>$request->apptmTel,
+            'apptmEmail'=>$request->apptmEmail
         ]);
 
         return response()->json([
             'res'=>true,
-            'msg'=>'Listado correctamente',
+            'msg'=>'Atención finalizada correctamente.',
             'data'=>''
         ],200);
 

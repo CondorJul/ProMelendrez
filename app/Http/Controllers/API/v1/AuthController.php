@@ -181,10 +181,28 @@ class AuthController extends Controller
         
         $data=array(
             'res' => true,
-            'msg' =>$request->file('profileImage')
+            'msg' =>"Actualizado correctamente. Iniciar sesión nuevamente para aplicar los cambios."
         );
         return response()->json($data,200);
 
+  
+    }
+
+    public function updUserWithPersonWithAuth(Request $request){
+        $user=User::where('id', $request->user()->id)->first();
+
+        $person = Person::where('perId', $user->perId)
+            ->update($request->person);
+    
+        $user->name = $request->person['perName'];
+        $user->email = $request->email;
+        $user->save();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Tu perfil se ha actualizado correctamente. Iniciar sesión nuevamente para aplicar los cambios.',
+            'data'=>User::where('id', $user->id)->with('person')->with('roles')->get()
+        ], 200);
   
     }
     

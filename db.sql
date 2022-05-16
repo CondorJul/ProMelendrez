@@ -1,3 +1,6 @@
+
+/*ALTER DATABASE melendres SET timezone TO 'America/Lima';*/
+
 /*Tablas generales*/
 CREATE TABLE "person"(
     "perId" SERIAL PRIMARY KEY,
@@ -232,6 +235,10 @@ CREATE TABLE "bussines"(
 
     "bussCodeSend" varchar(20),
     "bussCodeRNP" varchar(20),
+
+    /*Bus AFP*/
+    "bussAfpUser" varchar(20),
+    "bussAfpPass" varchar(20),
     /*Fin*/
 
 
@@ -262,6 +269,7 @@ CREATE TABLE "bussines"(
     "updated_at" timestamp,
     "created_at" timestamp
 );
+
 
 
 create table controlExercise(

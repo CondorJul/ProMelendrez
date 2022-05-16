@@ -15,7 +15,7 @@ class AppointmentTemp extends Model
         'apptmTicketCode', 
         'apptmDateTimePrint',
         'apptmSendFrom',
-
+        
         'apptKindClient',
         'perId',
         'bussId',
@@ -29,7 +29,11 @@ class AppointmentTemp extends Model
         'apptmDateStartAttention',
         'apptmNroCalls',
 
-        'apptmTransfer'
+        'apptmTransfer',
+        'apptmNameClient',
+        'apptmTel',
+        'apptmEmail',
+        'apptmComment'
     ];
 
     public function teller(){

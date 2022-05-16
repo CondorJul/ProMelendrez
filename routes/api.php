@@ -75,6 +75,8 @@ Route::post('registro', [AuthController::class, 'register']);
 Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
 Route::put('v1/auth/change-password-with-auth', [AuthController::class, 'changePasswordWithAuth'])->middleware(['auth:sanctum']);;
 Route::post('v1/auth/upload-profile-image-with-auth',[AuthController::class, 'uploadProfileImageWithAuth'])->middleware(['auth:sanctum']);;
+Route::put('v1/auth/upd-user-with-person-with-auth', [AuthController::class, 'updUserWithPersonWithAuth'])->middleware(['auth:sanctum']);
+
 
 //Route::post('v1/auth/signin', [AutenticarController::class, 'sign']);
 

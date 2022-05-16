@@ -91,8 +91,10 @@ class CategoryController extends Controller
         $category->catCode = $request->catCode;
         $category->catName = $request->catName;
         //$category->catNameLong=$request->catNameLong;
+        $category->catLinkBus=$request->catLinkBus;
         $category->catDescription = $request->catDescription;
         $category->catAuth = $request->catAuth;
+
         $category->catIdParent = $request->catIdParent;
         $category->save();
         return response()->json([
