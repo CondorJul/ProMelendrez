@@ -373,12 +373,14 @@ DECLARE
     _catCode varchar(10);
     _catLinkBus int;
     _hqId integer;
-
+_nroApptmStatePending int;
+_nroApptmStateCurrent int;
+_nroApptmStateAttended int;
 
 BEGIN
     /*Obtenemos algunos datos de categoria*/
     select "catCode", "catLinkBus", "hqId" INTO _catCode, _catLinkBus, _hqId from category where "catId"=NEW."catId";
-    NEW."catCode"=_catCode;
+    NEW."catCode":=_catCode;
     NEW."hqId":=_hqId;
     /*si esta vinculado a busi*/
 
@@ -394,21 +396,44 @@ BEGIN
         IF _catLinkBus=1 THEN
             select "tellState", "tellId" into _tellState, _tellId   from teller where "tellId"=(select "tellId" from bussines where "bussId"=NEW."bussId");
             IF _tellState=1 THEN
-                NEW."tellId"=_tellId;
+                NEW."tellId":=_tellId;
             END IF;
         END IF;
 
         IF NEW."tellId" is null  THEN
-            SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending into _o, _tellId, _nroCallPending 
+          /*  SELECT o, f."tellId", COALESCE("nroCallPending" ,0) as nroCallPending into _o, _tellId, _nroCallPending 
                 from (
                     select random() AS o, teller."tellId"  from teller
                         INNER JOIN d_category_teller
                             on teller."tellId"=d_category_teller."tellId"
                         INNER JOIN category
                             on d_category_teller."catId"=category."catId" where
-                            (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1/*Activo*/ and teller."hqId"=_hqId )  f
+                            (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1 and teller."hqId"=_hqId )  f
 
-                LEFT JOIN (select  "tellId",count(*) AS "nroCallPending" from appointment_temp  where "apptmState"='1'/*ACTIVO*/GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroCallPending ASC, o ASC limit 1;
+                LEFT JOIN (select  "tellId",count(*) AS "nroCallPending" from appointment_temp  where "apptmState"='1'/GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroCallPending ASC, o ASC limit 1;
+        */
+        SELECT o, f."tellId", 
+COALESCE("nroApptmStatePending" ,0) as nroApptmStatePending,
+COALESCE("nroApptmStateCurrent" ,0) as nroApptmStateCurrent,
+COALESCE("nroApptmStateAttended" ,0) as nroApptmStateAttended
+into
+ _o, _tellId, _nroApptmStatePending ,_nroApptmStateCurrent,_nroApptmStateAttended
+                from (
+                    select random() AS o, teller."tellId"  from teller
+                        INNER JOIN d_category_teller
+                            on teller."tellId"=d_category_teller."tellId"
+                        INNER JOIN category
+                            on d_category_teller."catId"=category."catId" where
+                            (select "catNameLong" from category where "catId"=new."catId") like concat("catNameLong",'%') and teller."tellState"=1 and teller."hqId"=_hqId )  f
+
+                LEFT JOIN (select  "tellId",
+                sum(case when "apptmState"=1 then 1 else 0 end) as "nroApptmStatePending", 
+                    sum(case when "apptmState"=2 then 1 else 0 end) as "nroApptmStateCurrent",
+                    sum(case when "apptmState"=3 then 1 else 0 end) as "nroApptmStateAttended"
+                
+                 from appointment_temp  GROUP BY "tellId")  s on f."tellId"=s."tellId"  ORDER BY nroApptmStatePending ASC, nroApptmStateCurrent ASC, nroApptmStateAttended, o ASC limit 1;
+
+
 
             /*Verificamos que exi*/
             IF _tellId IS NULL THEN
@@ -416,19 +441,19 @@ BEGIN
             END  IF;
             NEW."tellId":=_tellId;
         END IF;
-        select random() AS o, teller."tellId" INTO _o, _tellId from teller
+        /*select random() AS o, teller."tellId" INTO _o, _tellId from teller
             INNER JOIN d_category_teller
                 on teller."tellId"=d_category_teller."tellId"
             INNER JOIN category
                 on d_category_teller."catId"=category."catId"
-                and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%') and teller."hqId"=_hqId /*Por siacaso*/ ORDER BY o ASC;
-
+                and (select "catNameLong" from category where "catId"=NEW."catId") like concat("catNameLong",'%') and teller."hqId"=_hqId  ORDER BY o ASC;
+                */
         /*Verificamos que exi*/
         NEW."tellId":=_tellId;
     END IF;
     /*Generamos el codigo */
     select COALESCE(max("apptmNro"), 0) into _maxApptmNro from appointment_temp where "catId"=NEW."catId" and CAST(created_at as date)=CAST(now() AS date);
-    NEW."apptmNro"=_maxApptmNro+1;
+    NEW."apptmNro":=_maxApptmNro+1;
 
 RETURN NEW;
 END;
