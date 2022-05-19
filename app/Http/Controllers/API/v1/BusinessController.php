@@ -148,20 +148,18 @@ class BusinessController extends Controller
 
     public function updatePersonData(updPerDataRequest $request)
     {
-        $business = Business::where('bussId', $request->bussId)->first();
-        $person = new Person();
-        $person->perKindDoc = $request->person['perKindDoc'];
-        $person->perName = $request->person['perName'];
-        $person->perNumberDoc = $request->person['perNumberDoc'];
-        $person->perAddress = $request->person['perAddress'];
-        $person->perTel = $request->person['perTel'];
-        $person->perEmail = $request->person['perEmail'];
-        $person->perId = $business->perId;
-        $person->save();
+        $perData = Person::where('perId', $request->person['perId'])->first();
+        $perData->perKindDoc = $request->person['perKindDoc'];
+        $perData->perName = $request->person['perName'];
+        $perData->perNumberDoc = $request->person['perNumberDoc'];
+        $perData->perAddress = $request->person['perAddress'];
+        $perData->perTel = $request->person['perTel'];
+        $perData->perEmail = $request->person['perEmail'];
+        $perData->save();
         return response()->json([
             'res' => true,
             'msg' => 'Datos de Persona Actualizado',
-            'data' => Business::where('bussId', $request->bussId)->with('person')->get()
+            'data' => Person::where('perId', $request->person['perId'])->get()
         ], 200);
     }
 
