@@ -653,3 +653,154 @@ CREATE TABLE cards(
     "updated_at" timestamp,
     "created_at" timestamp
 );
+
+
+
+/**CAMBIOS AL 20/05/2022*/
+
+
+create table periods(
+    "prdsId" SERIAL PRIMARY KEY,
+    "prdsNameShort" VARCHAR(10),
+    "prdsDescription" varchar(200),
+    "prdsState" int,
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+
+create table d_bussines_periods(
+    "dbpId" SERIAL PRIMARY KEY,
+    "prdsId" integer,
+    "bussId"  integer,
+    
+    "dbpState" int,
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+
+create table model_of_services(
+    "msId" serial primary key,
+    "msName" varchar(150),
+    "msTimeInterval" varchar(50),
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+
+);
+
+create table services_provided(
+    "spId" SERIAL PRIMARY KEY,
+    "dbpId"  INTEGER,
+
+    "spState" int DEFAULT 1, /*1=Borrador, 2=*/
+
+    "spTimeInterval" VARCHAR(50),
+    "spName" varchar(150),
+    "spComment" varchar(200),
+    
+    "spCost" decimal(12,2) DEFAULT 0.0,
+    "spCostDate" TIMESTAMP,
+
+    "spDebt" decimal(12,2) DEFAULT 0.0,
+    "spDebtDate" TIMESTAMP,
+
+    "spPaid" decimal(12,2) DEFAULT 0.0,
+    "spPaidDate" TIMESTAMP,
+
+    "spLimitPaymentDate" DATE,
+
+    "spMaxPartToPay" INTEGER DEFAULT 1,
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    
+    "updated_at" timestamp,
+    "created_at" timestamp
+
+);
+/*payment_details*/
+create table payments(
+   "payId" serial PRIMARY KEY, 
+    
+    "payState" int, /*1=Borrador, 2=Facturado*/
+
+    "hqId" INTEGER,/*sede*/
+    "payKindDoc" int,/*Recibo, Boleta, Factura*/
+    "paySerie" varchar(10), /*Serie */
+    "payNumber" int, /*Numero correlativo*/
+ 
+    "payDatePrint" TIMESTAMP,
+    
+    "bussId" INTEGER,
+
+    "tellId" integer,
+    
+    /*CLientes sin regisgro en base de datos*/
+    "payClientName" varchar(80),
+    "payClientAddress" varchar(40),
+    "payClientTel" varchar(12),
+    "payClientEmail" varchar(40),
+    "payRucOrDni" varchar(12),
+    /*Campos para clientes no registrados*/
+ 
+    "paySubTotal" decimal(12,2) DEFAULT 0.0,
+    "payDiscount" decimal(12,2) DEFAULT 0.0,
+    "paySalesTax" decimal(12,2) DEFAULT 0.0, 
+    "payTotal" decimal(12,2) DEFAULT 0.0,
+    "payTotalInWords" VARCHAR(100),
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+
+create table payment_methods(
+    "paymthdsId" SERIAL PRIMARY KEY,
+    "paymthdsName" varchar(30),
+    "paymthdsStatus" int, /*1=activo, 2=inactivo*/  
+
+    "updated_at" timestamp,
+    "created_at" timestamp  
+);
+
+create table d_payments_payment_methods(
+    "dppmId" serial PRIMARY KEY,
+    "payId" INTEGER,
+    "paymthdsId" INTEGER, 
+    "dppmAmount" decimal(12,2),
+    "dppmDescription" varchar(50),
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+)
+
+create table payment_details(
+    "pdsId" serial PRIMARY KEY, 
+    "pdsQuantity" decimal(8,2) DEFAULT 1,
+    "spId" integer,
+    /*
+    "pdsPeriod" varchar(20),
+    "pdsYear" int,*/
+
+    "pdsDescription" varchar(200),
+    
+    "pdsUnitPrice" decimal(12,2) DEFAULT 0.0,
+    "pdsAmount" decimal(12,2) DEFAULT 0.0,
+
+
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+);

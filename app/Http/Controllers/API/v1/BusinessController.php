@@ -197,4 +197,37 @@ class BusinessController extends Controller
             'data' => Business::where('bussId', $request->bussId)->get()
         ], 200);
     }
+
+    /*Periods*/
+    public function addPeriod($bussId, Request $request)
+    {
+        $q = Business::find($bussId);
+        $q->periods()->attach($request->prdsId, $request->all());
+        return response()->json([
+            'res' => true,
+            'msg' => 'Agregado correctamente',
+            'data' => Business::find($bussId)->periods
+        ], 200);
+    }
+
+    public function delPeriod($bussId, $prdsId)
+    {
+        $q = Business::find($bussId);
+        $q->periods()->detach($prdsId);
+        return response()->json([
+            'res' => true,
+            'msg' => 'Eliminado correctamente',
+            'data' => Business::find($bussId)->periods
+        ], 200);
+    }
+
+    public function allPeriods($bussId)
+    {
+        return response()->json([
+            'res' => true,
+            'msg' => 'Leido correctamente',
+            'data' => Business::find($bussId)->periods
+        ], 200);
+    }
+
 }

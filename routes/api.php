@@ -19,6 +19,9 @@ use App\Models\Teller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\API\v1\VideosController;
 use App\Http\Controllers\API\v1\HeadquarterController;
+use App\Http\Controllers\API\v1\PeriodController;
+use App\Http\Controllers\API\v1\DBusinessPeriodController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -153,6 +156,15 @@ Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonD
 Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData']);
 Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData']);
 
+
+/*Business with periods*/
+Route::get('/v1/business/{bussId}/periods', [BusinessController::class, 'allPeriods']);
+Route::post('/v1/business/{bussId}/periods', [BusinessController::class, 'updPeriod']);
+//Route::put('/v1/business/{bussId}/periods/{prdsId}', [DBusinessPeriodController::class, 'update']);
+Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::class, 'delPeriod']);
+
+
+
 /* Person*/
 Route::post('v1/person/exist-dni', [PersonController::class, 'existDni']);
 
@@ -201,3 +213,26 @@ Route::get('/v1/dashboard/counter-cards', [DashboardController::class, 'getCount
 Route::get('/v1/appointments/get-all-by', [AppointmentController::class, 'getAllBy']);
 Route::get('/v1/appointments/getTellers', [AppointmentController::class, 'getTellers']);
 Route::get('/v1/appointments/getCategories', [AppointmentController::class, 'getCategories']);
+
+
+
+/*Modificaciones 22/05/2022 */
+Route::get('/v1/periods', [PeriodController::class, 'index']);
+Route::post('/v1/periods', [PeriodController::class, 'store']);
+Route::put('/v1/periods/{id}', [PeriodController::class, 'update']);
+Route::delete('/v1/periods/{id}', [PeriodController::class, 'destroy']);
+Route::put('/v1/periods/{prdsId}/change-state', [PeriodController::class, 'changeState']);
+
+
+Route::get('/v1/d-business-periods', [DBusinessPeriodController::class, 'index']);
+Route::post('/v1/d-business-periods', [DBusinessPeriodController::class, 'store']);
+Route::put('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'update']);
+Route::delete('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'destroy']);
+
+Route::get('/v1/services-provided{id}', [DBusinessPeriodController::class, 'find']);
+Route::get('/v1/services-provided', [DBusinessPeriodController::class, 'index']);
+Route::post('/v1/services-provided', [DBusinessPeriodController::class, 'store']);
+Route::put('/v1/services-provided/{id}', [DBusinessPeriodController::class, 'update']);
+Route::delete('/v1/services-provided/{id}', [DBusinessPeriodController::class, 'destroy']);
+
+

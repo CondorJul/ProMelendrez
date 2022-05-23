@@ -39,4 +39,12 @@ class Business extends Model
     {
         return $this->belongsTo(Person::class, 'perId', 'perId');
     }
+
+    public function periods(){
+        return $this->belongsToMany(Period::class,'d_bussines_periods','bussId', 'prdsId' )->withPivot(['dbpState']);
+    }
+
+
+
+    
 }
