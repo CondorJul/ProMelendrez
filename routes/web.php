@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\v1\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/v1/payments/{token}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
+
+
+
