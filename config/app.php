@@ -176,6 +176,10 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        
+        /*Paracrear pdf */
+        Barryvdh\DomPDF\ServiceProvider::class,
+
 
     ],
 
