@@ -13,24 +13,18 @@ class ServiceProvided extends Model
     protected $table = 'services_provided';
     protected $fillable = [
         'dbpId',
-    
-        'spStatus', /*1=Borrador, 2=*/
-    
-        'spTimeInterval',
+        'svId',
+        'spPeriodPayment',
         'spName',
-        'spComment',
-        
         'spCost',
         'spCostDate',
-    
         'spDebt',
         'spDebtDate',
-    
         'spPaid',
-        'spPaidDate' ,
-    
-        'spLimitPaymentDate' ,
-    
-        'spMaxPartToPay',
+        'spPaidDate',
+        'spState',
+        'spComment',
+        'spLimitPaymentDate',
+        'spMaxPartToPay'
     ];
 }

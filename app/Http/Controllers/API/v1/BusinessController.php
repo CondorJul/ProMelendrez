@@ -229,5 +229,4 @@ class BusinessController extends Controller
             'data' => Business::find($bussId)->periods
         ], 200);
     }
-
 }

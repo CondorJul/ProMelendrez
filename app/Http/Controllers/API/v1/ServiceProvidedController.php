@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\services_provided\AddServicesProvidedRequest;
+use App\Models\ServiceProvided;
 use Illuminate\Http\Request;
 
 class ServiceProvidedController extends Controller
@@ -23,9 +25,14 @@ class ServiceProvidedController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AddServicesProvidedRequest $request)
     {
-        //
+        $sp = ServiceProvided::create($request->all());
+        return response()->json([
+            'res' => true,
+            'msg' => 'Guardado correctamente',
+            'data' => ServiceProvided::where('spId', $sp->spId)->get()
+        ], 200);
     }
 
     /**

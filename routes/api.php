@@ -21,7 +21,8 @@ use App\Http\Controllers\API\v1\VideosController;
 use App\Http\Controllers\API\v1\HeadquarterController;
 use App\Http\Controllers\API\v1\PeriodController;
 use App\Http\Controllers\API\v1\DBusinessPeriodController;
-
+use App\Http\Controllers\API\v1\ServicesController;
+use App\Http\Controllers\API\v1\ServiceProvidedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,13 +34,14 @@ use App\Http\Controllers\API\v1\DBusinessPeriodController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/storage-link-public', function(){
+
+Route::get('/storage-link-public', function () {
     $target = storage_path('app/public');
     $link = public_path('/storage');
     symlink($target, $link);
     echo "symbolic link created successfully";
 });
-Route::get('/storage-link-profile-images', function(){
+Route::get('/storage-link-profile-images', function () {
     $target = storage_path('app/private/profile-images');
     $link = public_path('/strg/api/s/profile-images');
     symlink($target, $link);
@@ -77,7 +79,7 @@ Route::post('registro', [AuthController::class, 'register']);
 /*Autenticación*/
 Route::post('v1/auth/signin', [AuthController::class, 'signIn']);
 Route::put('v1/auth/change-password-with-auth', [AuthController::class, 'changePasswordWithAuth'])->middleware(['auth:sanctum']);;
-Route::post('v1/auth/upload-profile-image-with-auth',[AuthController::class, 'uploadProfileImageWithAuth'])->middleware(['auth:sanctum']);;
+Route::post('v1/auth/upload-profile-image-with-auth', [AuthController::class, 'uploadProfileImageWithAuth'])->middleware(['auth:sanctum']);;
 Route::put('v1/auth/upd-user-with-person-with-auth', [AuthController::class, 'updUserWithPersonWithAuth'])->middleware(['auth:sanctum']);
 
 
@@ -157,14 +159,6 @@ Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliat
 Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData']);
 
 
-/*Business with periods*/
-Route::get('/v1/business/{bussId}/periods', [BusinessController::class, 'allPeriods']);
-Route::post('/v1/business/{bussId}/periods', [BusinessController::class, 'updPeriod']);
-//Route::put('/v1/business/{bussId}/periods/{prdsId}', [DBusinessPeriodController::class, 'update']);
-Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::class, 'delPeriod']);
-
-
-
 /* Person*/
 Route::post('v1/person/exist-dni', [PersonController::class, 'existDni']);
 
@@ -217,22 +211,38 @@ Route::get('/v1/appointments/getCategories', [AppointmentController::class, 'get
 
 
 /*Modificaciones 22/05/2022 */
+
+/*Business with periods*/
+Route::get('/v1/business/{bussId}/periods', [BusinessController::class, 'allPeriods']);
+Route::post('/v1/business/{bussId}/periods', [BusinessController::class, 'updPeriod']);
+//Route::put('/v1/business/{bussId}/periods/{prdsId}', [DBusinessPeriodController::class, 'update']);
+Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::class, 'delPeriod']);
+
+
+/*Periodos */
 Route::get('/v1/periods', [PeriodController::class, 'index']);
 Route::post('/v1/periods', [PeriodController::class, 'store']);
 Route::put('/v1/periods/{id}', [PeriodController::class, 'update']);
 Route::delete('/v1/periods/{id}', [PeriodController::class, 'destroy']);
 Route::put('/v1/periods/{prdsId}/change-state', [PeriodController::class, 'changeState']);
 
-
+/*Detalle negocio y periodo */
 Route::get('/v1/d-business-periods', [DBusinessPeriodController::class, 'index']);
-Route::post('/v1/d-business-periods', [DBusinessPeriodController::class, 'store']);
+Route::post('/v1/d-business-periods/addDBP', [DBusinessPeriodController::class, 'store']);
 Route::put('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'update']);
 Route::delete('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'destroy']);
 
-Route::get('/v1/services-provided{id}', [DBusinessPeriodController::class, 'find']);
-Route::get('/v1/services-provided', [DBusinessPeriodController::class, 'index']);
-Route::post('/v1/services-provided', [DBusinessPeriodController::class, 'store']);
-Route::put('/v1/services-provided/{id}', [DBusinessPeriodController::class, 'update']);
-Route::delete('/v1/services-provided/{id}', [DBusinessPeriodController::class, 'destroy']);
+/*Servicios que se ofrecen */
+Route::get('/v1/services-provided{id}', [ServiceProvidedController::class, 'find']);
+Route::get('/v1/services-provided', [ServiceProvidedController::class, 'index']);
+Route::post('/v1/services-provided/addServicesProvided', [ServiceProvidedController::class, 'store']);
+Route::put('/v1/services-provided/{id}', [ServiceProvidedController::class, 'update']);
+Route::delete('/v1/services-provided/{id}', [ServiceProvidedController::class, 'destroy']);
 
 
+/* Gestion de Servicios */
+Route::get('v1/services', [ServicesController::class, 'index']);
+Route::post('v1/services/addServices', [ServicesController::class, 'store']);
+Route::put('v1/services/updServices', [ServicesController::class, 'update']);
+Route::delete('v1/services/delServices/{svId}', [ServicesController::class, 'destroy']);
+Route::delete('v1/services/stateServices/{svId}', [ServicesController::class, 'stateService']);

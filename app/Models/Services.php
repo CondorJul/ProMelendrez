@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DBusinessPeriod extends Model
+class Services extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'dbpId';
-    protected $table = 'd_bussines_periods';
+    protected $primaryKey = 'svId';
+    protected $table = 'services';
     protected $fillable = [
-        'prdsId',
-        'bussId',
-        'dbpState',
+        'svName',
+        'svState'
     ];
 }

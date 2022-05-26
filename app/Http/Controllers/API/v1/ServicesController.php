@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\d_business_period\AddDBusinessPeriodRequest;
-use App\Http\Requests\d_business_period\UpdDBusinessPeriodRequest;
-use App\Models\DBusinessPeriod;
+use App\Http\Requests\md_services\AddServicesRequest;
+use App\Http\Requests\md_services\UpdServicesRequest;
+use App\Models\Services;
 use Illuminate\Http\Request;
 
-class DBusinessPeriodController extends Controller
+class ServicesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,11 +17,7 @@ class DBusinessPeriodController extends Controller
      */
     public function index()
     {
-        return response()->json([
-            'res' => true,
-            'msg' => 'Listado correctamente',
-            'data' => DBusinessPeriod::all()
-        ], 200);
+        return Services::all();
     }
 
     /**
@@ -30,13 +26,13 @@ class DBusinessPeriodController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(AddDBusinessPeriodRequest $request)
+    public function store(AddServicesRequest $request)
     {
-        $p = DBusinessPeriod::create($request->all());
+        $service = Services::create($request->all());
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',
-            'data' => DBusinessPeriod::where('dbpId', $p->dbpId)->get()
+            'data' => Services::where('svId', $service->svId)->get()
         ], 200);
     }
 
@@ -58,18 +54,16 @@ class DBusinessPeriodController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdDBusinessPeriodRequest $request, $id)
+    public function update(UpdServicesRequest $request)
     {
-        $q = DBusinessPeriod::where('dbpId', $id)->first();
-        $q->prdsId = $request->prdsId;
-        $q->bussId = $request->bussId;
-
-
-        $q->save();
+        $service = Services::where('svId', $request->svId)->first();
+        $service->svName = $request->svName;
+        $service->svState = $request->svState;
+        $service->save();
         return response()->json([
             'res' => true,
-            'msg' => 'Actualizado correctamente',
-            'data' => DBusinessPeriod::where('dbpId', $q->dbpId)->get()
+            'msg' => 'Servicio Actualizado correctamente',
+            'data' => Services::where('svId', $request->svId)->get()
         ], 200);
     }
 
@@ -81,11 +75,22 @@ class DBusinessPeriodController extends Controller
      */
     public function destroy($id)
     {
-        $q = DBusinessPeriod::destroy($id);
+        $s = Services::whereIn('svId', explode(',', $id),)->delete();
         return response()->json([
             'res' => true,
-            'msg' => 'Eliminado correctamente',
-            'data' => $q
+            'msg' => 'Eliminado correctamente.',
+            'data' => $s
+        ], 200);
+    }
+
+    public function stateService($id)
+    {
+        $service = Services::where('svId', $id)->first();
+        $service->svState = $service->svState == 1 ? "2" : "1";
+        $service->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado Correctamente.',
         ], 200);
     }
 }
