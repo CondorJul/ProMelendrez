@@ -258,6 +258,7 @@ Route::get('/v1/payments', [PaymentController::class, 'index']);
 Route::post('/v1/payments', [PaymentController::class, 'store'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{id}', [PaymentController::class, 'update']);
 Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy']);
+Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
 
 
 
