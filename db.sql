@@ -271,13 +271,44 @@ INSERT
 
 /*Funcion y triger update*/
 
+
+
+
+CREATE FUNCTION tf_b_u_category()
+   RETURNS TRIGGER
+   LANGUAGE PLPGSQL
+AS $$
+DECLARE
+    _catNameLong varchar;
+BEGIN
+
+    IF COALESCE(NEW."catIdParent",-1)<>COALESCE(OLD."catIdParent" ,-1) OR NEW."catName"<>OLD."catName" THEN
+
+            select "catNameLong" INTO _catNameLong FROM category WHERE "catId"=NEW."catIdParent";
+        IF _catNameLong is not null THEN
+            NEW."catNameLong":=CONCAT(_catNameLong,'/',NEW."catName");
+        END IF;
+
+        IF _catNameLong is null THEN
+            NEW."catNameLong":=CONCAT('/',NEW."catName");
+        END IF;
+
+        UPDATE category set "catNameLong"=replace("catNameLong",  OLD."catNameLong", NEW."catNameLong") where "catNameLong" LIKE concat(OLD."catNameLong",'%') AND "catId"<>OLD."catId";
+    END IF;
+RETURN NEW;
+END;
+$$
+
+
+
+/*
 CREATE FUNCTION tf_b_u_category() RETURNS TRIGGER
 LANGUAGE PLPGSQL AS
 	$$ DECLARE _catNameLong varchar;
 	BEGIN IF COALESCE(NEW.",-1)<>COALESCE(OLD.", -1)
 	OR NEW."<>OLD." THEN
 	select
-		" INTO _catNameLong FROM category WHERE " = NEW.";
+		"CatNameLong" INTO _catNameLong FROM category WHERE " = NEW.";
 	        IF _catNameLong is not null THEN
 	            NEW.": = CONCAT(
 			_catNameLong,
@@ -308,7 +339,9 @@ RETURN NEW;
 
 END;
 
-$ $ CREATE TRIGGER t_b_u_category BEFORE
+$ $
+*/
+ CREATE TRIGGER t_b_u_category BEFORE
 UPDATE
 	ON category FOR EACH ROW EXECUTE PROCEDURE tf_b_u_category();
 
@@ -615,6 +648,7 @@ create table periods(
 	"created_at" timestamp
 );
 
+
 create table d_bussines_periods(
 	"dbpId" SERIAL PRIMARY KEY,
 	"prdsId" integer,
@@ -623,7 +657,6 @@ create table d_bussines_periods(
 	"updated_at" timestamp,
 	"created_at" timestamp
 );
-
 create table model_of_services(
 	"msId" serial primary key,
 	"msName" varchar(150),
@@ -632,11 +665,11 @@ create table model_of_services(
 	"created_at" timestamp
 );
 
-create table services_provided(
+/*create table services_provided(
 	"spId" SERIAL PRIMARY KEY,
 	"dbpId" INTEGER,
 	"spState" int DEFAULT 1,
-	/*1=Borrador, 2=*/
+
 	"spTimeInterval" VARCHAR(50),
 	"spName" varchar(150),
 	"spComment" varchar(200),
@@ -652,21 +685,74 @@ create table services_provided(
 	"updated_by" BIGINT,
 	"updated_at" timestamp,
 	"created_at" timestamp
+);*/
+
+
+
+
+create table services(
+    "svId" serial primary key,
+    "svName" varchar(150),
+    "svState" varchar(2), /*Habilitado, Deshabilitado*/
+
+    "updated_at" timestamp,
+    "created_at" timestamp
+
 );
 
-/*payment_details*/
 
+
+create table services_provided(
+    "spId" SERIAL PRIMARY KEY,
+    "dbpId"  INTEGER,
+		"svId" INTEGER,
+
+	"ppayId" INTEGER,
+    /*"spPeriodPayment" INTEGER,*/
+    "spName" varchar(150),
+        
+    "spCost" decimal(12,2) DEFAULT 0.0,
+    "spCostDate" TIMESTAMP,
+
+    "spDebt" decimal(12,2) DEFAULT 0.0,
+    "spDebtDate" TIMESTAMP,
+
+    "spPaid" decimal(12,2) DEFAULT 0.0,
+    "spPaidDate" TIMESTAMP,
+		
+	"spState" int DEFAULT 1, /*1=Borrador, 2=*/
+	"spComment" varchar(200),
+
+    "spLimitPaymentDate" DATE,
+
+    "spMaxPartToPay" INTEGER DEFAULT 1,
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+
+
+
+
+
+
+/*payment_details*/
 create table payments(
 	"payId" serial PRIMARY KEY,
-	"payState" int,
-	/*1=Borrador, 2=Facturado*/
-	"hqId" INTEGER,
+	"payToken" varchar(40),
+	"payState" int NOT NULL,
+	/*1=Borrador, 2=Reservado, 3=Facturado*/
+	"hqId" INTEGER NOT NULL,
+	"apptmId" integer,
 	/*sede*/
-	"payKindDoc" int,
-	/*Recibo, Boleta, Factura*/
+	"payKindDoc" int not null,
+	/*1=Recibo, 2=Boleta, 3=Factura*/
 	"paySerie" varchar(10),
 	/*Serie */
-	"payNumber" int,
+	"payNumber" integer,
 	/*Numero correlativo*/
 	"payDatePrint" TIMESTAMP,
 	"bussId" INTEGER,
@@ -676,7 +762,7 @@ create table payments(
 	"payClientAddress" varchar(40),
 	"payClientTel" varchar(12),
 	"payClientEmail" varchar(40),
-	"payRucOrDni" varchar(12),
+	"payClientRucOrDni" varchar(12),
 	/*Campos para clientes no registrados*/
 	"paySubTotal" decimal(12, 2) DEFAULT 0.0,
 	"payDiscount" decimal(12, 2) DEFAULT 0.0,
@@ -708,8 +794,10 @@ create table d_payments_payment_methods(
 	"updated_by" BIGINT,
 	"updated_at" timestamp,
 	"created_at" timestamp
-) create table payment_details(
+) 
+create table payment_details(
 	"pdsId" serial PRIMARY KEY,
+	"payId" INTEGER,
 	"pdsQuantity" decimal(8, 2) DEFAULT 1,
 	"spId" integer,
 	/*
@@ -723,3 +811,304 @@ create table d_payments_payment_methods(
 	"updated_at" timestamp,
 	"created_at" timestamp
 );
+
+create table period_payments(
+	"ppayId" SERIAL PRIMARY KEY,
+	"ppayName" varchar(20),
+	"ppayState" int default 1
+);	
+
+insert into period_payments
+("ppayName") VALUES
+('Enero'),
+	 ('Febrero'),
+	( 'Marzo'),
+	 ('Abril'),
+	 ('Mayo'),
+	 ('Junio'),
+	 ('Julio'),
+	 ('Agosto'),
+	 ('Setiembre'),
+     ('Octubre'),
+    ('Noviembre'),
+    ('Diciembre');
+
+create table correlative_proof(
+	"cpfId" integer PRIMARY KEY,
+	"hqId" integer, 
+	"cpfKindDoc" int, /*1=Recibo, 2=Boleta, 3=Factura*/
+	"cpfNameTypeProof" varchar(30),
+	"cpfSerie" varchar(10), 
+	"cpfNumber" integer,
+	UNIQUE("hqId", "cpfKindDoc"),
+	FOREIGN KEY ("hqId") REFERENCES headquarter("hqId")
+);
+INSERT INTO correlative_proof
+("cpfId", "hqId", "cpfKindDoc","cpfNameTypeProof", "cpfSerie", "cpfNumber") VALUES
+(1, 1/*Pasco*/, 1/*Ticket*/,'Ticket - Pasco','T001', 1 ),
+(2, 1/*Pasco*/, 2/*BOleta*/,'Boleta - Pasco','B001', 1 ),
+(3, 1/*Pasco*/, 3/*Factura*/,'Factura - Pasco','F001', 1 );
+
+
+
+create or replace function random_string(length integer)  returns text as 
+$$ 
+ declare 
+ chars text[] := '{0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,S,T,U,V,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z}'; 
+ result text := '';
+  i integer := 0;
+begin
+ if length < 0 then 
+	raise exception 'Given length cannot be less than 0'; 
+ end if; 
+ for i in 1..length loop
+  result := result || chars[1+random()*(array_length(chars, 1)-1)]; 
+ end loop; 
+ return result; 
+end; 
+$$ language plpgsql;
+
+
+
+
+CREATE FUNCTION tf_b_i_payment_details() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+	
+	_spCost decimal(12, 2);
+	_spDebt decimal(12, 2);
+	_spPaid decimal(12, 2); 
+
+	_sumPaidFromPD decimal(12,2);
+
+BEGIN
+/*Obtenemos algunos datos de categoria*/
+
+
+IF COALESCE(NEW."pdsQuantity",-1)<=0 THEN
+	RAISE EXCEPTION '<msg>La cantidad es requerido y tiene que ser mayor a 0<msg>';
+END IF;
+
+IF COALESCE(NEW."pdsUnitPrice",-1)<=0 THEN
+	RAISE EXCEPTION '<msg>El precio unitario es requerido y tiene que ser mayor a 0<msg>';
+END IF;
+
+NEW."pdsAmount":=NEW."pdsUnitPrice"*NEW."pdsQuantity";
+
+
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_b_i_appointment_temp on appointment_temp;
+drop FUNCTION tf_b_i_appointment_temp;*/
+CREATE TRIGGER t_b_i_payment_details BEFORE
+INSERT
+	ON payment_details FOR EACH ROW EXECUTE PROCEDURE tf_b_i_payment_details();
+
+
+
+CREATE FUNCTION tf_a_i_payment_details() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+	
+	_spCost decimal(12, 2);
+	_spDebt decimal(12, 2);
+	_spPaid decimal(12, 2); 
+
+	_sumPaidFromPD decimal(12,2);
+
+	_subTotal decimal(12,2);
+
+BEGIN
+/*Obtenemos algunos datos de categoria*/
+
+
+
+/*Si es un servicio de un cliente X, verificamos que este correcto*/
+IF COALESCE(NEW."spId", -1)>0 THEN
+	SELECT "spCost", "spDebt", "spPaid" INTO  _spCost, _spDebt, _spPaid FROM services_provided where "spId"=NEW."spId";
+	SELECT COALESCE(SUM("pdsAmount"),0) into _sumPaidFromPD FROM payment_details where "spId"=NEW."spId";
+	IF _spCost < _sumPaidFromPD THEN 
+		RAISE EXCEPTION '<msg>El pago por el servicio no puede superar el costo establecido.<msg>';
+
+	END IF;
+	UPDATE services_provided set  "spPaid" =_sumPaidFromPD, "spDebt"= _spCost-_sumPaidFromPD where "spId"=NEW."spId";
+
+END IF;
+
+SELECT sum("pdsUnitPrice") into _subTotal from payment_details where "payId"=NEW."payId";
+
+UPDATE payments set "paySubTotal"=_subTotal where "payId"=NEW."payId";
+
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_b_i_appointment_temp on appointment_temp;
+drop FUNCTION tf_b_i_appointment_temp;*/
+CREATE TRIGGER t_a_i_payment_details AFTER
+INSERT
+	ON payment_details FOR EACH ROW EXECUTE PROCEDURE tf_a_i_payment_details();
+
+
+
+/*payments */
+
+
+CREATE FUNCTION tf_b_i_payments() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+	_payTokenTemp varchar(40);
+
+
+BEGIN
+	select concat(random_string(12),NEW."payId") into _payTokenTemp;
+	NEW."payToken":= _payTokenTemp;
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_b_i_payments on payments;
+drop FUNCTION tf_b_i_payments;*/
+CREATE TRIGGER t_b_i_payments BEFORE
+INSERT
+	ON payments FOR EACH ROW EXECUTE PROCEDURE tf_b_i_payments();
+
+
+
+
+
+
+CREATE FUNCTION tf_b_u_payments() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+	
+	_spCost decimal(12, 2);
+	_spDebt decimal(12, 2);
+	_spPaid decimal(12, 2); 
+
+	_sumPaidFromPD decimal(12,2);
+
+	_serie varchar(10);
+	_number integer;
+
+BEGIN
+/*Analizamos que no sea una boleta facturada*/
+IF NEW."payState" <> 3/*Facturado*/ AND  OLD."payState"=3/*Facturado*/ THEN
+	RAISE EXCEPTION '<msg>Lo sentimos, este ticket no esta disponible para modificar.<msg>';
+END IF;
+
+IF NEW."payKindDoc"=1/*Tickets*/ THEN
+	NEW."payTotal":=NEW."paySubTotal";
+END IF;
+
+IF  NEW."payState"=3 AND OLD."payState"<>3 THEN
+	SELECT "cpfSerie", "cpfNumber" into _serie, _number from correlative_proof where "hqId"=new."hqId" and new."payKindDoc"=new."payKindDoc";
+    UPDATE correlative_proof SET "cpfNumber"=(_number+1) where "hqId"=new."hqId" and "cpfKindDoc"=new."payKindDoc";
+	NEW."paySerie":=_serie;
+	NEW."payNumber":=_number;
+END IF;
+
+
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_b_u_payments on payments;
+drop FUNCTION tf_b_u_payments;*/
+CREATE TRIGGER t_b_u_payments BEFORE
+UPDATE
+	ON payments FOR EACH ROW EXECUTE PROCEDURE tf_b_u_payments();
+
+/*services_provided*/
+
+CREATE FUNCTION tf_b_i_services_provided() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+	_spName varchar(150);
+	
+	_periodName varchar(10);
+	_serviceName varchar(150);
+	_periodPaymentName varchar(30);
+
+BEGIN
+
+	/*Periodos*/
+	select  "prdsNameShort" into _periodName from periods  inner join 
+    d_bussines_periods on periods."prdsId"=d_bussines_periods."prdsId" where d_bussines_periods."dbpId"=NEW."dbpId";
+
+ 	/*subPeriodo*/
+
+	/*Servicio */
+	select "svName" into _serviceName from services where "svId"=NEW."svId";
+	
+	select "ppayName" into _periodPaymentName from period_payments where "ppayId"=NEW."ppayId";
+	
+	NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));
+RETURN NEW;
+END;
+$$
+
+/*
+drop TRIGGER t_b_i_services_provided on payments;
+drop FUNCTION tf_b_i_services_provided;*/
+CREATE TRIGGER t_b_i_services_provided BEFORE
+INSERT
+	ON services_provided FOR EACH ROW EXECUTE PROCEDURE tf_b_i_services_provided();
+
+
+
+CREATE FUNCTION tf_b_u_services_provided() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+	
+		_spName varchar(150);
+	
+	_periodName varchar(10);
+	_serviceName varchar(150);
+	_periodPaymentName varchar(30);
+BEGIN
+
+/*Periodos*/
+	select  "prdsNameShort" into _periodName from periods  inner join 
+    d_bussines_periods on periods."prdsId"=d_bussines_periods."prdsId" where d_bussines_periods."dbpId"=NEW."dbpId";
+
+ 	/*subPeriodo*/
+
+	/*Servicio */
+	select "svName" into _serviceName from services where "svId"=NEW."svId";
+	
+	select "ppayName" into _periodPaymentName from period_payments where "ppayId"=NEW."ppayId";
+	
+	NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_b_i_services_provided on payments;
+drop FUNCTION tf_b_i_services_provided;*/
+CREATE TRIGGER t_b_u_services_provided BEFORE
+UPDATE
+	ON services_provided FOR EACH ROW EXECUTE PROCEDURE tf_b_u_services_provided();

@@ -9,7 +9,7 @@ class Payment extends Model
 {
     use HasFactory;
     protected $primaryKey = 'payId';
-    protected $table = 'd_bussines_periods';
+    protected $table = 'payments';
     protected $fillable = [
    
         'payState' , /*1=Borrador, 2=Facturado*/
@@ -40,4 +40,8 @@ class Payment extends Model
         'payTotalInWords',
     
     ];
+    public function paymentDetails(){
+        return $this->hasMany(PaymentDetail::class, 'payId', 'payId');
+    }
 }
+

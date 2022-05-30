@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\services_provided\AddServicesProvidedRequest;
+use App\Http\Requests\services_provided\UpdServicesProvidedRequest;
 use App\Models\ServiceProvided;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,14 @@ class ServiceProvidedController extends Controller
     public function index()
     {
         //
+    }
+    public function allByDBP(Request $request){
+        $r=ServiceProvided::where('dbpId', $request->dbpId)->get();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Seleccionado correctamente',
+            'data' => $r
+        ], 200);
     }
 
     /**
@@ -53,9 +62,17 @@ class ServiceProvidedController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdServicesProvidedRequest $request, $spId)
     {
-        //
+        $sp=ServiceProvided::where('spId', $spId)->first();
+
+        $sp->update($request->all());
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => ServiceProvided::where('spId', $sp->spId)->get()
+        ], 200);
+
     }
 
     /**

@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/v1/payments/{token}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
+Route::get('/v1/payments/{token}/proof-of-payment', [PaymentController::class, 'proofOfPayment'])->middleware(['cors']);;
 
 
 
