@@ -52,7 +52,7 @@ class PaymentController extends Controller
         $data1 = file_get_contents($path);
         $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('b6', 'portrait')->loadView('accounting.proof-of-payment', compact('pic'), $data);
+        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper(array(0, 0, 220, 500))->loadView('accounting.proof-of-payment', compact('pic'), $data);
 
         return $pdf->stream();
 
