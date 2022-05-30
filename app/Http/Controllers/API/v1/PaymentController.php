@@ -58,12 +58,19 @@ class PaymentController extends Controller
     {
         $data = [
             'titulo' => 'Styde.net',
-            'token'=>$token
+            'token' => $token
         ];
-    
-        return PDF::loadView('accounting.proof-of-payment', $data)
-            ->stream('archivo.pdf');
-    
+
+        $path = base_path('resources\views\logo.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data1 = file_get_contents($path);
+        $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('b6', 'portrait')->loadView('accounting.proof-of-payment', compact('pic'), $data);
+
+        return $pdf->stream();
+
+        //return PDF::loadView('accounting.proof-of-payment', $data)->stream('archivo.pdf');
         //return $pdf->download('mi-archivo.pdf');
     }
 
@@ -76,7 +83,6 @@ class PaymentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
     }
 
     /**
