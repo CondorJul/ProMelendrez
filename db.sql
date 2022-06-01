@@ -643,17 +643,28 @@ create table periods(
 	"prdsId" SERIAL PRIMARY KEY,
 	"prdsNameShort" VARCHAR(10),
 	"prdsDescription" varchar(200),
+	
 	"prdsState" int,
 	"updated_at" timestamp,
 	"created_at" timestamp
 );
-
 
 create table d_bussines_periods(
 	"dbpId" SERIAL PRIMARY KEY,
 	"prdsId" integer,
 	"bussId" integer,
 	"dbpState" int,
+
+	/**/
+	"dbpCost" decimal(12,2) DEFAULT 0.0,
+    "dbpCostDate" TIMESTAMP,
+
+    "dbpDebt" decimal(12,2) DEFAULT 0.0,
+    "dbpDebtDate" TIMESTAMP,
+
+    "dbpPaid" decimal(12,2) DEFAULT 0.0,
+    "dbpPaidDate" TIMESTAMP,
+	UNIQUE("prdsId", "bussId"),
 	"updated_at" timestamp,
 	"created_at" timestamp
 );
@@ -1063,12 +1074,20 @@ BEGIN
 	select "ppayName" into _periodPaymentName from period_payments where "ppayId"=NEW."ppayId";
 	
 	NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));
+
+	/*inserte monto*/
+
+
+	IF COALESCE(NEW."spPaid" , 0)> COALESCE(NEW."spCost",0)/*Tickets*/ THEN
+		RAISE EXCEPTION '<msg>El costo no puede ser menor al pago.<msg>';
+	END IF;
+	NEW."spDebt":=COALESCE(NEW."spCost",0)-COALESCE(NEW."spPaid",0);
 RETURN NEW;
 END;
 $$
 
 /*
-drop TRIGGER t_b_i_services_provided on payments;
+drop TRIGGER t_b_i_services_provided on services_provided;
 drop FUNCTION tf_b_i_services_provided;*/
 CREATE TRIGGER t_b_i_services_provided BEFORE
 INSERT
@@ -1100,6 +1119,13 @@ BEGIN
 	select "ppayName" into _periodPaymentName from period_payments where "ppayId"=NEW."ppayId";
 	
 	NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));
+
+
+	IF COALESCE(NEW."spPaid" , 0)> COALESCE(NEW."spCost",0)/*Tickets*/ THEN
+		RAISE EXCEPTION '<msg>El costo no puede ser menor al pago.<msg>';
+	END IF;
+	NEW."spDebt":=COALESCE(NEW."spCost",0)-COALESCE(NEW."spPaid",0);
+
 RETURN NEW;
 
 END;
@@ -1107,8 +1133,69 @@ END;
 $$
 
 /*
-drop TRIGGER t_b_i_services_provided on payments;
-drop FUNCTION tf_b_i_services_provided;*/
+drop TRIGGER t_b_u_services_provided on services_provided;
+drop FUNCTION tf_b_u_services_provided;*/
 CREATE TRIGGER t_b_u_services_provided BEFORE
 UPDATE
 	ON services_provided FOR EACH ROW EXECUTE PROCEDURE tf_b_u_services_provided();
+
+
+/*Update trigger 01/06/2022*/
+
+CREATE FUNCTION tf_a_i_services_provided() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+
+	_dbpCost decimal(12,2);
+	_dbpPaid decimal(12,2);
+BEGIN
+
+	SELECT COALESCE(SUM("spCost"),0) into _dbpCost FROM services_provided where "dbpId"=new."dbpId";
+	SELECT COALESCE(SUM("spPaid"),0) into _dbpPaid FROM services_provided where "dbpId"=new."dbpId";
+	
+	UPDATE d_bussines_periods SET "dbpCost"=_dbpCost, "dbpPaid"=_dbpPaid, "dbpDebt"=_dbpCost-_dbpPaid where "dbpId"=new."dbpId";
+	
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_a_i_services_provided on services_provided;
+drop FUNCTION tf_a_i_services_provided;*/
+CREATE TRIGGER t_a_i_services_provided AFTER
+INSERT
+	ON services_provided FOR EACH ROW EXECUTE PROCEDURE tf_a_i_services_provided();
+	
+
+
+
+CREATE FUNCTION tf_a_u_services_provided() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+	$$ 
+DECLARE
+
+	_dbpCost decimal(12,2);
+	_dbpPaid decimal(12,2);
+BEGIN
+
+	SELECT COALESCE(SUM("spCost"),0) into _dbpCost FROM services_provided where "dbpId"=new."dbpId";
+	SELECT COALESCE(SUM("spPaid"),0) into _dbpPaid FROM services_provided where "dbpId"=new."dbpId";
+	
+	UPDATE d_bussines_periods SET "dbpCost"=_dbpCost, "dbpPaid"=_dbpPaid, "dbpDebt"=_dbpCost-_dbpPaid where "dbpId"=new."dbpId";
+	
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_a_u_services_provided on services_provided;
+drop FUNCTION tf_a_u_services_provided;*/
+CREATE TRIGGER t_a_u_services_provided AFTER
+UPDATE
+	ON services_provided FOR EACH ROW EXECUTE PROCEDURE tf_a_u_services_provided();
+	

@@ -152,7 +152,7 @@
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">R.U.C:</th>
                 <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientRucOrDni']}}</th>
                 <th style="width:40px; font-size: 11px; text-align: left; font-weight: lighter;">Fecha:</th>
-                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientName']}}</th>
+                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payDatePrint']}}</th>
             </tr>
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Direccion:</th>
