@@ -30,7 +30,7 @@ class Payment extends Model
         'payClientAddress',
         'payClientTel',
         'payClientEmail',
-        'payRucOrDni',
+        'payClientRucOrDni',
         /*Campos para clientes no registrados*/
      
         'paySubTotal',

@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Models\Payment;
 use App\Models\PaymentDetail;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class PaymentController extends Controller
 {
@@ -28,16 +31,37 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        $p=Payment::create($request->all());
-        $p->paymentDetails()->createMany($request->paymentDetails);
-        $p->payState=3;/*Facturado */
-        $p->save();
+        try {
+            DB::connection()->beginTransaction();
+            $p=Payment::create($request->all());
+            $p->paymentDetails()->createMany($request->paymentDetails);
+            $p->payState=3;/*Facturado */
+            $p->save();
+            DB::connection()->commit();
+
+            return response()->json([
+                'res' => true,
+                'msg' => 'Guardado correctamente',
+                'data' => Payment::select()->with('paymentDetails')->where('payId',$p->payId )->first()
+            
+            ], 200);
+        } catch (PDOException $e) {
+                
+            DB::connection()->rollBack();
+            /*return response()->json([
+                'res' => false,
+                'msg' => $e->getMessage(),
+                'data' => $e->getMessage(),            
+            ], 502);*/
+            throw $e;
+        }
+        /*
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',
             'data' => Payment::select()->with('paymentDetails')->where('payId',$p->payId )->first()
         
-        ], 200);
+        ], 200);*/
         /*$data = [
             'titulo' => 'Styde.net',
             'token'=>123456
@@ -81,23 +105,27 @@ class PaymentController extends Controller
 
     public function proofOfPayment($payToken)
     {
-        $p=Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
+        try{
+            $p=Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
         
-       $data = [
-            'titulo' => 'Styde.net',
-            'payment' => $p
-        ];
-        
-        
-        $path = base_path('resources/views/logo.png');
-        //$path = base_path('storage/global/logo.png');
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data1 = file_get_contents($path);
-        $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
-
-        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('b6', 'portrait')->loadView('accounting.proof-of-payment', compact('pic'), $data);
-
-        return $pdf->stream();
+            $data = [
+                 'titulo' => 'Styde.net',
+                 'payment' => $p
+             ];
+             
+             
+             $path = base_path('resources/views/logo.png');
+             //$path = base_path('storage/global/logo.png');
+             $type = pathinfo($path, PATHINFO_EXTENSION);
+             $data1 = file_get_contents($path);
+             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+     
+             $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('b6', 'portrait')->loadView('accounting.proof-of-payment', compact('pic'), $data);
+     
+             return $pdf->stream();
+        }catch(Exception $e){
+            return 'Surgio un error, intente más tarde';
+        }
 
         //return PDF::loadView('accounting.proof-of-payment', $data)->stream('archivo.pdf');
         //return $pdf->download('mi-archivo.pdf');
