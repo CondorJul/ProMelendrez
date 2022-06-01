@@ -42,6 +42,6 @@ class Business extends Model
 
     public function periods()
     {
-        return $this->belongsToMany(Period::class, 'd_bussines_periods', 'bussId', 'prdsId')->withPivot(['dbpState'])->orderBy('prdsNameShort', 'desc');
+        return $this->belongsToMany(Period::class, 'd_bussines_periods', 'bussId', 'prdsId')->withPivot(['dbpState', 'dbpId'])->as('dbp')->orderBy('prdsNameShort', 'desc');
     }
 }

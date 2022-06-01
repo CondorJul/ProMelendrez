@@ -11,6 +11,7 @@ class PaymentDetail extends Model
     protected $primaryKey = 'pdsId';
     protected $table = 'payment_details';
     protected $fillable = [
+        'payId',
         'pdsQuantity',
         'spId' ,
         /*

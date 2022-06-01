@@ -137,7 +137,7 @@
     <div style="text-align: center; padding: 15px;">
         <img src="<?php echo $pic ?>" alt="" width="270px">
         <h5 style="font-size: 7.5px; font-family: arial-narrow; margin-top: 2px; margin-bottom: 5px; font-style: italic; font-weight: lighter;">Av. Daniel Alcides Carrion N° 204(Segundo Nivel) Urb. San Juan-Yanacancha-Pasco <br> Cel: 973896051/E-mail: melendres.auditores@hotmail.com</h5>
-        <h6 style="font-weight: bold; font-size: 20px;">001-000323</h6>
+        <h6 style="font-weight: bold; font-size: 20px;">{{$payment['paySerie']}}-{{sprintf('%08d', $payment['payNumber'])}}</h6>
         <table>
             <tr>
                 <th style="width: 270px; font-size: 2px; border-bottom: 1px solid;"></th>
@@ -146,19 +146,19 @@
         <table class="default" style="width: 270px;">
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Señor(es):</th>
-                <th colspan="3" style="width:200px; font-size: 11px; text-align: left; font-style: italic;">Ricardo Solis Almerco</th>
+                <th colspan="3" style="width:200px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientName']}}</th>
             </tr>
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">R.U.C:</th>
-                <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">10724563924</th>
+                <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientRucOrDni']}}</th>
                 <th style="width:40px; font-size: 11px; text-align: left; font-weight: lighter;">Fecha:</th>
-                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">29/05/2022</th>
+                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientName']}}</th>
             </tr>
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Direccion:</th>
-                <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">Av. Jose Martin Columna Pasco</th>
+                <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientAddress']}}</th>
                 <th style="width:40px; font-size: 11px; text-align: left; font-weight: lighter;">Celular:</th>
-                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">923313696</th>
+                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientTel']}}</th>
             </tr>
         </table>
         <table>
@@ -180,10 +180,12 @@
                 <th colspan="4" style="border-top: 1px dashed black;"></th>
             </tr>
             <tr>
-                <th style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">1</th>
-                <th style="width:155px; font-size: 11px; text-align: left; font-style: italic; font-weight: lighter;">Por Declaracion Jurada Anual -2021</th>
-                <th style="width:35px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">50.00</th>
-                <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">2000.00</th>
+                @foreach ($payment['paymentDetails'] as $key => $value)
+                <th style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">{{$value['pdsQuantity']}}</th>
+                <th style="width:155px; font-size: 11px; text-align: left; font-style: italic; font-weight: lighter;">{{$value['pdsDescription']}}</th>
+                <th style="width:35px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">5{{$value['pdsUnitPrice']}}</th>
+                <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">{{$value['pdsAmount']}}</th>
+                @endforeach
             </tr>
             <tr>
                 <th colspan="4" style="border-top: 1px dashed black;"></th>
@@ -191,7 +193,7 @@
             <tr>
                 <th colspan="2" style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;"></th>
                 <th style="width:35px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">Total</th>
-                <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">2000.00</th>
+                <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">{{$payment['payTotal']}}</th>
             </tr>
         </table>
         <table>

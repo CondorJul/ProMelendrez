@@ -15,6 +15,7 @@ class ServiceProvided extends Model
         'dbpId',
         'svId',
         'spPeriodPayment',
+        'ppayId',
         'spName',
         'spCost',
         'spCostDate',

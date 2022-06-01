@@ -4,7 +4,7 @@ namespace App\Http\Requests\services_provided;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddServicesProvidedRequest extends FormRequest
+class UpdServicesProvidedRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,6 +24,7 @@ class AddServicesProvidedRequest extends FormRequest
     public function rules()
     {
         return [
+            'spId'=>'required',
             'dbpId' => 'required',
             'svId' => 'required',
             'ppayId' => 'required',
