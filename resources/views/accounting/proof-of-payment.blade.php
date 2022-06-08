@@ -179,14 +179,16 @@
             <tr>
                 <th colspan="4" style="border-top: 1px dashed black;"></th>
             </tr>
+            @foreach ($payment['paymentDetails'] as $key => $value)
+
             <tr>
-                @foreach ($payment['paymentDetails'] as $key => $value)
                 <th style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">{{$value['pdsQuantity']}}</th>
                 <th style="width:155px; font-size: 11px; text-align: left; font-style: italic; font-weight: lighter;">{{$value['pdsDescription']}}</th>
-                <th style="width:35px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">5{{$value['pdsUnitPrice']}}</th>
+                <th style="width:35px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">{{$value['pdsUnitPrice']}}</th>
                 <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">{{$value['pdsAmount']}}</th>
-                @endforeach
             </tr>
+            @endforeach
+
             <tr>
                 <th colspan="4" style="border-top: 1px dashed black;"></th>
             </tr>

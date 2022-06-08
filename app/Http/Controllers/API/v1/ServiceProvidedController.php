@@ -20,7 +20,10 @@ class ServiceProvidedController extends Controller
         //
     }
     public function allByDBP(Request $request){
-        $r=ServiceProvided::where('dbpId', $request->dbpId)->get();
+        $r=ServiceProvided::where('dbpId', $request->dbpId)
+        ->orderBy('svId','ASC')
+        ->orderBy('ppayId','ASC')
+        ->get();
         return response()->json([
             'res' => true,
             'msg' => 'Seleccionado correctamente',
@@ -81,8 +84,15 @@ class ServiceProvidedController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+  
     public function destroy($id)
     {
-        //
+        $a = ServiceProvided::whereIn('spId', explode(',', $id))
+            ->delete();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Eliminado correctamente.',
+            'data' => $a
+        ], 200);
     }
 }

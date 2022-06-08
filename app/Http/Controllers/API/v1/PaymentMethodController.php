@@ -3,31 +3,31 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\period\AddPeriodRequest;
-use App\Http\Requests\period\UpdPeriodRequest;
-use App\Models\Period;
+use App\Http\Requests\payment_method\AddPaymentMethodRequest;
+use App\Http\Requests\payment_method\UpdPaymentMethodRequest;
+use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 
-class PeriodController extends Controller
+class PaymentMethodController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request){
-
+    public function index(Request $request)
+    {
         $params=[];
         $queryWhere='';
 
-        if($request->prdsState>0){
-            $queryWhere.=' and "prdsState"=?';
-            array_push($params,$request->prdsState );
+        if($request->paymthdsState>0){
+            $queryWhere.=' and "paymthdsState"=?';
+            array_push($params,$request->paymthdsState );
         } 
 
-        $data=Period::select()
+        $data=PaymentMethod::select()
             ->whereRaw(' 1=1 '.$queryWhere,[$params])
-            ->orderBy('prdsNameShort','DESC')
+            ->orderBy('paymthdsName','ASC')
             ->get();
         
         return response()->json([
@@ -35,12 +35,7 @@ class PeriodController extends Controller
             'msg'=>'Listado correctamente.',
             'data'=>$data
         ],200);
-       
-    
-    }
-
-
-
+           }
 
     /**
      * Store a newly created resource in storage.
@@ -48,13 +43,13 @@ class PeriodController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(AddPeriodRequest $request)
+    public function store(AddPaymentMethodRequest $request)
     {
-        $p = Period::create($request->all());
+        $p = PaymentMethod::create($request->all());
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',
-            'data' => Period::where('prdsId', $p->prdsId)->get()
+            'data' => PaymentMethod::where('paymthdsId', $p->paymthdsId)->get()
         ], 200);
     }
 
@@ -76,19 +71,18 @@ class PeriodController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdPeriodRequest $request, $id)
+    public function update(UpdPaymentMethodRequest $request, $id)
     {
-        $hq = Period::where('prdsId', $id)->first();
-        $hq->prdsNameShort = $request->prdsNameShort;
-        $hq->prdsDescription = $request->prdsDescription;
-        $hq->prdsState = $request->prdsState;
+        $hq = PaymentMethod::where('paymthdsId', $id)->first();
+        $hq->paymthdsName = $request->paymthdsName;
+        $hq->paymthdsState = $request->paymthdsState;
 
 
         $hq->save();
         return response()->json([
             'res' => true,
             'msg' => 'Actualizado correctamente',
-            'data' => Period::where('prdsId', $hq->prdsId)->get()
+            'data' => PaymentMethod::where('paymthdsId', $hq->paymthdsId)->get()
         ], 200);   
     }
 
@@ -100,18 +94,18 @@ class PeriodController extends Controller
      */
     public function destroy($id)
     {
-        $a = Period::whereIn('prdsId', explode(',', $id),)->delete();
+        $a = PaymentMethod::whereIn('paymthdsId', explode(',', $id),)->delete();
         return response()->json([
             'res' => true,
             'msg' => 'Eliminado correctamente.',
             'data' => $a
         ], 200);
-       
     }
-    public function changeState($prdsId, Request $request)
+
+    public function changeState($id, Request $request)
     {
-        $q = Period::where('prdsId', $prdsId)->first();
-        $q->prdsState = $request->prdsState;
+        $q = PaymentMethod::where('paymthdsId', $id)->first();
+        $q->paymthdsState = $request->paymthdsState;
         $q->save();
         return response()->json([
             'res' => true,

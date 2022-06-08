@@ -12,6 +12,6 @@ class PaymentMethod extends Model
     protected $table = 'payment_methods';
     protected $fillable = [
         'paymthdsName',
-        'paymthdsStatus', /*1=activo, 2=inactivo*/  
+        'paymthdsState', /*1=activo, 2=inactivo*/  
     ];
 }
