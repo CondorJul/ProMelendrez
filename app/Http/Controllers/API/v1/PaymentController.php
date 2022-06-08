@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Headquarter;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Models\Payment;
 use App\Models\PaymentDetail;
+use App\Models\Teller;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use PDOException;
@@ -20,7 +23,44 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        //
+    
+    }
+
+    public function all(Request $request){
+        $params=[];
+        $queryWhere='';
+
+        if($request->bussId>0){
+            $queryWhere.='and "bussId"=?';
+            array_push($params,$request->bussId);
+        } 
+ 
+        if($request->hqId>0){
+            $queryWhere.='and "hqId"=?';
+            array_push($params,$request->hqId );
+        }
+
+        $data=Payment::select()
+            ->whereRaw(' 1=1 '.$queryWhere,[$params])
+            ->orderBy('payDatePrint', 'DESC')
+            ->get();
+        /*
+            $data=AppointmentTemp::select()
+                ->addSelect(DB::raw(' EXTRACT(EPOCH FROM current_timestamp-"apptmDateStartAttention") as "elapsedSecondsStartAttention"'))
+                ->addSelect(DB::raw(' EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" '))
+                ->with('teller')
+                ->with('category')
+                ->whereRaw(' 1=1 '.$queryWhere,[$params])
+                //->where('apptmState', 1)
+                ->orderBy("elapsedSeconds", 'DESC')
+                
+                ->get();
+        */
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Listado correctamente',
+            'data'=>$data//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1 '.$queryWhere.' order by "elapsedSeconds" DESC',$params)
+        ],200);
     }
 
     /**
@@ -31,18 +71,28 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
+        $user=User::where('id', $request->user()->id)->with('tellers')->first();
+        $r=$request->all();
+                
         try {
             DB::connection()->beginTransaction();
-            $p = Payment::create($request->all());
+            $p = Payment::create(array_merge($request->all(),['created_by'=>$user->id]));
             $p->paymentDetails()->createMany($request->paymentDetails);
+            $p->dPaymentPaymentMethods()->createMany($request->dPaymentPaymentMethods);
+            /*Para Facturar */
+            $p->payDatePrint=DB::raw('now()');
+            $p->userId=$user->id;
+            $p->tellId=$user['tellers'][0]['tellId'];
+            $p->updated_by=$user->id;
             $p->payState = 3;/*Facturado */
+
             $p->save();
             DB::connection()->commit();
 
             return response()->json([
                 'res' => true,
                 'msg' => 'Guardado correctamente',
-                'data' => Payment::select()->with('paymentDetails')->where('payId', $p->payId)->first()
+                'data' => Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods')->where('payId', $p->payId)->first()
 
             ], 200);
         } catch (PDOException $e) {
@@ -103,16 +153,48 @@ class PaymentController extends Controller
         //
     }
 
+    public function proofOfPaymentJson($payToken)
+    {
+        try {
+            $p = Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
+            $h = Headquarter::where('hqId', $p->hqId)->first();
+            $t = Teller::where('tellId', $p->tellId)->first();
+            $u = User::select('id', 'perId')->with('person')->first();
+
+            $data = [
+                'titulo' => 'Styde.net',
+                'payment' => $p,
+                'headquarter'=>$h, 
+                'teller'=>$t,
+                'user'=>$u
+            ];
+
+            return response()->json($data);
+
+        } catch (Exception $e) {
+            return 'Surgio un error, intente más tarde';
+        }
+
+      
+    }
+
     public function proofOfPayment($payToken)
     {
         try {
             $p = Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
+            $h = Headquarter::where('hqId', $p->hqId)->first();
+            $t = Teller::where('tellId', $p->tellId)->first();
+            $u = User::select('id', 'perId')->with('person')->first();
 
             $data = [
                 'titulo' => 'Styde.net',
-                'payment' => $p
+                'payment' => $p,
+                'headquarter'=>$h, 
+                'teller'=>$t,
+                'user'=>$u
             ];
 
+            //return response()->json($data);
 
             $path = base_path('resources/views/logo.png');
             //$path = base_path('storage/global/logo.png');

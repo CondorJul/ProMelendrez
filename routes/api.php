@@ -22,6 +22,7 @@ use App\Http\Controllers\API\v1\HeadquarterController;
 use App\Http\Controllers\API\v1\PeriodController;
 use App\Http\Controllers\API\v1\DBusinessPeriodController;
 use App\Http\Controllers\API\v1\PaymentController;
+use App\Http\Controllers\API\v1\PaymentMethodController;
 use App\Http\Controllers\API\v1\PeriodPaymentController;
 use App\Http\Controllers\API\v1\ServicesController;
 use App\Http\Controllers\API\v1\ServiceProvidedController;
@@ -229,6 +230,15 @@ Route::put('/v1/periods/{id}', [PeriodController::class, 'update']);
 Route::delete('/v1/periods/{id}', [PeriodController::class, 'destroy']);
 Route::put('/v1/periods/{prdsId}/change-state', [PeriodController::class, 'changeState']);
 
+/*PaymentMethods */
+Route::get('/v1/payment-methods', [PaymentMethodController::class, 'index']);
+Route::post('/v1/payment-methods', [PaymentMethodController::class, 'store']);
+Route::put('/v1/payment-methods/{id}', [PaymentMethodController::class, 'update']);
+Route::delete('/v1/payment-methods/{id}', [PaymentMethodController::class, 'destroy']);
+Route::put('/v1/payment-methods/{id}/change-state', [PaymentMethodController::class, 'changeState']);
+
+
+
 /*Detalle negocio y periodo */
 Route::get('/v1/d-business-periods', [DBusinessPeriodController::class, 'index']);
 Route::post('/v1/d-business-periods/addDBP', [DBusinessPeriodController::class, 'store']);
@@ -254,11 +264,13 @@ Route::delete('v1/services/stateServices/{svId}', [ServicesController::class, 's
 
 /*Pagos */
 /*Detalle negocio y periodo */
-Route::get('/v1/payments', [PaymentController::class, 'index']);
+Route::get('/v1/payments', [PaymentController::class, 'all']);
 Route::post('/v1/payments', [PaymentController::class, 'store'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{id}', [PaymentController::class, 'update']);
 Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy']);
 Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
+Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::class, 'proofOfPaymentJson']);
+
 
 
 
