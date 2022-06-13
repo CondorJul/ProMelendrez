@@ -203,6 +203,7 @@ CREATE TABLE "appointment"(
     "perName" VARCHAR
 );
 
+
 CREATE TABLE "bussines"(
     "bussId" SERIAL PRIMARY KEY,
     "bussKind" varchar(10),
@@ -758,6 +759,7 @@ create table services_provided(
     "created_at" timestamp
 );
 
+
 /*payment_details*/
 create table payments(
     "payId" serial PRIMARY KEY,
@@ -780,16 +782,29 @@ create table payments(
     "userId" BIGINT,
     /*CLientes sin regisgro en base de datos*/
     "payClientName" varchar(80),
-    "payClientAddress" varchar(40),
+    "payClientAddress" varchar(200),
     "payClientTel" varchar(12),
-    "payClientEmail" varchar(40),
+    "payClientEmail" varchar(100),
     "payClientRucOrDni" varchar(12),
+
+    /*Igv 09/06/2022*/
+    "payTaxAcumulate" int default 1, /*1=Acumulado, 2=NO acumulado*/
+    "paySubPreviusTotal" DECIMAL(12,2) DEFAULT 0.0, /*El total previo*/ 
+    /*Igv 09/06/2022*/
     /*Campos para clientes no registrados*/
     "paySubTotal" decimal(12, 2) DEFAULT 0.0,
     "payDiscount" decimal(12, 2) DEFAULT 0.0,
+    "payTotalTaxBase" decimal(12, 2) DEFAULT 0.0,
+    "payTaxPercent" decimal (12,2) DEFAULT 0.18, 
     "paySalesTax" decimal(12, 2) DEFAULT 0.0,
     "payTotal" decimal(12, 2) DEFAULT 0.0,
     "payTotalInWords" VARCHAR(100),
+
+    "payIsCanceled" int DEFAULT 2,/*1=cancelado, 2=no cancelado*/
+    
+    "payTicketSN" varchar(50),
+    "payInvoiceSN" varchar(50),
+
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
@@ -827,6 +842,8 @@ create table payment_details(
     "pdsDescription" varchar(200),
     "pdsUnitPrice" decimal(12, 2) DEFAULT 0.0,
     "pdsAmount" decimal(12, 2) DEFAULT 0.0,
+
+    "pdsIsCanceled" int DEFAULT 2,/*1=cancelado, 2=no cancelado*/
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
@@ -946,17 +963,16 @@ DECLARE
 
     _sumPaidFromPD decimal(12,2);
 
-    _subTotal decimal(12,2);
+    _subPreviusTotal decimal(12,2);
+    
 
 BEGIN
 /*Obtenemos algunos datos de categoria*/
 
-
-
 /*Si es un servicio de un cliente X, verificamos que este correcto*/
 IF COALESCE(NEW."spId", -1)>0 THEN
     SELECT "spCost", "spDebt", "spPaid" INTO  _spCost, _spDebt, _spPaid FROM services_provided where "spId"=NEW."spId";
-    SELECT COALESCE(SUM("pdsAmount"),0) into _sumPaidFromPD FROM payment_details where "spId"=NEW."spId";
+    SELECT COALESCE(SUM("pdsAmount"),0) into _sumPaidFromPD FROM payment_details where "spId"=NEW."spId" and "pdsIsCanceled"=2/*NO CANCELADO*/;
     IF _spCost < _sumPaidFromPD THEN 
         RAISE EXCEPTION '<msg>El pago por el servicio no puede superar el costo establecido.<msg>';
 
@@ -965,9 +981,10 @@ IF COALESCE(NEW."spId", -1)>0 THEN
 
 END IF;
 
-SELECT sum("pdsAmount") into _subTotal from payment_details where "payId"=NEW."payId";
+SELECT sum("pdsAmount") into _subPreviusTotal from payment_details where "payId"=NEW."payId";
 
-UPDATE payments set "paySubTotal"=_subTotal where "payId"=NEW."payId";
+UPDATE payments set "paySubPreviusTotal"=_subPreviusTotal where "payId"=NEW."payId";
+
 
 RETURN NEW;
 
@@ -981,6 +998,49 @@ drop FUNCTION tf_a_i_payment_details;*/
 CREATE TRIGGER t_a_i_payment_details AFTER
 INSERT
     ON payment_details FOR EACH ROW EXECUTE PROCEDURE tf_a_i_payment_details();
+
+
+
+/*09/06/2022*/
+CREATE FUNCTION tf_a_u_payment_details() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+    $$ 
+DECLARE
+    
+    _spCost decimal(12, 2);
+    _spDebt decimal(12, 2);
+    _spPaid decimal(12, 2); 
+
+    _sumPaidFromPD decimal(12,2);
+
+    _subPreviusTotal decimal(12,2);
+BEGIN
+
+
+IF COALESCE(NEW."spId", -1)>0 AND NEW."pdsIsCanceled"<>OLD."pdsIsCanceled" THEN
+    SELECT "spCost", "spDebt", "spPaid" INTO  _spCost, _spDebt, _spPaid FROM services_provided where "spId"=NEW."spId";
+    SELECT COALESCE(SUM("pdsAmount"),0) into _sumPaidFromPD FROM payment_details where "spId"=NEW."spId" and "pdsIsCanceled"=2/*NO CANCELADO*/;
+    IF _spCost < _sumPaidFromPD THEN 
+        RAISE EXCEPTION '<msg>El pago por el servicio no puede superar el costo establecido.<msg>';
+    END IF;
+    UPDATE services_provided set  "spPaid" =_sumPaidFromPD, "spDebt"= _spCost-_sumPaidFromPD where "spId"=NEW."spId";
+END IF;
+
+RETURN NEW;
+
+END;
+
+$$
+
+/*
+drop TRIGGER t_a_u_payment_details on payment_details;
+drop FUNCTION tf_a_u_payment_details;*/
+CREATE TRIGGER t_a_u_payment_details AFTER
+UPDATE
+    ON payment_details FOR EACH ROW EXECUTE PROCEDURE tf_a_u_payment_details();
+
+
+
 
 
 
@@ -1030,14 +1090,40 @@ DECLARE
     _number integer;
 
     _payTotalInWords varchar(100);
+    /*Añadidos 09/06/2022*/
+    _paySubTotal decimal(12, 8);
+    _payDiscount decimal(12, 8);
+    _payTotalTaxBase decimal(12, 8);
+    _payTaxPercent decimal (12,8);
+    _paySalesTax decimal(12, 8);
+    _payTotal decimal(12, 8);
+
 BEGIN
 /*Analizamos que no sea una boleta facturada*/
 IF NEW."payState" <> 3/*Facturado*/ AND  OLD."payState"=3/*Facturado*/ THEN
     RAISE EXCEPTION '<msg>Lo sentimos, este ticket no esta disponible para modificar.<msg>';
 END IF;
 
-IF NEW."payKindDoc"=1/*Tickets*/ THEN
+
+IF NEW."payKindDoc"=1/*Tickets*/  AND OLD."payState"<>3/*Facturado*/ THEN
+    
     NEW."payTotal":=NEW."paySubTotal";
+
+      
+    IF NEW."payTaxAcumulate"=1 /*Acumulado*/ THEN
+        _paySubTotal:=(NEW."paySubPreviusTotal"/(1+NEW."payTaxPercent"));
+    END IF;
+    IF NEW."payTaxAcumulate"=2 /*NO acumulado*/ THEN
+        _paySubTotal:="paySubPreviusTotal";
+    END IF;
+    _payTotalTaxBase:=_paySubTotal-NEW."payDiscount";
+    _paySalesTax:=_payTotalTaxBase*(NEW."payTaxPercent");
+    _payTotal:=_payTotalTaxBase+_payTotalTaxBase*(NEW."payTaxPercent");
+
+    NEW."paySubTotal":=_paySubTotal;
+    NEW."payTotalTaxBase":=_payTotalTaxBase;
+    NEW."paySalesTax":= _paySalesTax;
+    NEW."payTotal":=_payTotal;
 END IF;
 
 IF  NEW."payState"=3 AND OLD."payState"<>3 THEN
@@ -1047,6 +1133,10 @@ IF  NEW."payState"=3 AND OLD."payState"<>3 THEN
     NEW."payNumber":=_number;
     SELECT fu_numero_letras(NEW."payTotal") into _payTotalInWords;
     NEW."payTotalInWords":=_payTotalInWords;
+END IF;
+
+IF NEW."payIsCanceled"<>OLD."payIsCanceled" THEN
+    UPDATE payment_details set "pdsIsCanceled"=NEW."payIsCanceled" where "payId"=NEW."payId";
 END IF;
 
 
@@ -1328,8 +1418,12 @@ BEGIN
   IF lnTerna = 1 THEN
     lcRetorno := 'CERO';
   END IF;
-  lcRetorno := RTRIM(lcRetorno) || ' CON ' || LTRIM(cast(lnFraccion as varchar)) || '/100 SOLES';
+  lcRetorno := RTRIM(lcRetorno) || ' CON ' || LPAD(LTRIM(cast(lnFraccion as varchar))::text, 2,'0') || '/100 SOLES';
 RETURN lcRetorno;
 END;
 $body$
 LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER;
+/**/
+
+
+UPDATE payments set "payIsCanceled"=1 where "payId"=12

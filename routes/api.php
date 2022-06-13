@@ -153,6 +153,7 @@ Route::put('v1/appointment-temps/{ids}/teller', [AppointmentTempController::clas
 
 /* Bussines*/
 Route::get('v1/bussines', [BusinessController::class, 'index']);
+Route::get('v1/bussines/all-summarized', [BusinessController::class, 'allSummarized']);
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
 Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
 Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson']);
@@ -267,6 +268,11 @@ Route::delete('v1/services/stateServices/{svId}', [ServicesController::class, 's
 Route::get('/v1/payments', [PaymentController::class, 'all']);
 Route::post('/v1/payments', [PaymentController::class, 'store'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{id}', [PaymentController::class, 'update']);
+Route::put('/v1/payments/{payId}/cancel', [PaymentController::class, 'cancel'])->middleware(['auth:sanctum']);
+Route::put('/v1/payments/{payId}/ticket', [PaymentController::class, 'setTicket'])->middleware(['auth:sanctum']);
+Route::put('/v1/payments/{payId}/invoice', [PaymentController::class, 'setInvoice'])->middleware(['auth:sanctum']);
+
+
 Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy']);
 Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
 Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::class, 'proofOfPaymentJson']);

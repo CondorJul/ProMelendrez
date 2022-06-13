@@ -29,7 +29,14 @@ class BusinessController extends Controller
             ->setStatusCode(200);*/
         return Business::with('person')->get();
     }
-
+    public function allSummarized()
+    {
+        /*return bussinesResource::collection(Business::with('person')->get())
+            ->additional(['msg' => "lista", 'res' => true])
+            ->response()
+            ->setStatusCode(200);*/
+        return Business::select('bussId','bussRUC', 'bussName', 'bussFileNumber')->get();
+    }
     /**
      * Store a newly created resource in storage.
      *
