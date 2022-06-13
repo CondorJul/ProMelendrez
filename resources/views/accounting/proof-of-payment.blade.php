@@ -136,49 +136,59 @@
 <body>
     <div style="text-align: center; padding: 15px;">
         <img src="<?php echo $pic ?>" alt="" width="270px">
-        <h5 style="font-size: 7.5px; font-family: arial-narrow; margin-top: 2px; margin-bottom: 5px; font-style: italic; font-weight: lighter;">Av. Daniel Alcides Carrion N° 204(Segundo Nivel) Urb. San Juan-Yanacancha-Pasco <br> Cel: 973896051/E-mail: melendres.auditores@hotmail.com</h5>
-        <h6 style="font-weight: bold; font-size: 20px;">{{$payment['paySerie']}}-{{sprintf('%08d', $payment['payNumber'])}}</h6>
-        <table>
+        <h5 style="font-size: 10px; font-family: arial-narrow; margin-top: 2px; font-style: italic; font-weight: lighter;">Av. Daniel Alcides Carrion N° 204(Segundo Nivel) <br> Urb. San Juan-Yanacancha-Pasco <br> Cel: 973896051/E-mail: melendres.auditores@hotmail.com</h5>
+        <table style="margin: 5 0 5 0;">
             <tr>
-                <th style="width: 270px; font-size: 2px; border-bottom: 1px solid;"></th>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
+            </tr>
+        </table>
+        <h6 style="font-size: 18px; font-family: impact;">RECIBO<br>{{$payment['paySerie']}}-{{sprintf('%08d', $payment['payNumber'])}}</h6>
+        <table style="margin: 5 0 5 0;">
+            <tr>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
         </table>
         <table class="default" style="width: 270px;">
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Señor(es):</th>
-                <th colspan="3" style="width:200px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientName']}}</th>
+                <th style="width:200px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientName']}}</th>
             </tr>
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">R.U.C:</th>
-                <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientRucOrDni']}}</th>
-                <th style="width:40px; font-size: 11px; text-align: left; font-weight: lighter;">Fecha:</th>
-                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payDatePrint']}}</th>
+                <th style="width:200px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientRucOrDni']}}</th>
+            </tr>
+            <tr>
+                <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Fecha:</th>
+                <th style="width:200px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payDatePrint']}}</th>
             </tr>
             <tr>
                 <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Direccion:</th>
-                <th style="width:105px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientAddress']}}</th>
-                <th style="width:40px; font-size: 11px; text-align: left; font-weight: lighter;">Celular:</th>
-                <th style="width:50px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientTel']}}</th>
+                <th style="width:200px; font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientAddress']}}</th>
+            </tr>
+            <tr>
+                <th style="width:50px; font-size: 11px; text-align: left; font-weight: lighter;">Celular:</th>
+                <th style="width:200px;font-size: 11px; text-align: left; font-style: italic;">{{$payment['payClientTel']}}</th>
             </tr>
         </table>
-        <table>
+        <table style="margin: 5 0 5 0;">
             <tr>
-                <th style="width: 270px; font-size: 2px; border-bottom: 1px solid black;"></th>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
         </table>
         <table class="default" style="width: 270px;">
-            <tr>
-                <th colspan="4" style="border-top: 1px dashed black;"></th>
-            </tr>
             <tr>
                 <th style="width:30px; font-size: 11px; text-align: center;">Cant.</th>
                 <th style="width:155px; font-size: 11px; text-align: center;">Descripcion</th>
                 <th style="width:35px; font-size: 11px; text-align: center;">P. Unit.</th>
                 <th style="width:30px;font-size: 11px; text-align: center;">Importe</th>
             </tr>
+        </table>
+        <table style="margin: 5 0 5 0;">
             <tr>
-                <th colspan="4" style="border-top: 1px dashed black;"></th>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
+        </table>
+        <table class="default" style="width: 270px;">
             @foreach ($payment['paymentDetails'] as $key => $value)
 
             <tr>
@@ -188,24 +198,48 @@
                 <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">{{$value['pdsAmount']}}</th>
             </tr>
             @endforeach
-
+        </table>
+        <table style="margin: 5 0 5 0;">
             <tr>
-                <th colspan="4" style="border-top: 1px dashed black;"></th>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
+        </table>
+        <table class="default" style="width: 270px;">
             <tr>
                 <th colspan="2" style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;"></th>
                 <th style="width:35px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">Total</th>
                 <th style="width:30px;font-size: 11px; text-align: right; font-style: italic; font-weight: lighter;">{{$payment['payTotal']}}</th>
             </tr>
-        </table>
-        <table>
             <tr>
-                <th style="width: 270px; font-size: 2px; border-bottom: 1px solid;"></th>
+                <th style="width:30px; font-size: 11px; text-align: left; font-style: italic; font-weight: lighter;">Son: </th>
+                <th colspan="3" style="width:30px; font-size: 11px; text-align: left; font-style: italic; font-weight: lighter;">{{$payment['payTotalInWords']}}</th>
+            </tr>
+        </table>
+        <table style="margin: 5 0 5 0;">
+            <tr>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
+            </tr>
+        </table>
+        <table class="default" style="width: 270px;">
+            <tr>
+                <th style="width:30px; font-size: 11px; text-align: center; font-weight: lighter;">Sede</th>
+                <th style="width:35px; font-size: 11px; text-align: center; font-weight: lighter;">Ventanilla</th>
+                <th style="width:30px;font-size: 11px; text-align: center; font-weight: lighter;">Usuario</th>
+            </tr>
+            <tr>
+                <th style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">{{$headquarter['hqName']}}</th>
+                <th style="width:30px; font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">{{$teller['tellCode']}}</th>
+                <th style="width:30px;font-size: 11px; text-align: center; font-style: italic; font-weight: lighter;">{{$user->person['perNumberDoc']}}</th>
+            </tr>
+        </table>
+        <table style="margin: 5 0 5 0;">
+            <tr>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
         </table>
         <br>
-        <div style="font-size: 9px; text-align: center; font-weight: lighter;"><br>..............................................<br>Melendres Auditores</div>
-        <div style="font-size: 11px; text-align: center;">Canjear por Factura o Boleta de Venta</div>
+        <div style="font-size: 10px; text-align: center; font-weight: lighter;"><br>..............................................<br>Melendres Auditores</div>
+        <div style="margin-top: 5px; font-size: 11px; text-align: center; font-style: italic">Conserve este Recibo en caso de reclamo o para <br> canjear por Factura o Boleta de Venta <br>¡Gracias por su preferencia...! </div>
     </div>
 </body>
 

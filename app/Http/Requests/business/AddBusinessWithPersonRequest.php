@@ -32,6 +32,7 @@ class AddBusinessWithPersonRequest extends FormRequest
             'business.bussFileNumber' => 'required',
             'business.bussDateStartedAct' => '',
             'business.bussDateMembership' => '',
+            'business.tellId' => 'required',
             'person.perKindDoc' => 'required',
             'person.perName' => 'required',
             'person.perNumberDoc' => 'required|unique:person,perNumberDoc',

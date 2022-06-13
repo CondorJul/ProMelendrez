@@ -26,6 +26,7 @@ use App\Http\Controllers\API\v1\PaymentMethodController;
 use App\Http\Controllers\API\v1\PeriodPaymentController;
 use App\Http\Controllers\API\v1\ServicesController;
 use App\Http\Controllers\API\v1\ServiceProvidedController;
+use Illuminate\Bus\BusServiceProvider;
 use Illuminate\Routing\RouteRegistrar;
 
 /*
@@ -152,6 +153,7 @@ Route::put('v1/appointment-temps/{ids}/teller', [AppointmentTempController::clas
 
 
 /* Bussines*/
+Route::get('v1/business/getCantTellerUsers', [BusinessController::class, 'getTellerJoinUsers']);
 Route::get('v1/bussines', [BusinessController::class, 'index']);
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
 Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
@@ -161,6 +163,7 @@ Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusine
 Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData']);
 Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData']);
 Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData']);
+
 
 
 /* Person*/

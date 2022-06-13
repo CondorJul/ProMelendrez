@@ -13,6 +13,7 @@ use App\Http\Requests\business\updPerDataRequest;
 use Illuminate\Http\Request;
 use App\Models\Business;
 use App\Models\Person;
+use Illuminate\Support\Facades\DB;
 
 class BusinessController extends Controller
 {
@@ -113,6 +114,7 @@ class BusinessController extends Controller
         $business->bussFileNumber = $request->business['bussFileNumber'];
         $business->bussDateStartedAct = $request->business['bussDateStartedAct'];
         $business->bussDateMembership = $request->business['bussDateMembership'];
+        $business->tellId = $request->business['tellId'];
         $business->perId = $person->perId;
         $business->save();
         return response()->json([
@@ -228,5 +230,14 @@ class BusinessController extends Controller
             'msg' => 'Leido correctamente',
             'data' => Business::find($bussId)->periods
         ], 200);
+    }
+
+    public function getTellerJoinUsers(Request $request)
+    {
+        return response()->json([
+            'res' => true,
+            'msg' => 'Leido Correctamente',
+            'data' => DB::select('SELECT "tellId", "tellCode", "tellName", users."name", teller."hqId", (SELECT COUNT(*) FROM bussines WHERE bussines."tellId"=teller."tellId") AS "cantBusiness" FROM teller LEFT JOIN users ON teller."userId"=users."id" WHERE teller."hqId"=?', [$request->hqId])
+        ]);
     }
 }
