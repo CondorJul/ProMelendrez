@@ -30,20 +30,42 @@ class PaymentController extends Controller
         $params=[];
         $queryWhere='';
 
+        /*$queryWhere.='and "hqId" = ?';
+        array_push($params, (empty($request->hqId))?0:$request->hqId);
+        */
         if($request->bussId>0){
-            $queryWhere.='and "bussId"=?';
+            $queryWhere.='and "bussId"=? ';
             array_push($params,$request->bussId);
         } 
  
         if($request->hqId>0){
-            $queryWhere.='and "hqId"=?';
+            $queryWhere.=' and "hqId"=? ';
             array_push($params,$request->hqId );
+        }
+
+        if($request->dateStart && $request->dateEnd){
+            $queryWhere.=' and "payDatePrint" between ? and ? ';
+            array_push($params,$request->dateStart, $request->dateEnd);
+        }else if($request->dateStart){
+            $queryWhere.=' and "payDatePrint">? ';
+            array_push($params,$request->dateStart);
+        }else if($request->dateEnd){
+            $queryWhere.=' and "payDatePrint"<? ';
+            array_push($params,$request->dateEnd);
+        }
+
+        if(!empty($request->wordLike)){
+            $queryWhere.=' and ( "payClientName" like ? or "payClientRucOrDni" like ? or cast( "payNumber" as varchar) like ?)';
+            $p='%'.$request->wordLike.'%';
+            array_push($params,$p,$p,$p);
         }
 
         $data=Payment::select()
             ->whereRaw(' 1=1 '.$queryWhere,[$params])
             ->orderBy('payDatePrint', 'DESC')
             ->get();
+
+
         /*
             $data=AppointmentTemp::select()
                 ->addSelect(DB::raw(' EXTRACT(EPOCH FROM current_timestamp-"apptmDateStartAttention") as "elapsedSecondsStartAttention"'))
@@ -59,7 +81,7 @@ class PaymentController extends Controller
         return response()->json([
             'res'=>true,
             'msg'=>'Listado correctamente',
-            'data'=>$data//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1 '.$queryWhere.' order by "elapsedSeconds" DESC',$params)
+            'data'=>$data//$data//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1 '.$queryWhere.' order by "elapsedSeconds" DESC',$params)
         ],200);
     }
 
@@ -140,6 +162,50 @@ class PaymentController extends Controller
         return $pdf->stream();
 
      */
+    }
+    public function cancel($payId, Request $request){
+        $p=Payment::where('payId',$payId )->first();
+
+        $p->updated_by=$request->user()->id;
+        $p->payIsCanceled=1/*1=Es cancelado, 2=No cancelado*/ ;
+        $p->save();
+        
+        return response()->json([
+            'res' => true,
+            'msg' => 'Anulado correctamente',
+            'data' => Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods')->where('payId', $p->payId)->first()
+
+        ], 200);
+    }
+
+    public function setTicket($payId, Request $request){
+        $p=Payment::where('payId',$payId )->first();
+
+        $p->updated_by=$request->user()->id;
+        $p->payTicketSN=$request->payTicketSN;
+        
+        $p->save();
+        
+        return response()->json([
+            'res' => true,
+            'msg' => 'Boleta actualizado correctamente',
+            'data' => Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods')->where('payId', $p->payId)->first()
+
+        ], 200);
+    }
+    public function setInvoice($payId, Request $request){
+        $p=Payment::where('payId',$payId )->first();
+
+        $p->updated_by=$request->user()->id;
+        $p->payInvoiceSN=$request->payInvoiceSN;
+        $p->save();
+        
+        return response()->json([
+            'res' => true,
+            'msg' => 'Factura actualizada correctamente',
+            'data' => Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods')->where('payId', $p->payId)->first()
+
+        ], 200);
     }
 
     /**

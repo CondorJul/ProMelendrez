@@ -33,7 +33,10 @@ class Payment extends Model
         'payClientEmail',
         'payClientRucOrDni',
         /*Campos para clientes no registrados*/
-     
+        'payTicketSN',
+        'payInvoiceSN',
+        'payIsCanceled',
+
         'paySubTotal',
         'payDiscount' ,
         'paySalesTax' , 
