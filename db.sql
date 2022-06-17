@@ -660,7 +660,8 @@ create table periods(
     
     "prdsState" int,
     "updated_at" timestamp,
-    "created_at" timestamp
+    "created_at" timestamp 
+
 );
 
 create table d_bussines_periods(
@@ -680,15 +681,18 @@ create table d_bussines_periods(
     "dbpPaidDate" TIMESTAMP,
     UNIQUE("prdsId", "bussId"),
     "updated_at" timestamp,
-    "created_at" timestamp
+    "created_at" timestamp, 
+
+    FOREIGN KEY ("prdsId") REFERENCES periods("prdsId"), 
+    FOREIGN KEY ("bussId") REFERENCES bussines("bussId")
 );
-create table model_of_services(
+/*create table model_of_services(
     "msId" serial primary key,
     "msName" varchar(150),
     "msTimeInterval" varchar(50),
     "updated_at" timestamp,
     "created_at" timestamp
-);
+);*/
 
 /*create table services_provided(
     "spId" SERIAL PRIMARY KEY,
@@ -726,11 +730,33 @@ create table services(
 );
 
 
+create table period_payments(
+    "ppayId" SERIAL PRIMARY KEY,
+    "ppayName" varchar(20),
+    "ppayState" int default 1
+);  
+
+insert into period_payments
+("ppayName") VALUES
+('Enero'),
+     ('Febrero'),
+    ( 'Marzo'),
+     ('Abril'),
+     ('Mayo'),
+     ('Junio'),
+     ('Julio'),
+     ('Agosto'),
+     ('Setiembre'),
+     ('Octubre'),
+    ('Noviembre'),
+    ('Diciembre'),
+    ('Anual'),
+    ('Ninguno/Otros');
 
 create table services_provided(
     "spId" SERIAL PRIMARY KEY,
     "dbpId"  INTEGER,
-        "svId" INTEGER,
+    "svId" INTEGER,
 
     "ppayId" INTEGER,
     /*"spPeriodPayment" INTEGER,*/
@@ -756,8 +782,28 @@ create table services_provided(
     "updated_by" BIGINT,
     
     "updated_at" timestamp,
-    "created_at" timestamp
+    "created_at" timestamp, 
+    FOREIGN KEY("svId") REFERENCES services("svId"), 
+    FOREIGN KEY("dbpId") REFERENCES d_bussines_periods("dbpId"), 
+    FOREIGN KEY ("ppayId") REFERENCES period_payments("ppayId")
 );
+
+
+create table correlative_proof(
+    "cpfId" integer PRIMARY KEY,
+    "hqId" integer, 
+    "cpfKindDoc" int, /*1=Recibo, 2=Boleta, 3=Factura*/
+    "cpfNameTypeProof" varchar(30),
+    "cpfSerie" varchar(10), 
+    "cpfNumber" integer,
+    UNIQUE("hqId", "cpfKindDoc"),
+    FOREIGN KEY ("hqId") REFERENCES headquarter("hqId")
+);
+INSERT INTO correlative_proof
+("cpfId", "hqId", "cpfKindDoc","cpfNameTypeProof", "cpfSerie", "cpfNumber") VALUES
+(1, 1/*Pasco*/, 1/*Ticket*/,'Ticket - Pasco','T001', 1 ),
+(2, 1/*Pasco*/, 2/*BOleta*/,'Boleta - Pasco','B001', 1 ),
+(3, 1/*Pasco*/, 3/*Factura*/,'Factura - Pasco','F001', 1 );
 
 
 /*payment_details*/
@@ -781,7 +827,7 @@ create table payments(
     /*userId facturado*/
     "userId" BIGINT,
     /*CLientes sin regisgro en base de datos*/
-    "payClientName" varchar(80),
+    "payClientName" varchar(150),
     "payClientAddress" varchar(200),
     "payClientTel" varchar(12),
     "payClientEmail" varchar(100),
@@ -810,6 +856,25 @@ create table payments(
     "updated_at" timestamp,
     "created_at" timestamp
 );
+create table payment_details(
+    "pdsId" serial PRIMARY KEY,
+    "payId" INTEGER,
+    "pdsQuantity" decimal(8, 2) DEFAULT 1,
+    "spId" integer,
+    /*
+        "pdsPeriod" varchar(20),
+        "pdsYear" int,*/
+    "pdsDescription" varchar(200),
+    "pdsUnitPrice" decimal(12, 2) DEFAULT 0.0,
+    "pdsAmount" decimal(12, 2) DEFAULT 0.0,
+
+    "pdsIsCanceled" int DEFAULT 2,/*1=cancelado, 2=no cancelado*/
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp, 
+    FOREIGN KEY ("payId") REFERENCES payments("payId")
+);
 
 create table payment_methods(
     "paymthdsId" SERIAL PRIMARY KEY,
@@ -829,68 +894,17 @@ create table d_payments_payment_methods(
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
-    "created_at" timestamp
-) 
-create table payment_details(
-    "pdsId" serial PRIMARY KEY,
-    "payId" INTEGER,
-    "pdsQuantity" decimal(8, 2) DEFAULT 1,
-    "spId" integer,
-    /*
-        "pdsPeriod" varchar(20),
-        "pdsYear" int,*/
-    "pdsDescription" varchar(200),
-    "pdsUnitPrice" decimal(12, 2) DEFAULT 0.0,
-    "pdsAmount" decimal(12, 2) DEFAULT 0.0,
-
-    "pdsIsCanceled" int DEFAULT 2,/*1=cancelado, 2=no cancelado*/
-    "created_by" BIGINT,
-    "updated_by" BIGINT,
-    "updated_at" timestamp,
-    "created_at" timestamp
-);
-
-create table period_payments(
-    "ppayId" SERIAL PRIMARY KEY,
-    "ppayName" varchar(20),
-    "ppayState" int default 1
-);  
-
-insert into period_payments
-("ppayName") VALUES
-('Enero'),
-     ('Febrero'),
-    ( 'Marzo'),
-     ('Abril'),
-     ('Mayo'),
-     ('Junio'),
-     ('Julio'),
-     ('Agosto'),
-     ('Setiembre'),
-     ('Octubre'),
-    ('Noviembre'),
-    ('Diciembre'),
-    ('Anual'),
-    ('Ninguno/Otros');
-
-create table correlative_proof(
-    "cpfId" integer PRIMARY KEY,
-    "hqId" integer, 
-    "cpfKindDoc" int, /*1=Recibo, 2=Boleta, 3=Factura*/
-    "cpfNameTypeProof" varchar(30),
-    "cpfSerie" varchar(10), 
-    "cpfNumber" integer,
-    UNIQUE("hqId", "cpfKindDoc"),
-    FOREIGN KEY ("hqId") REFERENCES headquarter("hqId")
-);
-INSERT INTO correlative_proof
-("cpfId", "hqId", "cpfKindDoc","cpfNameTypeProof", "cpfSerie", "cpfNumber") VALUES
-(1, 1/*Pasco*/, 1/*Ticket*/,'Ticket - Pasco','T001', 1 ),
-(2, 1/*Pasco*/, 2/*BOleta*/,'Boleta - Pasco','B001', 1 ),
-(3, 1/*Pasco*/, 3/*Factura*/,'Factura - Pasco','F001', 1 );
+    "created_at" timestamp, 
+    FOREIGN KEY ("payId") REFERENCES payments("payId"),
+    FOREIGN KEY ("paymthdsId") REFERENCES payment_methods("paymthdsId")
+  
+); 
 
 
 
+
+/*FUNCIONES Y TRIGER*/
+/*Numero aleatorio*/
 create or replace function random_string(length integer)  returns text as 
 $$ 
  declare 
@@ -910,7 +924,7 @@ $$ language plpgsql;
 
 
 
-
+/*Funcion y trigger payment_details*/
 CREATE FUNCTION tf_b_i_payment_details() RETURNS TRIGGER
 LANGUAGE PLPGSQL AS
     $$ 
@@ -923,8 +937,6 @@ DECLARE
     _sumPaidFromPD decimal(12,2);
 
 BEGIN
-/*Obtenemos algunos datos de categoria*/
-
 
 IF COALESCE(NEW."pdsQuantity",-1)<=0 THEN
     RAISE EXCEPTION '<msg>La cantidad es requerido y tiene que ser mayor a 0<msg>';
@@ -967,9 +979,7 @@ DECLARE
     
 
 BEGIN
-/*Obtenemos algunos datos de categoria*/
 
-/*Si es un servicio de un cliente X, verificamos que este correcto*/
 IF COALESCE(NEW."spId", -1)>0 THEN
     SELECT "spCost", "spDebt", "spPaid" INTO  _spCost, _spDebt, _spPaid FROM services_provided where "spId"=NEW."spId";
     SELECT COALESCE(SUM("pdsAmount"),0) into _sumPaidFromPD FROM payment_details where "spId"=NEW."spId" and "pdsIsCanceled"=2/*NO CANCELADO*/;
@@ -1426,4 +1436,21 @@ LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER;
 /**/
 
 
-UPDATE payments set "payIsCanceled"=1 where "payId"=12
+/*UPDATE payments set "payIsCanceled"=1 where "payId"=12*/
+
+/*MODIFICACIPOINES EN TABLAS 13/05/2022*/
+ALTER TABLE appointment_temp 
+    ALTER COLUMN "apptmNameClient" TYPE  VARCHAR(500);
+
+ALTER TABLE appointment
+    ALTER COLUMN "apptmNameClient" TYPE  VARCHAR(500);
+
+    
+/*Añadir FOREIGN KEY in payment_details*/
+ALTER TABLE payment_details ADD FOREIGN KEY ("spId") REFERENCES services_provided("spId");
+
+ALTER TABLE bussines ALTER COLUMN "bussState" set DEFAULT 1 
+UPDATE bussines SET "bussState"=1 where "bussState" is null;
+
+
+ALTER TABLE teller ALTER COLUMN "tellState" set DEFAULT 2 
