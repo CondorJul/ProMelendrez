@@ -16,6 +16,8 @@ class Person extends Model
         'perName',
         'perAddress',
         'perTel',
+        'perTel2',
+        'perTel3',
         'perEmail'
     ];
 }

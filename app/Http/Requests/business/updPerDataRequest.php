@@ -28,8 +28,10 @@ class updPerDataRequest extends FormRequest
             'person.perName' => 'required',
             'person.perNumberDoc' => 'required',
             'person.perAddress' => '',
+            'person.perEmail' => '',
             'person.perTel' => '',
-            'person.perEmail' => ''
+            'person.perTel2' => '',
+            'person.perTel3' => '',
         ];
     }
 }

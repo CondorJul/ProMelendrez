@@ -29,7 +29,10 @@ class updAfiDataRequest extends FormRequest
             'afiliation.bussCodeSend' => '',
             'afiliation.bussCodeRNP' => '',
             'afiliation.bussAfpUser' => '',
-            'afiliation.bussAfpPass' => ''
+            'afiliation.bussAfpPass' => '',
+            'afiliation.bussSimpleCode' => '',
+            'afiliation.bussDetractionsPass' => '',
+            'afiliation.bussSisClave' => ''
         ];
     }
 }
