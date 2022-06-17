@@ -30,7 +30,10 @@ class updBussDataRequest extends FormRequest
             'business.bussAddress' => '',
             'business.bussFileKind' => 'required',
             'business.bussFileNumber' => 'required',
-            'business.bussState' => 'required'
+            'business.bussState' => 'required',
+            'business.bussTel' => '',
+            'business.bussTel2' => '',
+            'business.bussTel3' => ''
         ];
     }
 }

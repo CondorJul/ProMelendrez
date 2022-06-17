@@ -36,7 +36,7 @@ class BusinessController extends Controller
             ->additional(['msg' => "lista", 'res' => true])
             ->response()
             ->setStatusCode(200);*/
-        return Business::select('bussId','bussRUC', 'bussName', 'bussFileNumber')->get();
+        return Business::select('bussId', 'bussRUC', 'bussName', 'bussFileNumber')->get();
     }
     /**
      * Store a newly created resource in storage.
@@ -147,6 +147,9 @@ class BusinessController extends Controller
         $bussData->bussFileKind = $request->business['bussFileKind'];
         $bussData->bussFileNumber = $request->business['bussFileNumber'];
         $bussData->bussState = $request->business['bussState'];
+        $bussData->bussTel = $request->business['bussTel'];
+        $bussData->bussTel2 = $request->business['bussTel2'];
+        $bussData->bussTel3 = $request->business['bussTel3'];
         $bussData->save();
         return response()->json([
             'res' => true,
@@ -162,8 +165,10 @@ class BusinessController extends Controller
         $perData->perName = $request->person['perName'];
         $perData->perNumberDoc = $request->person['perNumberDoc'];
         $perData->perAddress = $request->person['perAddress'];
-        $perData->perTel = $request->person['perTel'];
         $perData->perEmail = $request->person['perEmail'];
+        $perData->perTel = $request->person['perTel'];
+        $perData->perTel2 = $request->person['perTel2'];
+        $perData->perTel3 = $request->person['perTel3'];
         $perData->save();
         return response()->json([
             'res' => true,
@@ -181,6 +186,9 @@ class BusinessController extends Controller
         $afiData->bussCodeRNP = $request->afiliation['bussCodeRNP'];
         $afiData->bussAfpUser = $request->afiliation['bussAfpUser'];
         $afiData->bussAfpPass = $request->afiliation['bussAfpPass'];
+        $afiData->bussSimpleCode = $request->afiliation['bussSimpleCode'];
+        $afiData->bussDetractionsPass = $request->afiliation['bussDetractionsPass'];
+        $afiData->bussSisClave = $request->afiliation['bussSisClave'];
         $afiData->save();
         return response()->json([
             'res' => true,
@@ -196,7 +204,6 @@ class BusinessController extends Controller
         $adiData->bussDateStartedAct = $request->aditional['bussDateStartedAct'];
         $adiData->bussRegime = $request->aditional['bussRegime'];
         $adiData->bussKindBookAcc = $request->aditional['bussKindBookAcc'];
-        $adiData->bussTel = $request->aditional['bussTel'];
         $adiData->bussEmail = $request->aditional['bussEmail'];
         $adiData->bussObservation = $request->aditional['bussObservation'];
         $adiData->save();

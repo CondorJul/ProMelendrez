@@ -28,7 +28,6 @@ class updAdiDataRequest extends FormRequest
             'aditional.bussDateStartedAct' => 'required',
             'aditional.bussRegime' => '',
             'aditional.bussKindBookAcc' => '',
-            'aditional.bussTel' => '',
             'aditional.bussEmail' => '',
             'aditional.bussObservation' => ''
         ];
