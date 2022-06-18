@@ -1101,12 +1101,12 @@ DECLARE
 
     _payTotalInWords varchar(100);
     /*Añadidos 09/06/2022*/
-    _paySubTotal decimal(12, 8);
-    _payDiscount decimal(12, 8);
-    _payTotalTaxBase decimal(12, 8);
-    _payTaxPercent decimal (12,8);
-    _paySalesTax decimal(12, 8);
-    _payTotal decimal(12, 8);
+    _paySubTotal decimal(18, 8);
+    _payDiscount decimal(18, 8);
+    _payTotalTaxBase decimal(18, 8);
+    _payTaxPercent decimal (18,8);
+    _paySalesTax decimal(18, 8);
+    _payTotal decimal(18, 8);
 
 BEGIN
 /*Analizamos que no sea una boleta facturada*/

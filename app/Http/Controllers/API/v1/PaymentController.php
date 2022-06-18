@@ -225,7 +225,7 @@ class PaymentController extends Controller
             $p = Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
             $h = Headquarter::where('hqId', $p->hqId)->first();
             $t = Teller::where('tellId', $p->tellId)->first();
-            $u = User::select('id', 'perId')->with('person')->first();
+            $u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
 
             $data = [
                 'titulo' => 'Styde.net',
@@ -250,7 +250,7 @@ class PaymentController extends Controller
             $p = Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
             $h = Headquarter::where('hqId', $p->hqId)->first();
             $t = Teller::where('tellId', $p->tellId)->first();
-            $u = User::select('id', 'perId')->with('person')->first();
+            $u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
 
             $data = [
                 'titulo' => 'Styde.net',
@@ -272,7 +272,8 @@ class PaymentController extends Controller
 
             return $pdf->stream();
         } catch (Exception $e) {
-            return 'Surgio un error, intente más tarde';
+           throw $e;
+            // return 'Surgio un error, intente más tarde';
         }
 
         /*/
