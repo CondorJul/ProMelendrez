@@ -116,6 +116,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->with('person')->with('tellers')->first();
 
  
+
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'msg' => ['Las credenciales proporcionados son incorrectos'],
@@ -131,6 +132,8 @@ class AuthController extends Controller
         }
         $user['permissions']=$permissions;
 
+
+        \LogActivity::add($user->email.' está iniciando sesión.', null, null);
         return  response()->json([
             'res'=>true,
             'accessToken'=>$token,
@@ -140,6 +143,7 @@ class AuthController extends Controller
 
     public function signOut(Request $request){
         $request->user()->currentAccessToken()->delete();
+        //\LogActivity::add('Cerrando sesión.');
         return response()->json([
             'res' => true,
             'msg' => 'Token Eliminado Correctamente.'

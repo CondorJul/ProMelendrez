@@ -130,6 +130,21 @@ class TellerController extends Controller
         ], 200);
     }
 
+    public function removeUser($id, Request $request)
+    {
+        $teller = Teller::find($id);
+        $teller->userId = null;
+        $teller->save();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Usuario removido correctamente',
+            'data' => Teller::where('tellId', $teller->tellId)->get()
+        ], 200);
+    }
+
+    
+
     /**
      * Remove the specified resource from storage.
      *

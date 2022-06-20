@@ -41,6 +41,7 @@ class AppointmentController extends Controller
             array_push($params,$request->apptmState );
             
         }
+
         if($request->dateStart && $request->dateEnd){
             $queryWhere.='and "created_at" between ? and ? ';
             array_push($params,$request->dateStart, $request->dateEnd);

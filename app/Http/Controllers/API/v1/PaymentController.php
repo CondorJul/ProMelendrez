@@ -110,7 +110,7 @@ class PaymentController extends Controller
 
             $p->save();
             DB::connection()->commit();
-
+            \LogActivity::add($request->user()->email.' emitió recibo con id '.$p->payId, null, json_encode($request->all()));
             return response()->json([
                 'res' => true,
                 'msg' => 'Guardado correctamente',
@@ -169,7 +169,7 @@ class PaymentController extends Controller
         $p->updated_by=$request->user()->id;
         $p->payIsCanceled=1/*1=Es cancelado, 2=No cancelado*/ ;
         $p->save();
-        
+        \LogActivity::add($request->user()->email.' canceló recibo con id '.$payId, null, json_encode($request->all()));
         return response()->json([
             'res' => true,
             'msg' => 'Anulado correctamente',

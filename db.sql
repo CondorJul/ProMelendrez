@@ -1454,3 +1454,33 @@ UPDATE bussines SET "bussState"=1 where "bussState" is null;
 
 
 ALTER TABLE teller ALTER COLUMN "tellState" set DEFAULT 2 
+
+/*Modificaciones de appointment-temp*/
+
+
+
+create table audits(
+    "adtId" serial PRIMARY KEY,
+
+    "adtUserAgent" varchar(300),
+    "adtMethod" varchar(30),
+    "adtURL" varchar(300),
+    "adtIP" VARCHAR(100),
+
+    "adtNameTable" varchar(100),
+    
+    "adtKeyWord" VARCHAR(50), 
+    "adtSubject" varchar(300),
+
+    "adtDataOld" text,
+    "adtDataNew" text,
+
+    "adtSystem" varchar(50),
+    "adtHostname" varchar(100),
+    
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+

@@ -21,6 +21,7 @@ use App\Http\Controllers\API\v1\VideosController;
 use App\Http\Controllers\API\v1\HeadquarterController;
 use App\Http\Controllers\API\v1\PeriodController;
 use App\Http\Controllers\API\v1\DBusinessPeriodController;
+use App\Http\Controllers\API\v1\MailController;
 use App\Http\Controllers\API\v1\PaymentController;
 use App\Http\Controllers\API\v1\PaymentMethodController;
 use App\Http\Controllers\API\v1\PeriodPaymentController;
@@ -114,6 +115,8 @@ Route::put('v1/tellers', [TellerController::class, 'update']);
 Route::delete('v1/tellers/{id}', [TellerController::class, 'destroy']);
 Route::get('/v1/tellers/search-by-code/{code}', [TellerController::class, 'searchByCode']);
 Route::put('/v1/tellers/{id}/upd-user', [TellerController::class, 'updUser']);
+Route::delete('/v1/tellers/{id}/remove-user', [TellerController::class, 'removeUser']);
+
 Route::put('/v1/tellers/{id}/upd-state', [TellerController::class, 'updState']);
 
 
@@ -228,55 +231,55 @@ Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::cla
 
 
 /*Periodos */
-Route::get('/v1/periods', [PeriodController::class, 'index']);
-Route::post('/v1/periods', [PeriodController::class, 'store']);
-Route::put('/v1/periods/{id}', [PeriodController::class, 'update']);
-Route::delete('/v1/periods/{id}', [PeriodController::class, 'destroy']);
-Route::put('/v1/periods/{prdsId}/change-state', [PeriodController::class, 'changeState']);
+Route::get('/v1/periods', [PeriodController::class, 'index'])->middleware(['auth:sanctum']);
+Route::post('/v1/periods', [PeriodController::class, 'store'])->middleware(['auth:sanctum']);
+Route::put('/v1/periods/{id}', [PeriodController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('/v1/periods/{id}', [PeriodController::class, 'destroy'])->middleware(['auth:sanctum']);
+Route::put('/v1/periods/{prdsId}/change-state', [PeriodController::class, 'changeState'])->middleware(['auth:sanctum']);
 
 /*PaymentMethods */
-Route::get('/v1/payment-methods', [PaymentMethodController::class, 'index']);
-Route::post('/v1/payment-methods', [PaymentMethodController::class, 'store']);
-Route::put('/v1/payment-methods/{id}', [PaymentMethodController::class, 'update']);
-Route::delete('/v1/payment-methods/{id}', [PaymentMethodController::class, 'destroy']);
-Route::put('/v1/payment-methods/{id}/change-state', [PaymentMethodController::class, 'changeState']);
+Route::get('/v1/payment-methods', [PaymentMethodController::class, 'index'])->middleware(['auth:sanctum']);
+Route::post('/v1/payment-methods', [PaymentMethodController::class, 'store'])->middleware(['auth:sanctum']);
+Route::put('/v1/payment-methods/{id}', [PaymentMethodController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('/v1/payment-methods/{id}', [PaymentMethodController::class, 'destroy'])->middleware(['auth:sanctum']);
+Route::put('/v1/payment-methods/{id}/change-state', [PaymentMethodController::class, 'changeState'])->middleware(['auth:sanctum']);
 
 
 
 /*Detalle negocio y periodo */
-Route::get('/v1/d-business-periods', [DBusinessPeriodController::class, 'index']);
-Route::post('/v1/d-business-periods/addDBP', [DBusinessPeriodController::class, 'store']);
-Route::put('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'update']);
-Route::delete('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'destroy']);
+Route::get('/v1/d-business-periods', [DBusinessPeriodController::class, 'index'])->middleware(['auth:sanctum']);
+Route::post('/v1/d-business-periods/addDBP', [DBusinessPeriodController::class, 'store'])->middleware(['auth:sanctum']);
+Route::put('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('/v1/d-business-periods/{id}', [DBusinessPeriodController::class, 'destroy'])->middleware(['auth:sanctum']);
 
 /*Servicios que se ofrecen */
-Route::get('/v1/services-provided/all-by-dbp', [ServiceProvidedController::class, 'allByDBP']);
-Route::get('/v1/services-provided{id}', [ServiceProvidedController::class, 'find']);
-Route::get('/v1/services-provided', [ServiceProvidedController::class, 'index']);
-Route::post('/v1/services-provided/addServicesProvided', [ServiceProvidedController::class, 'store']);
-Route::put('/v1/services-provided/{spId}', [ServiceProvidedController::class, 'update']);
-Route::delete('/v1/services-provided/{id}', [ServiceProvidedController::class, 'destroy']);
+Route::get('/v1/services-provided/all-by-dbp', [ServiceProvidedController::class, 'allByDBP'])->middleware(['auth:sanctum']);
+Route::get('/v1/services-provided{id}', [ServiceProvidedController::class, 'find'])->middleware(['auth:sanctum']);
+Route::get('/v1/services-provided', [ServiceProvidedController::class, 'index'])->middleware(['auth:sanctum']);
+Route::post('/v1/services-provided/addServicesProvided', [ServiceProvidedController::class, 'store'])->middleware(['auth:sanctum']);
+Route::put('/v1/services-provided/{spId}', [ServiceProvidedController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('/v1/services-provided/{id}', [ServiceProvidedController::class, 'destroy'])->middleware(['auth:sanctum']);
 
 
 
 /* Gestion de Servicios */
-Route::get('v1/services', [ServicesController::class, 'index']);
-Route::post('v1/services/addServices', [ServicesController::class, 'store']);
-Route::put('v1/services/updServices', [ServicesController::class, 'update']);
-Route::delete('v1/services/delServices/{svId}', [ServicesController::class, 'destroy']);
-Route::delete('v1/services/stateServices/{svId}', [ServicesController::class, 'stateService']);
+Route::get('v1/services', [ServicesController::class, 'index'])->middleware(['auth:sanctum']);
+Route::post('v1/services/addServices', [ServicesController::class, 'store'])->middleware(['auth:sanctum']);
+Route::put('v1/services/updServices', [ServicesController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('v1/services/delServices/{svId}', [ServicesController::class, 'destroy'])->middleware(['auth:sanctum']);
+Route::delete('v1/services/stateServices/{svId}', [ServicesController::class, 'stateService'])->middleware(['auth:sanctum']);
 
 /*Pagos */
 /*Detalle negocio y periodo */
-Route::get('/v1/payments', [PaymentController::class, 'all']);
+Route::get('/v1/payments', [PaymentController::class, 'all'])->middleware(['auth:sanctum']);
 Route::post('/v1/payments', [PaymentController::class, 'store'])->middleware(['auth:sanctum']);
-Route::put('/v1/payments/{id}', [PaymentController::class, 'update']);
+Route::put('/v1/payments/{id}', [PaymentController::class, 'update'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{payId}/cancel', [PaymentController::class, 'cancel'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{payId}/ticket', [PaymentController::class, 'setTicket'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{payId}/invoice', [PaymentController::class, 'setInvoice'])->middleware(['auth:sanctum']);
 
 
-Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy']);
+Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy'])->middleware(['auth:sanctum']);
 Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
 Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::class, 'proofOfPaymentJson']);
 
@@ -284,7 +287,14 @@ Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::
 
 
 /*periodos de pago */
-Route::get('/v1/period-payments', [PeriodPaymentController::class, 'index']);
-Route::post('/v1/period-payments', [PeriodPaymentController::class, 'store']);
-Route::put('/v1/period-payments/{id}', [PeriodPaymentController::class, 'update']);
-Route::delete('/v1/period-payments/{id}', [PeriodPaymentController::class, 'destroy']);
+Route::get('/v1/period-payments', [PeriodPaymentController::class, 'index'])->middleware(['auth:sanctum']);
+Route::post('/v1/period-payments', [PeriodPaymentController::class, 'store'])->middleware(['auth:sanctum']);
+Route::put('/v1/period-payments/{id}', [PeriodPaymentController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('/v1/period-payments/{id}', [PeriodPaymentController::class, 'destroy'])->middleware(['auth:sanctum']);
+
+
+/*ENviar emails */
+Route::get('/v1/send-mail-test', [MailController::class, 'sendMail']);
+Route::get('/v1/send-mail-test2', function () {
+    return view('mails.test', ['name' => 'James']);
+});
