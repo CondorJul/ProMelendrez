@@ -7,6 +7,7 @@ use App\Http\Controllers\API\v1\AppointmentTempController;
 use App\Http\Controllers\API\v1\BusinessController;
 use App\Http\Controllers\API\v1\CardsController;
 use App\Http\Controllers\API\v1\CategoryController;
+use App\Http\Controllers\API\v1\CopyToClipboardController;
 use App\Http\Controllers\API\v1\DashboardController;
 use App\Http\Controllers\API\v1\PersonController;
 use Illuminate\Http\Request;
@@ -291,6 +292,10 @@ Route::get('/v1/period-payments', [PeriodPaymentController::class, 'index'])->mi
 Route::post('/v1/period-payments', [PeriodPaymentController::class, 'store'])->middleware(['auth:sanctum']);
 Route::put('/v1/period-payments/{id}', [PeriodPaymentController::class, 'update'])->middleware(['auth:sanctum']);
 Route::delete('/v1/period-payments/{id}', [PeriodPaymentController::class, 'destroy'])->middleware(['auth:sanctum']);
+
+
+/*Copy to clipboard */
+Route::post('/v1/copy-to-clipboard', [CopyToClipboardController::class, 'store'])->middleware(['auth:sanctum']);
 
 
 /*ENviar emails */

@@ -40,6 +40,9 @@ class ServiceProvidedController extends Controller
     public function store(AddServicesProvidedRequest $request)
     {
         $sp = ServiceProvided::create($request->all());
+
+        \App\Helpers\LogActivity::add($request->user()->email.' en control de ejercicio, ha creado el registro con id '.$sp->spId, null, json_encode($request->all()));
+
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',

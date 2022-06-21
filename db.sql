@@ -263,7 +263,8 @@ FROM
 WHERE
     "catId" = NEW."catIdParent";
 
-IF _catNameLong is not null THEN NEW."catNameLong": = CONCAT(_catNameLong, '/', NEW."catName");
+IF _catNameLong is not null THEN 
+    NEW."catNameLong": = CONCAT(_catNameLong, '/', NEW."catName");
 
 END IF;
 
@@ -1084,7 +1085,6 @@ INSERT
 
 
 
-
 CREATE FUNCTION tf_b_u_payments() RETURNS TRIGGER
 LANGUAGE PLPGSQL AS
     $$ 
@@ -1188,7 +1188,7 @@ BEGIN
     
     select "ppayName" into _periodPaymentName from period_payments where "ppayId"=NEW."ppayId";
     
-    NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));
+    NEW."spName":=CONCAT(COALESCE(_serviceName,'-'), ' / ' ,  COALESCE(_periodPaymentName, '-'),' / ', COALESCE(_periodName, '-'));
 
     /*inserte monto*/
 
@@ -1232,8 +1232,9 @@ BEGIN
     select "svName" into _serviceName from services where "svId"=NEW."svId";
     
     select "ppayName" into _periodPaymentName from period_payments where "ppayId"=NEW."ppayId";
-    
-    NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));
+        NEW."spName":=CONCAT(COALESCE(_serviceName,'-'), ' / ' ,  COALESCE(_periodPaymentName, '-'),' / ', COALESCE(_periodName, '-'));
+
+ /*   NEW."spName":=CONCAT(COALESCE(_periodName, '-'),' / ',COALESCE(_periodPaymentName, '-'),' / ',COALESCE(_serviceName,'-'));*/
 
 
     IF COALESCE(NEW."spPaid" , 0)> COALESCE(NEW."spCost",0)/*Tickets*/ THEN
@@ -1483,4 +1484,24 @@ create table audits(
     "updated_at" timestamp,
     "created_at" timestamp
 );
+
+/*20/06/2022*/
+UPDATE correlative_proof set "cpfSerie"='R001' WHERE "hqId"=1 and "cpfKindDoc"=1; 
+UPDATE period_payments SET "ppayName"=UPPER("ppayName");
+UPDATE period_payments set "ppayName"='NINGUNO' WHERE "ppayId"=14;
+
+insert into period_payments("ppayName") values('OTRO')
+/*Ejectuar trigger in serviced_provided*/
+
+
+
+
+
+
+
+
+
+
+
+
 

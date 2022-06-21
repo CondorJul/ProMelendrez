@@ -113,11 +113,13 @@ class AuthController extends Controller
 
 
     public function signIn(SignInRequest $request){
+
         $user = User::where('email', $request->email)->with('person')->with('tellers')->first();
 
- 
-
         if (! $user || ! Hash::check($request->password, $user->password)) {
+
+            \LogActivity::add($request->email.' ha intentado iniciar sesión sin exito.', null, null);
+            
             throw ValidationException::withMessages([
                 'msg' => ['Las credenciales proporcionados son incorrectos'],
             ]);
