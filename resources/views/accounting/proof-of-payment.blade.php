@@ -141,8 +141,8 @@
 <body>
     <div style="text-align: center; padding: 15px;">
         <img src="<?php echo $pic ?>" alt="" width="270px">
-        <h2 style="font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 2px;">RUC: 20542566630</h2>
-        <h5 style="font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin-top: 2px; font-weight: lighter;">Av. Daniel Alcides Carrion N° 204(Segundo Nivel) <br> Urb. San Juan-Yanacancha-Pasco <br> <span style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">E-mail: melendres.auditores@hotmail.com<br>Cel: 973896051 - 999918316</span></h5>
+        <h2 style="font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px;">RUC: 20542566630</h2>
+        <h5 style="font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-weight: lighter;">Av. Daniel Alcides Carrion N° 204(Segundo Nivel) <br> Urb. San Juan-Yanacancha-Pasco <br> <span style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">E-mail: melendres.auditores@hotmail.com<br>Cel: 973896051 - 999918316</span></h5>
         <table style="margin: 5 0 5 0;">
             <tr>
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
@@ -168,20 +168,23 @@
                 <th class="t2" style="width:200px; font-size: 12px; text-align: left; font-weight: lighter; font-family: Arial, Helvetica, sans-serif;"> {{date_format( date_create ($payment['payDatePrint']),"d/m/Y h:i A")}}</th>
             </tr>
             <tr class="t1">
-                <th class="t2" style="width:50px; font-size: 12px; text-align: left; font-weight: bold; font-family: Arial, Helvetica, sans-serif;">Direccion:</th>
-                <th class="t2" style="width:200px; font-size: 10px; text-align: left; font-weight: lighter; font-family: Arial, Helvetica, sans-serif;">{{$payment['payClientAddress']}}</th>
+                <th class="t2" style="width:50px; font-size: 12px; text-align: left; font-weight: bold; font-family: Arial, Helvetica, sans-serif; padding-bottom: 8px;">Direccion:</th>
+                <th class="t2" style="width:200px; font-size: 10px; text-align: left; font-weight: lighter; font-family: Arial, Helvetica, sans-serif; padding-bottom: 8px;">{{$payment['payClientAddress']}}</th>
             </tr>
             <!--<tr>
                 <th style="width:50px; font-size: 12px; text-align: left; font-weight: bold; font-family: Arial, Helvetica, sans-serif;">Celular:</th>
                 <th style="width:200px; font-size: 12px; text-align: left; font-weight: lighter; font-family: Arial, Helvetica, sans-serif;">{{$payment['payClientTel']}}</th>
             </tr>-->
         </table>
-        <table style="margin: 5 0 5 0;">
+        <!--<table style="margin: 5 0 5 0;">
             <tr>
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
-        </table>
+        </table>-->
         <table class="default" style="width: 270px;">
+            <tr>
+                <th colspan="4" style="width: 270px; font-size: 2px; border-top: 1px dashed; padding-top: 5px;"></th>
+            </tr>
             <tr>
                 <th style="width:30px; font-size: 11px; text-align: center; border-right: 1px dashed; padding-bottom: 5px;">Cant.</th>
                 <th style="width:150px; font-size: 11px; text-align: center; border-right: 1px dashed; padding-bottom: 5px;">Descripcion</th>
@@ -194,22 +197,29 @@
             @foreach ($payment['paymentDetails'] as $key => $value)
 
             <tr>
-                <th style="width:30px; font-size: 11px; text-align: center; font-weight: lighter; border-right: 1px dashed;">{{$value['pdsQuantity']}}</th>
-                <th style="width:150px; font-size: 11px; text-align: left; font-weight: lighter; border-right: 1px dashed;">{{$value['pdsDescription']}}</th>
-                <th style="width:40px; font-size: 11px; text-align: right; font-weight: lighter; border-right: 1px dashed;" align="right">{{$value['pdsUnitPrice']}}</th>
-                <th style="width:40px; font-size: 11px; text-align: right; font-weight: lighter;" align="right">{{$value['pdsAmount']}}</th>
+                <th style="width:30px; font-size: 11px; text-align: center; font-weight: lighter; border-right: 1px dashed; padding-bottom: 5px;">{{$value['pdsQuantity']}}</th>
+                <th style="width:150px; font-size: 11px; text-align: left; font-weight: lighter; border-right: 1px dashed; padding-bottom: 5px;">{{$value['pdsDescription']}}</th>
+                <th style="width:40px; font-size: 11px; text-align: right; font-weight: lighter; border-right: 1px dashed; padding-bottom: 5px;" align="right">{{$value['pdsUnitPrice']}}</th>
+                <th style="width:40px; font-size: 11px; text-align: right; font-weight: lighter;" align="right; padding-bottom: 5px;">{{$value['pdsAmount']}}</th>
             </tr>
             @endforeach
+            <tr>
+                <th colspan="4" style="width: 270px; font-size: 2px; border-top: 1px dashed; padding-top: 5px;"></th>
+            </tr>
+            <!--<table style="margin: 5 0 5 0;">
+            <tr>
+                <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
+            </tr>
+        </table>-->
+
+            <tr>
+                <th colspan="3" style="width:35px; font-size: 11px; text-align: right; font-weight: bold; border-right: 1px dashed; padding-bottom: 5px;">Total a Pagar S/ </th>
+                <th style="width:40px;font-size: 11px; text-align: right; font-weight: bold;" align="right; padding-bottom: 5px;">{{$payment['payTotal']}}</th>
+            </tr>
         </table>
         <table style="margin: 5 0 5 0;">
             <tr>
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
-            </tr>
-        </table>
-        <table class="default" style="width: 270px;">
-            <tr>
-                <th colspan="3" style="width:35px; font-size: 11px; text-align: right; font-weight: bold;">Total a Pagar S/ </th>
-                <th style="width:40px;font-size: 11px; text-align: right; font-weight: bold;" align="right">{{$payment['payTotal']}}</th>
             </tr>
         </table>
         <table class="default" style="width: 270px;">
