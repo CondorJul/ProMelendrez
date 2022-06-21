@@ -251,7 +251,21 @@ class BusinessController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Leido Correctamente',
-            'data' => DB::select('SELECT "tellId", "tellCode", "tellName", users."name", teller."hqId", (SELECT COUNT(*) FROM bussines WHERE bussines."tellId"=teller."tellId") AS "cantBusiness" FROM teller LEFT JOIN users ON teller."userId"=users."id" WHERE teller."hqId"=?', [$request->hqId])
+            'data' => DB::select('SELECT "tellId", "tellCode", "tellName", users."name", teller."hqId", (SELECT COUNT(*) FROM bussines WHERE bussines."tellId"=teller."tellId") AS "cantBusiness" FROM teller LEFT JOIN users ON teller."userId"=users."id" WHERE teller."hqId"=?  ORDER BY "tellCode" ASC', [$request->hqId])
+        ]);
+    }
+
+    public function getBusinessOfTeller(Request $request)
+    {
+        if ($request->tellId == 0) {
+            $data = Business::with('person')->get();
+        } else {
+            $data = Business::with('person')->where('tellId', $request->tellId)->get();
+        }
+        return response()->json([
+            'res' => true,
+            'msg' => 'Leido Correctamente',
+            'data' => $data
         ]);
     }
 }
