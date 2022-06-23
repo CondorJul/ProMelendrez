@@ -157,6 +157,7 @@ Route::put('v1/appointment-temps/{ids}/teller', [AppointmentTempController::clas
 
 
 /* Bussines*/
+Route::put('v1/business/{ids}/updTeller', [BusinessController::class, 'updateBusinessTeller']);
 Route::get('v1/business/getBusinessJoinTeller', [BusinessController::class, 'getBusinessOfTeller']);
 Route::get('v1/business/getCantTellerUsers', [BusinessController::class, 'getTellerJoinUsers']);
 Route::get('v1/bussines', [BusinessController::class, 'index']);
