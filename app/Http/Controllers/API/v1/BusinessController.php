@@ -278,4 +278,14 @@ class BusinessController extends Controller
             'data' => $a,
         ], 200);
     }
+
+    public function updateBusinessState($ids, Request $request)
+    {
+        $a = Business::whereIn('bussId', explode(',', $ids),)->update($request->all());
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => $a,
+        ], 200);
+    }
 }
