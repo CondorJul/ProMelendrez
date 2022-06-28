@@ -16,4 +16,10 @@ class DPaymentPaymentMethod extends Model
         "dppmAmount",
         "dppmDescription",
     ];
+
+    public function paymentMethod(){
+        return $this->belongsTo(PaymentMethod::class, 'paymthdsId', 'paymthdsId');
+    } 
+
+
 }

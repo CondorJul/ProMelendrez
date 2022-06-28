@@ -227,6 +227,46 @@
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
             </tr>
         </table>
+
+        <!--Forma de pago-->
+        <table class="default" style="width: 270px;">
+            <tr>
+                <th colsspan="3" style="width:30px; font-size: 11px; text-align: center; font-weight: bold;">Forma de pago</th>
+                
+            </tr>
+            @foreach ($payment['dPaymentPaymentMethods'] as $key => $value)
+
+            <tr>
+                <th style="width:30px; font-size: 11px; text-align: left; font-weight: lighter;">{{$value->paymentMethod['paymthdsName']}}</th>
+                <th style="width:30px; font-size: 11px; text-align: right; font-weight: lighter;">S/</th>
+                <th style="width:30px;font-size: 11px; text-align: right; font-weight: lighter;">{{$value->dppmAmount}}</th>
+            </tr>
+            @endforeach
+
+        </table>
+     
+
+   
+        <table class="default" style="width: 270px;">
+        @if($payment['payTicketSN'])         
+            <tr>
+                <th style="width:30px; font-size: 11px; text-align: left; font-weight: lighter;">Canjeado por boleta número </th>
+                <th style="width:30px;font-size: 11px; text-align: right; font-weight: lighter;">{{$payment['payTicketSN']}}</th>
+            </tr>
+        @endif
+        @if($payment['payInvoiceSN'])         
+        <tr>
+                <th style="width:30px; font-size: 11px; text-align: left; font-weight: lighter;">Canjeado por Factura número </th>
+                <th style="width:30px;font-size: 11px; text-align: right; font-weight: lighter;">{{$payment['payInvoiceSN']}}</th>
+            </tr>
+        @endif
+            
+
+        </table>
+
+
+        <!--fin de forma de pago -->
+
         <table class="default" style="width: 270px;">
             <tr>
                 <th style="width:30px; font-size: 11px; text-align: center; font-weight: bold;">Sede</th>
@@ -239,6 +279,7 @@
                 <th style="width:30px;font-size: 11px; text-align: center; font-weight: lighter;">{{ strtok( $user->person['perName'], " ")}}</th>
             </tr>
         </table>
+
         <table style="margin: 5 0 5 0;">
             <tr>
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>

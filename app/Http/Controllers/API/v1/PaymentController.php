@@ -222,7 +222,7 @@ class PaymentController extends Controller
     public function proofOfPaymentJson($payToken)
     {
         try {
-            $p = Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
+            $p = Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods.paymentMethod')->where('payToken', $payToken)->first();
             $h = Headquarter::where('hqId', $p->hqId)->first();
             $t = Teller::where('tellId', $p->tellId)->first();
             $u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
@@ -247,7 +247,7 @@ class PaymentController extends Controller
     public function proofOfPayment($payToken)
     {
         try {
-            $p = Payment::select()->with('paymentDetails')->where('payToken', $payToken)->first();
+            $p = Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods.paymentMethod')->where('payToken', $payToken)->first();
             $h = Headquarter::where('hqId', $p->hqId)->first();
             $t = Teller::where('tellId', $p->tellId)->first();
             $u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
