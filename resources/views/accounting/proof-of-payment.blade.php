@@ -144,7 +144,7 @@
             </tr>
             @endforeach
 
-            @if($payment['payTicketSN'])
+            <!--@if($payment['payTicketSN'])
             <tr>
                 <th style="width: 100px; font-size: 11px; text-align: left; font-weight: lighter;">Canjeado por boleta de venta número </th>
                 <th colspan="2" style="width: 30px; font-size: 11px; text-align: right; font-weight: lighter;">{{$payment['payTicketSN']}}</th>
@@ -155,7 +155,7 @@
                 <th style="width: 100px; font-size: 11px; text-align: left; font-weight: lighter;">Canjeado por Factura número </th>
                 <th colspan="2" style="width: 30px; font-size: 11px; text-align: right; font-weight: lighter;">{{$payment['payInvoiceSN']}}</th>
             </tr>
-            @endif
+            @endif-->
         </table>
         <!--fin de forma de pago -->
 
@@ -185,7 +185,16 @@
         </table>
         <br>
         <!--<div style="font-size: 10px; text-align: center; font-weight: lighter;"><br>..............................................<br>Melendres Auditores</div>-->
-        <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjear por Factura o Boleta de Venta <br>¡Gracias por su preferencia...! </div>
+        @if($payment['payTicketSN'])
+        <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjeado por Boleta de Venta <br>{{$payment['payTicketSN']}}<br>¡Gracias por su preferencia...! </div>
+        @endif
+        @if($payment['payInvoiceSN'])
+        <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjeado por Factura <br>{{$payment['payInvoiceSN']}}<br>¡Gracias por su preferencia...! </div>
+        @endif
+        @if(!($payment['payInvoiceSN'] || $payment['payTicketSN']))
+        <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjear por Factura o Boleta de Venta<br>¡Gracias por su preferencia...! </div>
+        @endif
+
     </div>
 </body>
 
