@@ -29,6 +29,7 @@ class AddServicesProvidedRequest extends FormRequest
             'ppayId' => 'required',
             'spCost' => 'required',
             'spComment' => '',
+            'spCommentColourText'=>''
         ];
     }
 }

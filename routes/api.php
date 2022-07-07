@@ -302,7 +302,7 @@ Route::post('/v1/copy-to-clipboard', [CopyToClipboardController::class, 'store']
 
 
 /*ENviar emails */
-Route::get('/v1/send-mail-test', [MailController::class, 'sendMail']);
+Route::get('/v1/send-mail-test/{mail}', [MailController::class, 'sendMail']);
 Route::get('/v1/send-mail-test2', function () {
     return view('mails.test', ['name' => 'James']);
 });

@@ -26,6 +26,9 @@ class ServiceProvided extends Model
         'spState',
         'spComment',
         'spLimitPaymentDate',
-        'spMaxPartToPay'
+        'spMaxPartToPay',
+        'spCommentColourText',
+        'created_by',
+        'updated_by'
     ];
 }

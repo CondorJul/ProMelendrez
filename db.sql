@@ -1497,6 +1497,14 @@ insert into period_payments("ppayName") values('OTRO')
 
 
 
+/* colours 07/07/2022*/
+
+ALTER TABLE services_provided ADD COLUMN "spCommentColourText" VARCHAR(20) DEFAULT '#000000';
+ALTER TABLE payments ADD COLUMN "payReceiptHonorarySN" VARCHAR(50);
+
+/*select * from services_provided*/
+
+
 
 
 

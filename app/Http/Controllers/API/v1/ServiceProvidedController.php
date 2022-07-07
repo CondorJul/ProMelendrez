@@ -39,7 +39,8 @@ class ServiceProvidedController extends Controller
      */
     public function store(AddServicesProvidedRequest $request)
     {
-        $sp = ServiceProvided::create($request->all());
+        $user=$request->user();
+        $sp = ServiceProvided::create(array_merge($request->all(),['created_by'=>$user->id]));
 
         \App\Helpers\LogActivity::add($request->user()->email.' en control de ejercicio, ha creado el registro con id '.$sp->spId, null, json_encode($request->all()));
 
@@ -70,9 +71,12 @@ class ServiceProvidedController extends Controller
      */
     public function update(UpdServicesProvidedRequest $request, $spId)
     {
+        $user=$request->user();
         $sp=ServiceProvided::where('spId', $spId)->first();
 
-        $sp->update($request->all());
+        \App\Helpers\LogActivity::add($request->user()->email.' en control de ejercicio, ha modificado el registro con id '.$sp->spId, null, json_encode($request->all()));
+        
+        $sp->update(array_merge($request->all(),['updated_by'=>$user->id]));
         return response()->json([
             'res' => true,
             'msg' => 'Actualizado correctamente',
