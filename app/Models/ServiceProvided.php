@@ -31,4 +31,16 @@ class ServiceProvided extends Model
         'created_by',
         'updated_by'
     ];
+    public function periodPayments()
+    {
+        return $this->belongsTo(PeriodPayment::class, 'ppayId', 'ppayId');
+    }
+    public function services()
+    {
+        return $this->belongsTo(Services::class, 'svId', 'svId');
+    }
+    public function paymentDetails()
+    {
+        return $this->hasMany(PaymentDetail::class, 'spId', 'spId');
+    }
 }

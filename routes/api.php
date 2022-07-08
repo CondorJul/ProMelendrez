@@ -26,6 +26,7 @@ use App\Http\Controllers\API\v1\MailController;
 use App\Http\Controllers\API\v1\PaymentController;
 use App\Http\Controllers\API\v1\PaymentMethodController;
 use App\Http\Controllers\API\v1\PeriodPaymentController;
+use App\Http\Controllers\API\v1\ReportsController;
 use App\Http\Controllers\API\v1\ServicesController;
 use App\Http\Controllers\API\v1\ServiceProvidedController;
 use Illuminate\Bus\BusServiceProvider;
@@ -289,7 +290,7 @@ Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy'])->middl
 Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment']);
 Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::class, 'proofOfPaymentJson']);
 
-
+Route::get('/v1/report/{prdsId}/control-monitoring-json/{bussId}', [ReportsController::class, 'controlMonitoringJson']);
 
 
 /*periodos de pago */
