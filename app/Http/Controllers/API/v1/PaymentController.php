@@ -118,13 +118,14 @@ class PaymentController extends Controller
 
             ], 200);
         } catch (PDOException $e) {
-
             DB::connection()->rollBack();
             /*return response()->json([
                 'res' => false,
                 'msg' => $e->getMessage(),
                 'data' => $e->getMessage(),
             ], 502);*/
+            \LogActivity::add($request->user()->email.' trató de emitir un recibo sin éxito. Error'.$e->getMessage(), null, json_encode($request->all()));
+
             throw $e;
         }
         /*
@@ -193,6 +194,7 @@ class PaymentController extends Controller
 
         ], 200);
     }
+
     public function setInvoice($payId, Request $request){
         $p=Payment::where('payId',$payId )->first();
 
@@ -203,6 +205,21 @@ class PaymentController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Factura actualizada correctamente',
+            'data' => Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods')->where('payId', $p->payId)->first()
+
+        ], 200);
+    }
+
+    public function setReceiptHonorary($payId, Request $request){
+        $p=Payment::where('payId',$payId )->first();
+
+        $p->updated_by=$request->user()->id;
+        $p->payReceiptHonorarySN=$request->payReceiptHonorarySN;
+        $p->save();
+        
+        return response()->json([
+            'res' => true,
+            'msg' => 'Recibo por honorarios actualizada correctamente',
             'data' => Payment::select()->with('paymentDetails')->with('dPaymentPaymentMethods')->where('payId', $p->payId)->first()
 
         ], 200);

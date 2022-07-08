@@ -43,8 +43,8 @@ class Payment extends Model
         'payTotal',
         'payTotalInWords',
         'created_by',
-        'updated_by'
-
+        'updated_by',
+        'payReceiptHonorarySN'
 
     ];
     public function paymentDetails()

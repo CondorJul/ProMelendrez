@@ -282,6 +282,8 @@ Route::put('/v1/payments/{id}', [PaymentController::class, 'update'])->middlewar
 Route::put('/v1/payments/{payId}/cancel', [PaymentController::class, 'cancel'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{payId}/ticket', [PaymentController::class, 'setTicket'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{payId}/invoice', [PaymentController::class, 'setInvoice'])->middleware(['auth:sanctum']);
+Route::put('/v1/payments/{payId}/receipt-honorary', [PaymentController::class, 'setReceiptHonorary'])->middleware(['auth:sanctum']);
+
 
 
 Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy'])->middleware(['auth:sanctum']);
