@@ -122,4 +122,41 @@ class ReportsController extends Controller
             return 'Surgio un error, intente más tarde' + $e;
         }
     }
+
+    public function reportAllPeriods($bussId)
+    {
+
+
+        $path = base_path('resources/views/logo.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data1 = file_get_contents($path);
+        $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.report-all-periods', compact('pic'));
+
+        return $pdf->stream();
+    }
+
+    public function reportAllPeriodsJson($bussId)
+    {
+        try {
+            $dbp = DBusinessPeriod::select()->with('serviceProvided')
+                ->with('serviceProvided.services')
+                ->with('serviceProvided.periodPayments')
+                ->with('serviceProvided.paymentDetails.payments.user.person')
+                ->where('bussId', $bussId)->first();
+            /*$p = Period::where('prdsId', $dbp->prdsId)->first();
+            $b = Business::with('person')->where('bussId', $dbp->bussId)->first();*/
+
+            $data = [
+                'd_business_period' => $dbp
+                /*'period' => $p,
+                'business' => $b,*/
+            ];
+
+            return response()->json($data);
+        } catch (Exception $e) {
+            return 'Surgio un error, intente más tarde' + $e;
+        }
+    }
 }

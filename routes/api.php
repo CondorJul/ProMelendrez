@@ -289,6 +289,7 @@ Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class
 Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::class, 'proofOfPaymentJson']);
 
 Route::get('/v1/report/{prdsId}/control-monitoring-json/{bussId}', [ReportsController::class, 'controlMonitoringJson']);
+Route::get('/v1/reports/all-periods/{bussId}', [ReportsController::class, 'reportAllPeriodsJson']);
 
 
 /*periodos de pago */

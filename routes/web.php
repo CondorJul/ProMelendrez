@@ -20,4 +20,6 @@ Route::get('/', function () {
 });
 
 Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment'])->middleware(['cors']);
+
 Route::get('/v1/reports/{prdsId}/exercise-monitoring/{bussId}', [ReportsController::class, 'reportControlMonitoring'])->middleware(['cors']);
+Route::get('/v1/reports/all-periods/{bussId}', [ReportsController::class, 'reportAllPeriods'])->middleware(['cors']);
