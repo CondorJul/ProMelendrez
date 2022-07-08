@@ -13,16 +13,20 @@ class PaymentDetail extends Model
     protected $fillable = [
         'payId',
         'pdsQuantity',
-        'spId' ,
+        'spId',
         /*
         'pdsPeriod' varchar(20),
         'pdsYear' int,*/
-    
-        'pdsDescription' ,
-        
-        'pdsUnitPrice'  ,
+
+        'pdsDescription',
+
+        'pdsUnitPrice',
         'pdsAmount',
-    
-    
+
+
     ];
+    public function payments()
+    {
+        return $this->belongsTo(Payment::class, 'payId', 'payId');
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\v1\PaymentController;
+use App\Http\Controllers\API\v1\ReportsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +19,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment'])->middleware(['cors']);;
-
-
-
+Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment'])->middleware(['cors']);
+Route::get('/v1/reports/{prdsId}/exercise-monitoring/{bussId}', [ReportsController::class, 'reportControlMonitoring'])->middleware(['cors']);

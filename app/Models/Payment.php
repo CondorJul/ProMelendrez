@@ -11,21 +11,21 @@ class Payment extends Model
     protected $primaryKey = 'payId';
     protected $table = 'payments';
     protected $fillable = [
-   
-        'payState' , /*1=Borrador, 2=Facturado*/
+
+        'payState', /*1=Borrador, 2=Facturado*/
         'apptmId',
-        'hqId' ,/*sede*/
-        'payKindDoc' ,/*Recibo, Boleta, Factura*/
-        'paySerie' , /*Serie */
-        'payNumber' , /*Numero correlativo*/
-     
-        'payDatePrint' ,
-        
-        'bussId' ,
-    
-        'tellId' ,
+        'hqId',/*sede*/
+        'payKindDoc',/*Recibo, Boleta, Factura*/
+        'paySerie', /*Serie */
+        'payNumber', /*Numero correlativo*/
+
+        'payDatePrint',
+
+        'bussId',
+
+        'tellId',
         'userId',
-        
+
         /*CLientes sin regisgro en base de datos*/
         'payClientName',
         'payClientAddress',
@@ -38,20 +38,25 @@ class Payment extends Model
         'payIsCanceled',
 
         'paySubTotal',
-        'payDiscount' ,
-        'paySalesTax' , 
+        'payDiscount',
+        'paySalesTax',
         'payTotal',
         'payTotalInWords',
         'created_by',
         'updated_by'
 
-    
+
     ];
-    public function paymentDetails(){
+    public function paymentDetails()
+    {
         return $this->hasMany(PaymentDetail::class, 'payId', 'payId');
     }
-    public function dPaymentPaymentMethods(){
+    public function dPaymentPaymentMethods()
+    {
         return $this->hasMany(DPaymentPaymentMethod::class, 'payId', 'payId');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userId', 'id');
+    }
 }
-

@@ -28,4 +28,16 @@ class ServiceProvided extends Model
         'spLimitPaymentDate',
         'spMaxPartToPay'
     ];
+    public function periodPayments()
+    {
+        return $this->belongsTo(PeriodPayment::class, 'ppayId', 'ppayId');
+    }
+    public function services()
+    {
+        return $this->belongsTo(Services::class, 'svId', 'svId');
+    }
+    public function paymentDetails()
+    {
+        return $this->hasMany(PaymentDetail::class, 'spId', 'spId');
+    }
 }
