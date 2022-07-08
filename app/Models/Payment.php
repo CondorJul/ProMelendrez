@@ -42,10 +42,11 @@ class Payment extends Model
         'paySalesTax' , 
         'payTotal',
         'payTotalInWords',
-        'created_by',
-        'updated_by'
 
-    
+        
+        'created_by',
+        'updated_by',
+        'payReceiptHonorarySN'
     ];
     public function paymentDetails(){
         return $this->hasMany(PaymentDetail::class, 'payId', 'payId');

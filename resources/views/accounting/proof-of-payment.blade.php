@@ -191,7 +191,10 @@
         @if($payment['payInvoiceSN'])
         <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjeado por Factura <br>{{$payment['payInvoiceSN']}}<br>¡Gracias por su preferencia...! </div>
         @endif
-        @if(!($payment['payInvoiceSN'] || $payment['payTicketSN']))
+        @if($payment['payReceiptHonorarySN'])
+        <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjeado por Recibo por Honorarios <br>{{$payment['payReceiptHonorarySN']}}<br>¡Gracias por su preferencia...! </div>
+        @endif
+        @if(!($payment['payInvoiceSN'] || $payment['payTicketSN'] || $payment['payReceiptHonorarySN'] ))
         <div style="margin-top: 5px; font-size: 11px; text-align: center;">Canjear por Factura o Boleta de Venta<br>¡Gracias por su preferencia...! </div>
         @endif
 
@@ -199,6 +202,7 @@
 </body>
 
 </html>
+
 
 <!--<html>
 
