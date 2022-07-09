@@ -117,23 +117,29 @@ class ReportsController extends Controller
 
             return response()->json($data);
         } catch (Exception $e) {
-            return 'Surgio un error, intente más tarde' + $e;
+            return 'Surgio un error, intente más tarde';
         }
     }
 
     public function reportAllPeriods($bussId)
     {
         try {
-            $dbp = DBusinessPeriod::select()->with('serviceProvided')
+            $dbp = DBusinessPeriod::select()
+                ->join('periods', 'periods.prdsId', '=', 'd_bussines_periods.prdsId')
+                ->with('serviceProvided')
                 ->with('periods')
                 ->with('serviceProvided.services')
                 ->with('serviceProvided.periodPayments')
-                ->where('bussId', $bussId)->get();
+                ->where('bussId', $bussId)
+                ->orderBy('periods.prdsNameShort', 'ASC')->get();
             $b = Business::with('person')->where('bussId', $bussId)->first();
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $f = iconv('ISO-8859-2', 'UTF-8', strftime("%d de %B de %Y", strtotime(date('F j, Y, g:i a'))));
 
             $data = [
                 'd_business_period' => $dbp,
-                'business' => $b
+                'business' => $b,
+                'date' => $f
             ];
             $path = base_path('resources/views/logo.png');
             $type = pathinfo($path, PATHINFO_EXTENSION);
@@ -144,6 +150,7 @@ class ReportsController extends Controller
 
             return $pdf->stream();
         } catch (Exception $e) {
+            throw $e;
             return 'Surgio un error, intente más tarde';
         }
     }
@@ -157,15 +164,19 @@ class ReportsController extends Controller
                 ->with('serviceProvided.periodPayments')
                 ->where('bussId', $bussId)->get();
             $b = Business::with('person')->where('bussId', $bussId)->first();
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $f = iconv('ISO-8859-2', 'UTF-8', strftime("%d de %B de %Y", strtotime(date('F j, Y, g:i a'))));
 
             $data = [
                 'd_business_period' => $dbp,
-                'business' => $b
+                'business' => $b,
+                'date' => $f
             ];
 
             return response()->json($data);
         } catch (Exception $e) {
-            return 'Surgio un error, intente más tarde' + $e;
+            throw $e;
+            return 'Surgio un error, intente más tarde';
         }
     }
 }

@@ -12,7 +12,7 @@
         </div>
         <h1 style="text-align: center; font-size: 35px; font-family: Arial, Helvetica, sans-serif; text-decoration: underline; margin: 5px;">{{ $business['bussName'] }}</h1>
         <h2 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">RUC: {{ $business['bussRUC'] }}</h2>
-        <h2 style="text-align: right; font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">Cerro de Pasco 08 de Julio de 2022</h2>
+        <h2 style="text-align: right; font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">Pasco, {{ $date }}</h2>
 
         @foreach($d_business_period as $key => $value)
         <table style="width: 100%;" border="1" cellspacing="0">
@@ -22,11 +22,11 @@
             <tr>
                 <th>MESES</th>
                 <th>DESCRIPCIÓN</th>
-                <th colspan="2">DEUDA</th>
+                <th colspan="2">MONTO TOTAL</th>
 
                 <th colspan="2">PAGADO</th>
 
-                <th colspan="2">MONTO TOTAL</th>
+                <th colspan="2">DEUDA</th>
 
             </tr>
             @foreach($value['serviceProvided'] as $key=> $val)
@@ -34,21 +34,21 @@
                 <th style="font-weight: lighter;">{{ $val->periodPayments['ppayName'] }}</th>
                 <th style="width: 35%; font-weight: lighter;">{{ $val->services['svName'] }}</th>
                 <th style="width: 1px; font-weight: lighter; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; font-weight: lighter; text-align: right;">{{ $val['spDebt'] }}</th>
+                <th style="width: 15%; font-weight: lighter; text-align: right;">{{ $val['spCost'] }}</th>
                 <th style="width: 1px; font-weight: lighter; border-right: 1px solid white;">&nbspS/</th>
                 <th style="width: 15%; font-weight: lighter; text-align: right;">{{ $val['spPaid'] }}</th>
                 <th style="width: 1px; font-weight: lighter; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; font-weight: lighter; text-align: right;">{{ $val['spCost'] }}</th>
+                <th style="width: 15%; font-weight: lighter; text-align: right;">{{ $val['spDebt'] }}</th>
             </tr>
             @endforeach
             <tr>
                 <th colspan="2" style="width: 35%;">TOTAL</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ $value['dbpDebt'] }}</th>
+                <th style="width: 15%; text-align: right;">{{ $value['dbpCost'] }}</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
                 <th style="width: 15%; text-align: right;">{{ $value['dbpPaid'] }}</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ $value['dbpCost'] }}</th>
+                <th style="width: 15%; text-align: right;">{{ $value['dbpDebt'] }}</th>
 
             </tr>
         </table>
@@ -62,11 +62,11 @@
             </tr>
             <tr>
                 <th>AÑOS</th>
-                <th colspan="2">DEUDA</th>
+                <th colspan="2">MONTO TOTAL</th>
 
                 <th colspan="2">PAGADO</th>
 
-                <th colspan="2">MONTO TOTAL</th>
+                <th colspan="2">DEUDA</th>
 
             </tr>
             @php
@@ -83,21 +83,21 @@
             <tr>
                 <th style="font-weight: lighter;">{{ $value->periods['prdsNameShort'] }}</th>
                 <th style="width: 1px; border-right: 1px solid white; font-weight: lighter;">&nbspS/</th>
-                <th style="width: 15%; text-align: right; font-weight: lighter;">{{ $value['dbpDebt'] }}</th>
+                <th style="width: 15%; text-align: right; font-weight: lighter;">{{ $value['dbpCost'] }}</th>
                 <th style="width: 1px; border-right: 1px solid white; font-weight: lighter;">&nbspS/</th>
                 <th style="width: 15%; text-align: right; font-weight: lighter;">{{ $value['dbpPaid'] }}</th>
                 <th style="width: 1px; border-right: 1px solid white; font-weight: lighter;">&nbspS/</th>
-                <th style="width: 15%; text-align: right; font-weight: lighter;">{{ $value['dbpCost'] }}</th>
+                <th style="width: 15%; text-align: right; font-weight: lighter;">{{ $value['dbpDebt'] }}</th>
             </tr>
             @endforeach
             <tr>
                 <th>TOTAL</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ number_format($total2, 2, '.', '0')}}</th>
+                <th style="width: 15%; text-align: right;">{{ number_format($total, 2, '.', '')}}</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ number_format($total1, 2, '.', '0')}}</th>
+                <th style="width: 15%; text-align: right;">{{ number_format($total1, 2, '.', '')}}</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ number_format($total, 2, '.', '0')}}</th>
+                <th style="width: 15%; text-align: right;">{{ number_format($total2, 2, '.', '')}}</th>
             </tr>
         </table>
     </div>
