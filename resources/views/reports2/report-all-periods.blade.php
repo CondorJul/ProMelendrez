@@ -22,7 +22,7 @@
             <tr>
                 <th>MESES</th>
                 <th>DESCRIPCIÓN</th>
-                <th colspan="2">MONTO TOTAL</th>
+                <th colspan="2">MENSUALIDAD</th>
 
                 <th colspan="2">PAGADO</th>
 
