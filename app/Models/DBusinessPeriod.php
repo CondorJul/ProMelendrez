@@ -19,8 +19,8 @@ class DBusinessPeriod extends Model
     {
         return $this->hasMany(ServiceProvided::class, 'dbpId', 'dbpId')->orderBy('svId', 'asc')->orderBy('ppayId', 'asc');
     }
-    /*public function periods()
+    public function periods()
     {
         return $this->belongsTo(Period::class, 'prdsId', 'prdsId');
-    }*/
+    }
 }

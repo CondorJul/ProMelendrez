@@ -5,9 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\DBusinessPeriod;
-use App\Models\Payment;
 use App\Models\Period;
-use App\Models\User;
 use Barryvdh\DomPDF\Facade as PDF;
 use Exception;
 use Illuminate\Http\Request;
@@ -125,33 +123,44 @@ class ReportsController extends Controller
 
     public function reportAllPeriods($bussId)
     {
+        try {
+            $dbp = DBusinessPeriod::select()->with('serviceProvided')
+                ->with('periods')
+                ->with('serviceProvided.services')
+                ->with('serviceProvided.periodPayments')
+                ->where('bussId', $bussId)->get();
+            $b = Business::with('person')->where('bussId', $bussId)->first();
 
+            $data = [
+                'd_business_period' => $dbp,
+                'business' => $b
+            ];
+            $path = base_path('resources/views/logo.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-        $path = base_path('resources/views/logo.png');
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data1 = file_get_contents($path);
-        $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.report-all-periods', compact('pic'), $data);
 
-        $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.report-all-periods', compact('pic'));
-
-        return $pdf->stream();
+            return $pdf->stream();
+        } catch (Exception $e) {
+            return 'Surgio un error, intente más tarde';
+        }
     }
 
     public function reportAllPeriodsJson($bussId)
     {
         try {
             $dbp = DBusinessPeriod::select()->with('serviceProvided')
+                ->with('periods')
                 ->with('serviceProvided.services')
                 ->with('serviceProvided.periodPayments')
-                ->with('serviceProvided.paymentDetails.payments.user.person')
-                ->where('bussId', $bussId)->first();
-            /*$p = Period::where('prdsId', $dbp->prdsId)->first();
-            $b = Business::with('person')->where('bussId', $dbp->bussId)->first();*/
+                ->where('bussId', $bussId)->get();
+            $b = Business::with('person')->where('bussId', $bussId)->first();
 
             $data = [
-                'd_business_period' => $dbp
-                /*'period' => $p,
-                'business' => $b,*/
+                'd_business_period' => $dbp,
+                'business' => $b
             ];
 
             return response()->json($data);

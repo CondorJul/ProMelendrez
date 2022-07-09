@@ -72,7 +72,7 @@
         <br>
         <Table style="width: 100%;" border="1" cellspacing="0">
             <tr>
-                <th colspan="9" style="font-size: 35px; letter-spacing: 10px;">EJERCICIO 2022</th>
+                <th colspan="9" style="font-size: 35px; letter-spacing: 10px;">EJERCICIO {{ $period['prdsNameShort'] }}</th>
 
                 <th colspan="2">FECHA DE INICIO <br>DE ACTIVIDADES</th>
 
