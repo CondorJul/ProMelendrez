@@ -93,11 +93,11 @@
             <tr>
                 <th>TOTAL</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ $total2 }}</th>
+                <th style="width: 15%; text-align: right;">{{ number_format($total2, 2, '.', '0')}}</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ $total1 }}</th>
+                <th style="width: 15%; text-align: right;">{{ number_format($total1, 2, '.', '0')}}</th>
                 <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                <th style="width: 15%; text-align: right;">{{ $total }}</th>
+                <th style="width: 15%; text-align: right;">{{ number_format($total, 2, '.', '0')}}</th>
             </tr>
         </table>
     </div>
