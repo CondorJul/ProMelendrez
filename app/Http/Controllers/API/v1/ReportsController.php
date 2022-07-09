@@ -7,6 +7,7 @@ use App\Models\Business;
 use App\Models\DBusinessPeriod;
 use App\Models\Period;
 use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -133,8 +134,13 @@ class ReportsController extends Controller
                 ->where('bussId', $bussId)
                 ->orderBy('periods.prdsNameShort', 'ASC')->get();
             $b = Business::with('person')->where('bussId', $bussId)->first();
-            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            /*setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
             $f = iconv('ISO-8859-2', 'UTF-8', strftime("%d de %B de %Y", strtotime(date('F j, Y, g:i a'))));
+*/
+            $meses = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $meses[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
 
             $data = [
                 'd_business_period' => $dbp,
