@@ -15,7 +15,9 @@ class Headquarter extends Model
         'hqId', 
         'hqName',
         'hqRUC',
-        'hqAddress'
+        'hqAddress',
+        'hqTel',
+        'hqEmail'
     ];
 
  

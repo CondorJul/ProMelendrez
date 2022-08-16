@@ -72,7 +72,7 @@ Route::post('v1/categories', [CategoryController::class, 'store']);
 Route::put('v1/categories', [CategoryController::class, 'update']);
 Route::delete('v1/categories/{id}', [CategoryController::class, 'destroy']);
 Route::get('/v1/categories/search-by-code/{code}', [CategoryController::class, 'searchByCode']);
-
+Route::put('v1/categories/{id}/upd-state', [CategoryController::class, 'updState']);
 /*Route::get('v1/prueba', [PruebaController::class, 'index']);
 Route::post('v1/prueba', [PruebaController::class, 'store']);
 Route::get('v1/prueba/{prueba}', [PruebaController::class, 'show']);
@@ -158,8 +158,8 @@ Route::put('v1/appointment-temps/{ids}/teller', [AppointmentTempController::clas
 
 
 /* Bussines*/
-Route::put('v1/business/{ids}/updStateBuss', [BusinessController::class, 'updateBusinessState']);
-Route::put('v1/business/{ids}/updTeller', [BusinessController::class, 'updateBusinessTeller']);
+Route::put('v1/business/{ids}/updStateBuss', [BusinessController::class, 'updateBusinessState'])->middleware(['auth:sanctum']);
+Route::put('v1/business/{ids}/updTeller', [BusinessController::class, 'updateBusinessTeller'])->middleware(['auth:sanctum']);
 Route::get('v1/business/getBusinessJoinTeller', [BusinessController::class, 'getBusinessOfTeller']);
 Route::get('v1/business/getCantTellerUsers', [BusinessController::class, 'getTellerJoinUsers']);
 Route::get('v1/bussines', [BusinessController::class, 'index']);
@@ -168,10 +168,10 @@ Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
 Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
 Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson']);
 Route::get('/v1/business/{bussId}', [BusinessController::class, 'viewBusinessPerson']);
-Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusinessData']);
-Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData']);
-Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData']);
-Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData']);
+Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusinessData'])->middleware(['auth:sanctum']);;
+Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData'])->middleware(['auth:sanctum']);;
+Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData'])->middleware(['auth:sanctum']);;
+Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData'])->middleware(['auth:sanctum']);;
 
 
 

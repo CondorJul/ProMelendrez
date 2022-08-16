@@ -119,4 +119,17 @@ class CategoryController extends Controller
             'data' => []
         ], 200);
     }
+
+    public function updState($id, Request $request)
+    {
+        $category = Category::find($id);
+        $category->catState = $request->catState;
+        $category->save();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => Category::where('catId', $category->catId)->get()
+        ], 200);
+    }
 }

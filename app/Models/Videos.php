@@ -13,6 +13,11 @@ class Videos extends Model
     protected $fillable = [
         'vidName',
         'vidLink',
-        'vidState'
+        'vidState',
+        'vidChannelTitle',
+        'vidDescription',
+        'vidImgLinkDefault',
+        'vidImgLinkMedium',
+        'vidImgLinkHigh'
     ];
 }

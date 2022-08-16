@@ -12,9 +12,15 @@ class Category extends Model
     protected $primaryKey = 'catId';
     protected $table = 'category';
     protected $fillable = [
-        'catCode', 'catName', 'catLinkBus',
-        'catNameLong', 'catDescription',
-        'catAuth', 'catIdParent', 'hqId'
+        'catCode',
+        'catName',
+        'catLinkBus',
+        'catNameLong',
+        'catDescription',
+        'catAuth',
+        'catIdParent',
+        'hqId',
+        'catState'
     ];
 
     public function tellers(){

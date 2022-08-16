@@ -1506,6 +1506,47 @@ ALTER TABLE payments ADD COLUMN "payReceiptHonorarySN" VARCHAR(50);
 
 
 
+/*Modificaciones al 25/07/2022*/
+
+CREATE FUNCTION tf_a_d_services_provided() RETURNS TRIGGER
+LANGUAGE PLPGSQL AS
+    $$ 
+DECLARE
+    _dbpCost decimal(12,2);
+    _dbpPaid decimal(12,2);
+BEGIN
+    SELECT COALESCE(SUM("spCost"),0) into _dbpCost FROM services_provided where "dbpId"=old."dbpId";
+    SELECT COALESCE(SUM("spPaid"),0) into _dbpPaid FROM services_provided where "dbpId"=old."dbpId";
+    
+    UPDATE d_bussines_periods SET "dbpCost"=_dbpCost, "dbpPaid"=_dbpPaid, "dbpDebt"=_dbpCost-_dbpPaid where "dbpId"=old."dbpId";
+
+RETURN OLD;
+
+END;
+$$
+
+ CREATE TRIGGER t_a_d_services_provided AFTER DELETE ON services_provided FOR EACH ROW EXECUTE PROCEDURE tf_a_d_services_provided();
+/*FALTA EN PRODUCCION**/
+
+/*Cambios 28 de Julio 2022*/
+
+ALTER TABLE videos ADD COLUMN "vidChannelTitle" VARCHAR(200);
+ALTER TABLE videos ADD COLUMN "vidDescription" VARCHAR(500);
+ALTER TABLE videos ADD COLUMN "vidImgLinkDefault" VARCHAR(200);
+ALTER TABLE videos ADD COLUMN "vidImgLinkMedium" VARCHAR(200);
+ALTER TABLE videos ADD COLUMN "vidImgLinkHigh" VARCHAR(200);
+
+
+ALTER TABLE category   ADD COLUMN "catState" int DEFAULT 1; 
+
+ALTER TABLE headquarter ADD COLUMN "hqTel" VARCHAR(200);
+
+ALTER TABLE headquarter ADD COLUMN "hqEmail" VARCHAR(200);
+
+
+
+
+
 
 
 

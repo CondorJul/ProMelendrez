@@ -64,6 +64,8 @@ class HeadquarterController extends Controller
         $hq->hqName = $request->hqName;
         $hq->hqRUC = $request->hqRUC;
         $hq->hqAddress = $request->hqAddress;
+        $hq->hqTel = $request->hqTel;
+        $hq->hqEmail = $request->hqEmail;
 
         $hq->save();
         return response()->json([

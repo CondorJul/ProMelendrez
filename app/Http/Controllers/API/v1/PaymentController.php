@@ -44,13 +44,13 @@ class PaymentController extends Controller
         }
 
         if($request->dateStart && $request->dateEnd){
-            $queryWhere.=' and "payDatePrint" between ? and ? ';
+            $queryWhere.=' and date("payDatePrint") between ? and ? ';
             array_push($params,$request->dateStart, $request->dateEnd);
         }else if($request->dateStart){
-            $queryWhere.=' and "payDatePrint">? ';
+            $queryWhere.=' and date("payDatePrint")>? ';
             array_push($params,$request->dateStart);
         }else if($request->dateEnd){
-            $queryWhere.=' and "payDatePrint"<? ';
+            $queryWhere.=' and date("payDatePrint")<? ';
             array_push($params,$request->dateEnd);
         }
 

@@ -43,8 +43,15 @@
 <body>
     <div style="text-align: center; padding: 15px;">
         <img src="<?php echo $pic ?>" alt="" width="270px">
+        <!--
         <h2 style="font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px;">RUC: 20542566630</h2>
         <h5 style="font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-weight: lighter;">Av. Daniel Alcides Carrión N° 204(Segundo Piso) <br> Urb. San Juan-Yanacancha-Pasco <br> <span style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">E-mail: melendres.auditores@hotmail.com<br>Cel: 999918316 / 999918376 / 999918498</span></h5>
+        -->
+        
+        <h2 style="font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px;">RUC: {{$headquarter['hqRUC']}}</h2>
+        <h5 style="font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-weight: lighter;">{!!$headquarter['hqAddress']!!} <br> <span style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">E-mail: {{$headquarter['hqEmail']}}<br>Cel: {{$headquarter['hqTel']}}</span></h5>
+        
+        
         <table style="margin: 5 0 5 0;">
             <tr>
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>

@@ -207,6 +207,7 @@ class AppointmentTempController extends Controller
                 ->with('category')
                 ->where('apptmState','>', 1)
                 ->where('hqId','=', $request->hqId)
+                ->whereRaw('date("apptmDateStartAttention")=date(now())')
                 ->orderBy( 'apptmDateStartAttention' ,'DESC' )
                 ->limit($request->limit)
                 ->get()
