@@ -2,6 +2,39 @@
 
 <head>
     <style type="text/css">
+        .a {
+            border: 1px solid black;
+            width: 49%;
+        }
+
+        .b {
+            border: 1px solid black;
+            width: 49%;
+            margin-left: 5px;
+        }
+
+        .contenedor {
+            margin: 0 auto;
+        }
+
+        .contenedor .a,
+        .contenedor .b {
+            display: inline-block;
+        }
+
+        footer {
+            border-top: 1px solid black;
+            position: fixed;
+            bottom: -40px;
+
+            height: 40px;
+
+            /** Extra personal styles **/
+
+            color: black;
+            text-align: center;
+
+        }
     </style>
 </head>
 
@@ -101,6 +134,32 @@
             </tr>
         </table>
     </div>
+    <br><br> <br>
+    <div class="contenedor">
+        <div class="a" style="font-size: 14px; font-weight: bold; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+            CUENTA DE AHORROS <br> MELENDRES AUDITORES CONSULTORES S.A.C.
+            <div style="border-top: 1px solid black; padding: 8px;">
+                <span>Cuenta Soles BBVA BANCO CONTINENTAL</span> <br>
+                <span style="font-weight: normal;">N° 0011 0321 0200838764</span> <br><br>
+
+                <span>Código Interbancario CCI es </span> <br>
+                <span style="font-weight: normal;">011-321-000200838764-75</span>
+            </div>
+        </div>
+        <div class="b" style="font-size: 14px; font-weight: bold; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+            CUENTA DIGITAL <br> JOSE LUIS MELENDRES CONDOR
+            <div style="border-top: 1px solid black; padding: 8px;">
+                <span style="font-size: 12px;">Cuenta Soles BCP BANCO DE CREDITO DEL PERU</span> <br>
+                <span style="font-weight: normal;">N° 280-94036878-0-05</span> <br><br>
+
+                <span>Código Interbancario CCI es </span> <br>
+                <span style="font-weight: normal;">002-28019403687800568</span>
+            </div>
+        </div>
+    </div>
 </body>
+<footer>
+    <div style="font-size: 11px; line-height: 12px; padding-top: 5px;">EL PRESENTE ES PARA INFORMAR RESPECTO A LOS HONORARIOS POR SERVICIOS QUE NOS ADEUDA HASTA LA FECHA. <br> Ante cualquier duda o consulta, sírvase comunicarse con nosotros al celular <span style="color: red;">N° 973896051 / 951415451</span> a los señores José Luis MELENDRES CÓNDOR y/o <br> Rita Cindy MIRANDA RAMOS, o al correo <span style="color: blue;">melendres.auditores@hotmail.com</span></div>
+</footer>
 
 </html>
