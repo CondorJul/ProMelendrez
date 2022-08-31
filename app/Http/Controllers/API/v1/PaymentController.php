@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Headquarter;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -243,16 +244,21 @@ class PaymentController extends Controller
             $h = Headquarter::where('hqId', $p->hqId)->first();
             $t = Teller::where('tellId', $p->tellId)->first();
             $u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
-
+            $a = Appointment::where('apptmId', $p->apptmId)->first();
             $data = [
-                'titulo' => 'Styde.net',
                 'payment' => $p,
                 'headquarter'=>$h, 
                 'teller'=>$t,
-                'user'=>$u
+                'user'=>$u,
+                'appointment'=>$a
             ];
-
-            return response()->json($data);
+            return response()->json([
+                'res' => true,
+                'msg' => 'Leido correctamente',
+                'data' => $data
+    
+            ], 200);
+            
 
         } catch (Exception $e) {
             return 'Surgio un error, intente más tarde';

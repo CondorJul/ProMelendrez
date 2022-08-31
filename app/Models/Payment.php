@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
+    
     use HasFactory;
+    public static $snakeAttributes = false;
+
     protected $primaryKey = 'payId';
     protected $table = 'payments';
     protected $fillable = [
@@ -58,5 +61,10 @@ class Payment extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'userId', 'id');
+    }
+
+    public function appointment()
+    {
+        return $this->belongsTo(Appointment::class, 'apptmId', 'apptmId');
     }
 }

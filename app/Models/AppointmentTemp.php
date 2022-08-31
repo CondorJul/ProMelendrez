@@ -16,6 +16,7 @@ class AppointmentTemp extends Model
         'apptmDateTimePrint',
         'apptmSendFrom',
         
+        
         'apptKindClient',
         'perId',
         'bussId',
@@ -27,6 +28,7 @@ class AppointmentTemp extends Model
 
         'apptmState',
         'apptmDateStartAttention',
+        'apptmDateFinishAttention',
         'apptmNroCalls',
 
         'apptmTransfer',

@@ -223,6 +223,8 @@ Route::get('/v1/dashboard/counter-cards', [DashboardController::class, 'getCount
 Route::get('/v1/appointments/get-all-by', [AppointmentController::class, 'getAllBy']);
 Route::get('/v1/appointments/getTellers', [AppointmentController::class, 'getTellers']);
 Route::get('/v1/appointments/getCategories', [AppointmentController::class, 'getCategories']);
+Route::get('/v1/appointments/{apptmId}', [AppointmentController::class, 'find']);
+
 
 
 
@@ -264,6 +266,7 @@ Route::get('/v1/services-provided', [ServiceProvidedController::class, 'index'])
 Route::post('/v1/services-provided/addServicesProvided', [ServiceProvidedController::class, 'store'])->middleware(['auth:sanctum']);
 Route::put('/v1/services-provided/{spId}', [ServiceProvidedController::class, 'update'])->middleware(['auth:sanctum']);
 Route::delete('/v1/services-provided/{id}', [ServiceProvidedController::class, 'destroy'])->middleware(['auth:sanctum']);
+Route::get('/v1/services-provided/{spId}/payments', [ServiceProvidedController::class, 'getPayments']);
 
 
 

@@ -43,15 +43,15 @@ class AppointmentController extends Controller
         }
 
         if($request->dateStart && $request->dateEnd){
-            $queryWhere.='and "created_at" between ? and ? ';
+            $queryWhere.='and date("created_at") between ? and ? ';
             array_push($params,$request->dateStart, $request->dateEnd);
         }
         else if($request->dateStart){
-            $queryWhere.='and "created_at">? ';
+            $queryWhere.='and date("created_at")>? ';
             array_push($params,$request->dateStart);
         }
         else if($request->dateEnd){
-            $queryWhere.='and "created_at"<? ';
+            $queryWhere.='and date("created_at")<? ';
             array_push($params,$request->dateEnd);
         }
 
@@ -82,6 +82,19 @@ class AppointmentController extends Controller
 
     public function getApptmState(Request $request){
         
+    }
+
+
+    public function find($apptmId){
+        $data=Appointment::select()
+            ->with('payments')
+            ->where('apptmId', $apptmId)
+            ->first();
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Listado correctamente.',
+            'data'=>$data//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1 '.$queryWhere.' order by "elapsedSeconds" DESC',$params)
+        ],200);
     }
 
 

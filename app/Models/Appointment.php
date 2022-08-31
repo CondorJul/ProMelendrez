@@ -30,4 +30,9 @@ class Appointment extends Model
 
         'apptmTransfer'
     ];
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'apptmId', 'apptmId');
+    }
 }

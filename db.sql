@@ -568,64 +568,169 @@ INSERT
 
 /*TRIGGER ON DELETE APPOINTMENT TEMP*/
 
-CREATE FUNCTION tf_b_d_appointment_temp() RETURNS TRIGGER
-LANGUAGE PLPGSQL AS
-    $ $ DECLARE
-"apptmSendFrom", "apptKindClient", "perId", "bussId"
-, "apptmNumberDocClient", "apptmNameClient",
-/*Sede*/
-"hqId", /*id de ventanilla y id de categoria*/
-"tellId", "catId", "catCode", "apptmNro",
-/*Transfer*/
-"apptmTransfer", "apptmTel", "apptmEmail", "apptmComment"
-, /*Posiblemente en la siguiente tabla original*/
-"tellNameLong",
-/*atencion en ventanilla*/
-"apptmState",
-/*En espera=1, En atención=2, Atendido=3, 4=no atendido 5=cancelado*/
-"apptmNroCalls", "apptmDateStartAttention", "apptmDateFinishAttention"
-, /*Comment client*/
-"apptmScoreClient", "apptmCommentClient", "apptmScoreDateClient"
-, "apptmCommentDateClient", "updated_at", "created_at"
-, /*fields with teller */
-"tellName", "tellCode",
-/*fields with category */
-"catNameLong",
-/*fields with user*/
-"userId", "perName") VALUES(OLD."apptmId", OLD."apptmTicketCode"
-, OLD."apptmDateTimePrint", OLD."apptmSendFrom", OLD
-."apptKindClient", OLD."perId", OLD."bussId", OLD.
-"apptmNumberDocClient", OLD."apptmNameClient",
-/*Sede*/
-OLD."hqId",
-/*id de ventanilla y id de categoria*/
-OLD."tellId", OLD."catId", OLD."catCode", OLD."apptmNro"
-, /*Transfer*/
-OLD."apptmTransfer", OLD."apptmTel", OLD."apptmEmail"
-, OLD."apptmComment",
-/*Posiblemente en la siguiente tabla original*/
-OLD."tellNameLong",
-/*atencion en ventanilla*/
-OLD."apptmState",
-/*En espera=1, En atención=2, Atendido=3, 4=no atendido 5=cancelado*/
-OLD."apptmNroCalls", OLD."apptmDateStartAttention"
-, OLD."apptmDateFinishAttention",
-/*Comment client*/
-OLD."apptmScoreClient", OLD."apptmCommentClient",
-OLD."apptmScoreDateClient", OLD."apptmCommentDateClient"
-, OLD."updated_at", OLD."created_at",
-/*fields with teller */
-_tellName, _tellCode,
-/*fields with category */
-_catNameLong,
-/*fields with user*/
-_userId, _perName) ;
 
+
+
+CREATE OR REPLACE FUNCTION tf_b_d_appointment_temp()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    
+    /*fields with teller */
+    _tellName varchar(50);
+    _tellCode varchar(10);
+
+    /*fields with category */
+    _catNameLong varchar;
+
+    /*fields with user*/
+    _userId bigint;
+    _perName VARCHAR;
+    
+BEGIN
+
+    select 
+        "tellName", "tellCode", "userId", "perName" 
+        into _tellName, _tellCode, _userId, _perName
+        from teller inner join users on teller."userId"=users.id 
+        left join person on  users."perId"=person."perId" where teller."tellId" = OLD."tellId";
+        
+    select "catNameLong" into _catNameLong from category where category."catId"=OLD."catId";
+
+    insert into appointment
+                (
+                    "apptmId",
+                    "apptmTicketCode",
+                    "apptmDateTimePrint",
+                    "apptmSendFrom",
+
+                    "apptKindClient",
+                    "perId",
+                    "bussId",
+    
+                    "apptmNumberDocClient",
+                    "apptmNameClient",
+
+                    /*Sede*/
+                    "hqId",
+
+                    /*id de ventanilla y id de categoria*/
+                    "tellId",
+
+                    "catId",
+                    "catCode",
+                    "apptmNro",
+                    /*Transfer*/
+                    "apptmTransfer",
+                    "apptmTel",
+                    "apptmEmail",
+                    "apptmComment",
+
+                    /*Posiblemente en la siguiente tabla original*/
+                    "tellNameLong",
+
+                    /*atencion en ventanilla*/
+                    "apptmState", /*En espera=1, En atención=2, Atendido=3, 4=no atendido 5=cancelado*/
+                    "apptmNroCalls",
+                    "apptmDateStartAttention",
+                    "apptmDateFinishAttention",
+
+                    /*Comment client*/
+                    "apptmScoreClient", 
+                    "apptmCommentClient",
+                    "apptmScoreDateClient",
+                    "apptmCommentDateClient",
+
+                    "updated_at",
+                    "created_at",
+
+
+                    /*fields with teller */
+                    "tellName",
+                    "tellCode",
+
+                    /*fields with category */
+                    "catNameLong",
+
+                    /*fields with user*/
+                    "userId", 
+                    "perName",
+                    
+                    /*NEW FIELDS*/
+                    "apptmEpochInWaiting",
+                    "apptmEpochInAtention"
+                    ) 
+            VALUES  (
+                    OLD."apptmId",
+                    OLD."apptmTicketCode",
+                    OLD."apptmDateTimePrint",
+                    OLD."apptmSendFrom",
+
+                    OLD."apptKindClient",
+                    OLD."perId",
+                    OLD."bussId",
+    
+                    OLD."apptmNumberDocClient",
+                    OLD."apptmNameClient",
+
+                    /*Sede*/
+                    OLD."hqId",
+
+                    /*id de ventanilla y id de categoria*/
+                    OLD."tellId",
+
+                    OLD."catId",
+                    OLD."catCode",
+                    OLD."apptmNro",
+                    /*Transfer*/
+                    OLD."apptmTransfer",
+                    OLD."apptmTel",
+                    OLD."apptmEmail",
+                    OLD."apptmComment",
+
+                    /*Posiblemente en la siguiente tabla original*/
+                    OLD."tellNameLong",
+
+                    /*atencion en ventanilla*/
+                    OLD."apptmState", /*En espera=1, En atención=2, Atendido=3, 4=no atendido 5=cancelado*/
+                    OLD."apptmNroCalls",
+                    OLD."apptmDateStartAttention",
+                    OLD."apptmDateFinishAttention",
+
+                    /*Comment client*/
+                    OLD."apptmScoreClient", 
+                    OLD."apptmCommentClient",
+                    OLD."apptmScoreDateClient",
+                    OLD."apptmCommentDateClient",
+
+
+                    OLD."updated_at",
+                    OLD."created_at",
+
+
+                    /*fields with teller */
+                    _tellName,
+                    _tellCode,
+
+                    /*fields with category */
+                    _catNameLong,
+
+                    /*fields with user*/
+                    _userId, 
+                    _perName,
+
+                    /*NEW FIELDS*/
+                    OLD."apptmEpochInWaiting",
+                    OLD."apptmEpochInAtention"
+            );
 RETURN OLD;
-
 END;
+$function$
 
-$ $ CREATE TRIGGER t_b_d_appointment_temp BEFORE DELETE ON appointment_temp FOR EACH ROW EXECUTE PROCEDURE tf_b_d_appointment_temp();
+
+
+ CREATE TRIGGER t_b_d_appointment_temp BEFORE DELETE ON appointment_temp FOR EACH ROW EXECUTE PROCEDURE tf_b_d_appointment_temp();
 
 /*
 delete from appointment_temp where "apptmId"=18
@@ -1543,14 +1648,70 @@ ALTER TABLE headquarter ADD COLUMN "hqTel" VARCHAR(200);
 
 ALTER TABLE headquarter ADD COLUMN "hqEmail" VARCHAR(200);
 
+/*Cambios de DB*/
+
+/*
+select "apptmDateTimePrint",
+"apptmDateStartAttention",
+"apptmDateFinishAttention",
+ extract(EPOCH from "apptmDateStartAttention"::timestamp - "apptmDateTimePrint"::timestamp) as "apptmEpochInWaiting", 
+ extract(EPOCH from "apptmDateFinishAttention"::timestamp - "apptmDateStartAttention"::timestamp) as "apptmEpochInAtention"
+  from appointment*/
+
+/*30 / 08 /2022*/
+
+ALTER TABLE appointment_temp ADD COLUMN "apptmEpochInWaiting" decimal(20,8);
+ALTER TABLE appointment_temp ADD COLUMN "apptmEpochInAtention" decimal(20,8);
+
+ALTER TABLE appointment ADD COLUMN "apptmEpochInWaiting" decimal(20,8);
+ALTER TABLE appointment ADD COLUMN "apptmEpochInAtention" decimal(20,8);
 
 
 
 
 
+CREATE FUNCTION tf_b_u_appointment_temp()
+   RETURNS TRIGGER
+   LANGUAGE PLPGSQL
+AS $$
+DECLARE
+    _catNameLong varchar;
+BEGIN
+
+    IF NEW."apptmDateStartAttention" IS NOT NULL THEN 
+        NEW."apptmEpochInWaiting":= extract(EPOCH from NEW."apptmDateStartAttention"::timestamp - NEW."apptmDateTimePrint"::timestamp) as "apptmEpochInWaiting";
+    END IF;
+
+
+    IF NEW."apptmDateFinishAttention" IS NOT NULL THEN 
+        NEW."apptmEpochInAtention":=extract(EPOCH from NEW."apptmDateFinishAttention"::timestamp - NEW."apptmDateStartAttention"::timestamp) as "apptmEpochInAtention";
+    END IF;
 
 
 
 
+RETURN NEW;
+END;
+$$
 
+CREATE TRIGGER t_b_u_appointment_temp BEFORE
+UPDATE
+    ON appointment_temp FOR EACH ROW EXECUTE PROCEDURE tf_b_u_appointment_temp();
+
+
+
+
+/*
+drop TRIGGER t_b_u_appointment_temp on appointment_temp;
+drop FUNCTION tf_b_u_appointment_temp;*/
+
+update appointment_temp set "apptmDateFinishAttention"="apptmDateStartAttention" where "apptmDateFinishAttention" is null
+update appointment set"apptmDateFinishAttention"="apptmDateStartAttention"  where "apptmDateFinishAttention" is null
+
+update appointment_temp set "apptmEpochInAtention"=extract(EPOCH from "apptmDateFinishAttention"::timestamp - "apptmDateStartAttention"::timestamp);
+UPDATE appointment_temp set "apptmEpochInWaiting"= extract(EPOCH from "apptmDateStartAttention"::timestamp - "apptmDateTimePrint"::timestamp) ;
+
+
+update appointment set "apptmEpochInAtention"=extract(EPOCH from "apptmDateFinishAttention"::timestamp - "apptmDateStartAttention"::timestamp) ;
+UPDATE appointment set "apptmEpochInWaiting"= extract(EPOCH from "apptmDateStartAttention"::timestamp - "apptmDateTimePrint"::timestamp) ;
 

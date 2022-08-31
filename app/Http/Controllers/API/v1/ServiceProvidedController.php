@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\services_provided\AddServicesProvidedRequest;
 use App\Http\Requests\services_provided\UpdServicesProvidedRequest;
+use App\Models\PaymentDetail;
 use App\Models\ServiceProvided;
 use Illuminate\Http\Request;
 
@@ -100,6 +101,18 @@ class ServiceProvidedController extends Controller
             'res' => true,
             'msg' => 'Eliminado correctamente.',
             'data' => $a
+        ], 200);
+    }
+
+    public function getPayments($spId){
+        $p=ServiceProvided::select()
+            ->with('paymentDetails.payment.appointment')
+            ->where('spId', $spId)
+            ->first();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Seleccionado correctamente.'.$spId,
+            'data' => $p
         ], 200);
     }
 }

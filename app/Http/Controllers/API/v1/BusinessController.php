@@ -257,11 +257,39 @@ class BusinessController extends Controller
 
     public function getBusinessOfTeller(Request $request)
     {
-        if ($request->tellId == 0) {
+        /*Get*/
+
+        $params=[];
+        $queryWhere='';
+
+
+        if($request->tellId>0){
+            $queryWhere.=' and "tellId"=?';
+            array_push($params,$request->tellId );
+        }
+        
+        if($request->bussState>0){
+            $queryWhere.=' and "bussState"=?';
+            array_push($params,$request->bussState);
+        }
+
+        if(!empty($request->q)){
+            $queryWhere.=' and (lower("bussName" ) like lower(?) or "bussRUC" like ?)';
+            $q='%'.$request->q.'%';
+            array_push($params,$q, $q);
+        }
+
+        /*if ($request->tellId == 0) {
             $data = Business::with('person')->get();
         } else {
             $data = Business::with('person')->where('tellId', $request->tellId)->get();
-        }
+        }*/
+        $data=Business::select()
+        ->with('person')
+        ->whereRaw(' 1=1 '.$queryWhere,[$params])
+        ->orderBy("bussName", 'ASC')
+        ->get();
+
         return response()->json([
             'res' => true,
             'msg' => 'Leido Correctamente',

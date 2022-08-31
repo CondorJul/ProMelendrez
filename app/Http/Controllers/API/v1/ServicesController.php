@@ -15,10 +15,13 @@ class ServicesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
     public function index()
     {
         return Services::all();
     }
+
+    
 
     /**
      * Store a newly created resource in storage.
@@ -93,4 +96,6 @@ class ServicesController extends Controller
             'msg' => 'Actualizado Correctamente.',
         ], 200);
     }
+
+
 }
