@@ -22,6 +22,7 @@ use App\Http\Controllers\API\v1\VideosController;
 use App\Http\Controllers\API\v1\HeadquarterController;
 use App\Http\Controllers\API\v1\PeriodController;
 use App\Http\Controllers\API\v1\DBusinessPeriodController;
+use App\Http\Controllers\API\v1\DebtsAndPaidsController;
 use App\Http\Controllers\API\v1\MailController;
 use App\Http\Controllers\API\v1\PaymentController;
 use App\Http\Controllers\API\v1\PaymentMethodController;
@@ -224,6 +225,7 @@ Route::get('/v1/appointments/get-all-by', [AppointmentController::class, 'getAll
 Route::get('/v1/appointments/getTellers', [AppointmentController::class, 'getTellers']);
 Route::get('/v1/appointments/getCategories', [AppointmentController::class, 'getCategories']);
 Route::get('/v1/appointments/{apptmId}', [AppointmentController::class, 'find']);
+Route::post('/v1/appointments/{token}/qualify-service', [AppointmentController::class, 'qualifyService']);
 
 
 
@@ -287,6 +289,11 @@ Route::put('/v1/payments/{payId}/ticket', [PaymentController::class, 'setTicket'
 Route::put('/v1/payments/{payId}/invoice', [PaymentController::class, 'setInvoice'])->middleware(['auth:sanctum']);
 Route::put('/v1/payments/{payId}/receipt-honorary', [PaymentController::class, 'setReceiptHonorary'])->middleware(['auth:sanctum']);
 
+/**Deudas y Pagos */
+Route::get('/v1/debts-and-paids', [DebtsAndPaidsController::class, 'index'])->middleware(['auth:sanctum']);
+
+
+
 
 
 Route::delete('/v1/payments/{id}', [PaymentController::class, 'destroy'])->middleware(['auth:sanctum']);
@@ -295,6 +302,11 @@ Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::
 
 Route::get('/v1/report/{prdsId}/control-monitoring-json/{bussId}', [ReportsController::class, 'controlMonitoringJson']);
 Route::get('/v1/reports/all-periods-json/{bussId}', [ReportsController::class, 'reportAllPeriodsJson']);
+
+/*Reportes añadidos el 17/08/2022 */
+Route::get('/v1/reports/get-all-bussines-and-visitors-by-date', [ReportsController::class, 'getAllBussinesAndVisitorsByDate']);
+
+
 
 
 /*periodos de pago */

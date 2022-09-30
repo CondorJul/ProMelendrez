@@ -1715,3 +1715,12 @@ UPDATE appointment_temp set "apptmEpochInWaiting"= extract(EPOCH from "apptmDate
 update appointment set "apptmEpochInAtention"=extract(EPOCH from "apptmDateFinishAttention"::timestamp - "apptmDateStartAttention"::timestamp) ;
 UPDATE appointment set "apptmEpochInWaiting"= extract(EPOCH from "apptmDateStartAttention"::timestamp - "apptmDateTimePrint"::timestamp) ;
 
+
+
+
+/*modificaciones en servidor 27/09/2022*/
+ALTER TABLE appointment_temp ADD COLUMN "apptmTokenToQualify" VARCHAR(200);
+
+ALTER TABLE appointment ADD COLUMN "apptmTokenToQualify" varchar(200);
+
+

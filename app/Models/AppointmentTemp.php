@@ -35,7 +35,8 @@ class AppointmentTemp extends Model
         'apptmNameClient',
         'apptmTel',
         'apptmEmail',
-        'apptmComment'
+        'apptmComment',
+        'apptmTokenToQualify'
     ];
 
     public function teller(){

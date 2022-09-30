@@ -28,7 +28,15 @@ class Appointment extends Model
         'apptmDateStartAttention',
         'apptmNroCalls',
 
-        'apptmTransfer'
+        'apptmTransfer',
+        'apptmTokenToQualify',
+        
+        'apptmScoreClient',
+        'apptmCommentClient',
+        'apptmScoreDateClient',
+        'apptmCommentDateClient'
+
+
     ];
 
     public function payments()

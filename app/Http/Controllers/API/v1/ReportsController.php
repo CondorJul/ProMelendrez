@@ -10,6 +10,8 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Nette\Utils\Arrays;
 
 class ReportsController extends Controller
 {
@@ -216,4 +218,52 @@ class ReportsController extends Controller
             return 'Surgio un error, intente más tarde';
         }
     }
+
+    public function getAllBussinesAndVisitorsByDate(Request $request){
+
+        $array=DB::select(
+            'select  
+                date("apptmDateTimePrint")
+                "apptmDatePrint", 
+                sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business, 
+                sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors 
+            
+                from appointment GROUP BY date("apptmDateTimePrint") ORDER BY date("apptmDateTimePrint") desc;'
+            );
+
+           
+            $seriesBusiness=Array();
+            $seriesBusiness['name']="Clientes";
+            $seriesBusiness['series']= array_map(function($element) {
+                return ['name'=>$element->apptmDatePrint,'value'=> $element->business];
+            },$array); 
+
+            $seriesVisitors=Array();
+            $seriesBusiness['name']="Visitantes";
+            $seriesVisitors['series']= array_map(function($element) {
+                return ['name'=>$element->apptmDatePrint,'value'=> $element->visitors];
+            },$array); 
+
+            $arrayLineChart = Array($seriesBusiness, $seriesVisitors);
+
+
+
+
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Listado correctamente',
+            'data'=>$arrayLineChart
+        ],200);  
+    }
+
+
+
+
+
+
+
+
+
+
+
 }

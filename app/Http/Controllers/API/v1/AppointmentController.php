@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\AppointmentTemp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentController extends Controller
 {
@@ -142,4 +144,37 @@ class AppointmentController extends Controller
     {
         //
     }
+
+
+    public function qualifyService(Request $request,$token){
+
+        $c=AppointmentTemp::select()->where('apptmTokenToQualify',$token)->first();
+
+        if(!$c){
+            $c=Appointment::select()->where('apptmTokenToQualify',$token)->first();
+        }
+        
+        $c->apptmScoreClient=$request->apptmScoreClient;
+        $c->apptmCommentClient=$request->apptmCommentClient;
+        
+        if(!empty($request->apptmScoreClient)){
+            $c->apptmScoreDateClient=DB::raw('now()');
+        }
+
+        if(!empty($request->apptmCommentClient)){
+            $c->apptmCommentDateClient=DB::raw('now()');
+        }
+        $c->save();
+
+        return response()->json([
+            'res'=>true,
+            'msg'=>'Hemos enviado tu calificación correctamente.',
+            'data'=>$c
+        ],200);
+    }
+
+    
+
+
+
 }
