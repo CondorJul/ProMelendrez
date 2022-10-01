@@ -25,8 +25,15 @@ class AppointmentController extends Controller
         $params=[];
         $queryWhere='';
 
-        $queryWhere.='and "hqId" = ?';
-        array_push($params, (empty($request->hqId))?0:$request->hqId);
+        
+
+        if($request->bussId>0){
+            $queryWhere.='and "bussId"=? ';
+            array_push($params,$request->bussId);
+        }else {
+            $queryWhere.='and "hqId" = ?';
+            array_push($params, (empty($request->hqId))?0:$request->hqId);
+        } 
 
         if($request->tellId>0){
             $queryWhere.='and "tellId"=?';
@@ -57,11 +64,18 @@ class AppointmentController extends Controller
             array_push($params,$request->dateEnd);
         }
 
-        $data=Appointment::select()
+
+
+        $a=Appointment::select()
             ->whereRaw(' 1=1 '.$queryWhere,[$params])
             //->where('apptmState', 1)
-            ->orderBy("created_at", 'DESC')
-            ->get();
+            ->orderBy("created_at", 'DESC');
+
+            if(!empty($request->limit)){
+                $a->limit($request->limit);
+            }
+            
+            $data=$a->get();
 
         return response()->json([
             'res'=>true,
@@ -69,6 +83,7 @@ class AppointmentController extends Controller
             'data'=>$data//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1 '.$queryWhere.' order by "elapsedSeconds" DESC',$params)
         ],200);
     }
+
 
     public function getTellers(Request $request){
         $params=[];
