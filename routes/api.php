@@ -291,6 +291,7 @@ Route::put('/v1/payments/{payId}/receipt-honorary', [PaymentController::class, '
 
 /**Deudas y Pagos */
 Route::get('/v1/debts-and-paids', [DebtsAndPaidsController::class, 'index'])->middleware(['auth:sanctum']);
+Route::get('/v1/debts-and-paids/last-payment-by-client', [DebtsAndPaidsController::class, 'getLastPaymentByClient'])->middleware(['auth:sanctum']);
 
 
 
