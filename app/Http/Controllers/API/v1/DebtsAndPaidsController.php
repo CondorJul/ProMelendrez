@@ -111,14 +111,14 @@ class DebtsAndPaidsController extends Controller
     LEFT JOIN (
 SELECT distinct on (d_bussines_periods."bussId")  
         payments."payId", "payToken", "paySerie",   "payNumber","payDatePrint", 
-      d_bussines_periods."bussId",  d_bussines_periods."prdsId", 
+      d_bussines_periods."bussId" as "_busId",  d_bussines_periods."prdsId", 
       "spName","svId", "ppayId",  "spCost", "spDebt", "spPaid"  FROM payments 
       
 INNER JOIN payment_details ON payments."payId"= payment_details."payId" 
 INNER JOIN services_provided ON payment_details."spId"=services_provided."spId"
 INNER JOIN d_bussines_periods on services_provided."dbpId"=d_bussines_periods."dbpId"
 INNER JOIN periods ON d_bussines_periods."prdsId"=periods."prdsId"
-where "payState"=3 AND  "payIsCanceled"=2 and services_provided."svId"=1 ORDER BY d_bussines_periods."bussId", periods."prdsNameShort" DESC, services_provided."svId" ASC, services_provided."ppayId" DESC) lp ON b."bussId" = lp."bussId" ORDER BY "payId" ASC NULLS LAST;
+where "payState"=3 AND  "payIsCanceled"=2 and services_provided."svId"=1 ORDER BY d_bussines_periods."bussId", periods."prdsNameShort" DESC, services_provided."svId" ASC, services_provided."ppayId" DESC) lp ON b."bussId" = lp."_bussId" ORDER BY "payId" ASC NULLS LAST;
         ', $params);
 return response()->json([
     'res'=>true,
