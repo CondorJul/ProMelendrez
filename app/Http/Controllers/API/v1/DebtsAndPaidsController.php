@@ -111,7 +111,7 @@ class DebtsAndPaidsController extends Controller
     LEFT JOIN (
 SELECT distinct on (d_bussines_periods."bussId")  
         payments."payId", "payToken", "paySerie",   "payNumber","payDatePrint", 
-      d_bussines_periods."bussId" as "_busId",  d_bussines_periods."prdsId", 
+      d_bussines_periods."bussId" as "_bussId",  d_bussines_periods."prdsId", 
       "spName","svId", "ppayId",  "spCost", "spDebt", "spPaid"  FROM payments 
       
 INNER JOIN payment_details ON payments."payId"= payment_details."payId" 
