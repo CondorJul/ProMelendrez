@@ -180,7 +180,7 @@ class ReportsController extends Controller
             $data1 = file_get_contents($path);
             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.report-all-periods', compact('pic'), $data);
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.reports-alls-periods', compact('pic'), $data);
 
             return $pdf->stream();
         } catch (Exception $e) {
@@ -219,51 +219,41 @@ class ReportsController extends Controller
         }
     }
 
-    public function getAllBussinesAndVisitorsByDate(Request $request){
+    public function getAllBussinesAndVisitorsByDate(Request $request)
+    {
 
-        $array=DB::select(
-            'select  
+        $array = DB::select(
+            'select
                 date("apptmDateTimePrint")
-                "apptmDatePrint", 
-                sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business, 
-                sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors 
-            
+                "apptmDatePrint",
+                sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business,
+                sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors
+
                 from appointment GROUP BY date("apptmDateTimePrint") ORDER BY date("apptmDateTimePrint") desc;'
-            );
+        );
 
-           
-            $seriesBusiness=Array();
-            $seriesBusiness['name']="Clientes";
-            $seriesBusiness['series']= array_map(function($element) {
-                return ['name'=>$element->apptmDatePrint,'value'=> $element->business];
-            },$array); 
 
-            $seriesVisitors=Array();
-            $seriesBusiness['name']="Visitantes";
-            $seriesVisitors['series']= array_map(function($element) {
-                return ['name'=>$element->apptmDatePrint,'value'=> $element->visitors];
-            },$array); 
+        $seriesBusiness = array();
+        $seriesBusiness['name'] = "Clientes";
+        $seriesBusiness['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->business];
+        }, $array);
 
-            $arrayLineChart = Array($seriesBusiness, $seriesVisitors);
+        $seriesVisitors = array();
+        $seriesBusiness['name'] = "Visitantes";
+        $seriesVisitors['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->visitors];
+        }, $array);
+
+        $arrayLineChart = array($seriesBusiness, $seriesVisitors);
 
 
 
 
         return response()->json([
-            'res'=>true,
-            'msg'=>'Listado correctamente',
-            'data'=>$arrayLineChart
-        ],200);  
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $arrayLineChart
+        ], 200);
     }
-
-
-
-
-
-
-
-
-
-
-
 }
