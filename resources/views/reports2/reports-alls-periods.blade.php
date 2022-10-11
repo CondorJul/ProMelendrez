@@ -89,7 +89,7 @@
             <br><br>
             @endforeach
 
-            <table align="right" style="width: 50%;" border="1" cellspacing="0">
+            <table align="center" style="width: 50%;" border="1" cellspacing="0">
                 <tr>
                     <th colspan="3" style="font-size: 16px; letter-spacing: 5px;">RESUMEN GENERAL</th>
 
