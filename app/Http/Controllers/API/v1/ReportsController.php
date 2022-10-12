@@ -222,37 +222,56 @@ class ReportsController extends Controller
     public function getAllBussinesAndVisitorsByDate(Request $request){
 
         $array=DB::select(
-            'select  
+            '
+            select * from ( SELECT date_trunc(\'day\', dd):: date "apptmDatePrint"
+            FROM generate_series
+                    ( CURRENT_DATE - INTERVAL \'1 months\'
+                    , CURRENT_DATE
+                    , \'1 day\'::interval) dd
+            ) d
+
+
+            left join
+            (
+            select  
                 date("apptmDateTimePrint")
-                "apptmDatePrint", 
+                "_apptmDatePrint", 
                 sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business, 
                 sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors 
             
-                from appointment GROUP BY date("apptmDateTimePrint") ORDER BY date("apptmDateTimePrint") desc;'
+                from appointment where "apptmDateTimePrint" >= (CURRENT_DATE - INTERVAL \'1 months\') GROUP BY date("apptmDateTimePrint") ORDER BY date("apptmDateTimePrint") desc) e on d."apptmDatePrint"=e."_apptmDatePrint"'
             );
-
            
+
             $seriesBusiness=Array();
             $seriesBusiness['name']="Clientes";
             $seriesBusiness['series']= array_map(function($element) {
-                return ['name'=>$element->apptmDatePrint,'value'=> $element->business];
+                return ['name'=>$element->apptmDatePrint,'value'=> $element->business  | 0];
             },$array); 
 
             $seriesVisitors=Array();
-            $seriesBusiness['name']="Visitantes";
+            $seriesVisitors['name']="Visitantes";
             $seriesVisitors['series']= array_map(function($element) {
-                return ['name'=>$element->apptmDatePrint,'value'=> $element->visitors];
+                return ['name'=>$element->apptmDatePrint,'value'=> $element->visitors | 0];
             },$array); 
 
-            $arrayLineChart = Array($seriesBusiness, $seriesVisitors);
+            $result = Array($seriesBusiness, $seriesVisitors);
 
+            /** */
+            $xAxisLabel = 'Últimos 30 dias';
+            $yAxisLabel = 'Tickets de atención';
 
+            $graph=Array(
+                'xAxisLabel'=>$xAxisLabel,
+                'yAxisLabel'=>$yAxisLabel, 
+                'results'=>$result
+            );
 
 
         return response()->json([
             'res'=>true,
             'msg'=>'Listado correctamente',
-            'data'=>$arrayLineChart
+            'data'=>$graph
         ],200);  
     }
 

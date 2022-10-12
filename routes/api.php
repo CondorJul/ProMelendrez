@@ -168,11 +168,12 @@ Route::get('v1/bussines/all-summarized', [BusinessController::class, 'allSummari
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
 Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
 Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson']);
-Route::get('/v1/business/{bussId}', [BusinessController::class, 'viewBusinessPerson']);
+Route::get('/v1/business/{bussId}', [BusinessController::class, 'viewBusinessPerson'])->middleware(['auth:sanctum']);
 Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusinessData'])->middleware(['auth:sanctum']);;
 Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData'])->middleware(['auth:sanctum']);;
 Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData'])->middleware(['auth:sanctum']);;
 Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData'])->middleware(['auth:sanctum']);;
+Route::delete('v1/business/{bussId}', [BusinessController::class, 'destroy'])->middleware(['auth:sanctum']);
 
 
 

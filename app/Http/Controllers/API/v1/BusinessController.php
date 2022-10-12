@@ -78,9 +78,18 @@ class BusinessController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $bussId)
     {
-        //
+        $b = Business::where('bussId', $bussId)->first();
+
+        \LogActivity::add($request->user()->email.' ha eliminado el cliente con id '.$bussId.', RUC='.$b->bussRUC.', NAME='.$b->bussName,null, json_encode($request->all()));
+
+        $c=$b->delete();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Se ha eliminado '.$c.' registro(s).',
+            'data' => $c
+        ], 200);
     }
 
     public function existRuc(ExistRucRequest $request)
@@ -123,7 +132,11 @@ class BusinessController extends Controller
         $business->bussDateMembership = $request->business['bussDateMembership'];
         $business->tellId = $request->business['tellId'];
         $business->perId = $person->perId;
+
         $business->save();
+        
+        \LogActivity::add($request->user()->email.' ha creado un cliente con id '.$business->bussId.', RUC='.$business->bussRUC.', NAME='.$business->bussName,null, json_encode($request->all()));
+
         return response()->json([
             'res' => true,
             'msg' => 'Usuario registrado con exito',
@@ -131,15 +144,21 @@ class BusinessController extends Controller
         ], 200);
     }
 
-    public function viewBusinessPerson($id)
+    public function viewBusinessPerson(Request $request, $bussId )
     {
         //Business::with('person')->get();
-        return Business::with('person')->where('bussId', $id)->get();
+        $b=Business::with('person')->where('bussId', $bussId)->get();
+        \LogActivity::add($request->user()->email.' ha realizado una consulta de cliente con id '.$bussId.', RUC='.$b[0]->bussRUC.', NAME='.$b[0]->bussName,null, json_encode($request->all()));
+        
+        return $b; 
     }
 
     public function updateBusinessData(updBussDataRequest $request)
     {
         $bussData = Business::where('bussId', $request->bussId)->first();
+
+        \LogActivity::add($request->user()->email.' ha actualizado los datos de negocio de cliente con id '.$bussData->bussId,json_encode($bussData), json_encode($request->all()));
+
         $bussData->bussKind = $request->business['bussKind'];
         $bussData->bussName = $request->business['bussName'];
         $bussData->bussRUC = $request->business['bussRUC'];
@@ -161,6 +180,10 @@ class BusinessController extends Controller
     public function updatePersonData(updPerDataRequest $request)
     {
         $perData = Person::where('perId', $request->person['perId'])->first();
+        
+        \LogActivity::add($request->user()->email.' ha actualizado los datos de persona de cliente con id '.$perData->bussId,json_encode($perData), json_encode($request->all()));
+
+
         $perData->perKindDoc = $request->person['perKindDoc'];
         $perData->perName = $request->person['perName'];
         $perData->perNumberDoc = $request->person['perNumberDoc'];
@@ -180,6 +203,9 @@ class BusinessController extends Controller
     public function updateAfiliationData(updAfiDataRequest $request)
     {
         $afiData = Business::where('bussId', $request->bussId)->first();
+
+        \LogActivity::add($request->user()->email.' ha actualizado los datos de afiliacion de cliente con id '.$afiData->bussId,json_encode($afiData), json_encode($request->all()));
+
         $afiData->bussSunatUser = $request->afiliation['bussSunatUser'];
         $afiData->bussSunatPass = $request->afiliation['bussSunatPass'];
         $afiData->bussCodeSend = $request->afiliation['bussCodeSend'];
@@ -200,6 +226,10 @@ class BusinessController extends Controller
     public function updateAditionalData(updAdiDataRequest $request)
     {
         $adiData = Business::where('bussId', $request->bussId)->first();
+
+        \LogActivity::add($request->user()->email.' ha actualizado los datos adicionales de cliente con id '.$adiData->bussId,json_encode($adiData), json_encode($request->all()));
+
+
         $adiData->bussDateMembership = $request->aditional['bussDateMembership'];
         $adiData->bussDateStartedAct = $request->aditional['bussDateStartedAct'];
         $adiData->bussRegime = $request->aditional['bussRegime'];
@@ -309,7 +339,12 @@ class BusinessController extends Controller
 
     public function updateBusinessState($ids, Request $request)
     {
+        $b= Business::select()->whereIn('bussId', explode(',', $ids),)->get();
+
+        \LogActivity::add($request->user()->email.' ha actualizado el estado de los clientes con  ids '.$ids,json_encode($b), json_encode($request->all()));
+        
         $a = Business::whereIn('bussId', explode(',', $ids),)->update($request->all());
+
         return response()->json([
             'res' => true,
             'msg' => 'Actualizado correctamente',
