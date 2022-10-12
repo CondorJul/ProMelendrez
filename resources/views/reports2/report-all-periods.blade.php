@@ -157,6 +157,29 @@
             </div>
         </div>
     </div>
+    <br>
+    <div class="contenedor">
+        <div class="a" style="font-size: 14px; font-weight: bold; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+            CUENTA SIMPLE <br> JOSE LUIS MELENDRES CONDOR
+            <div style="border-top: 1px solid black; padding: 8px;">
+                <span>Cuenta Soles BANCO INTERBANK </span> <br>
+                <span style="font-weight: normal;">N° 5903116283167</span> <br><br>
+
+                <span>Código Interbancario CCI es </span> <br>
+                <span style="font-weight: normal;">-</span>
+            </div>
+        </div>
+        <div class="b" style="font-size: 14px; font-weight: bold; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+            CUENTA DE AHORRROS <br> JOSE LUIS MELENDRES CONDOR
+            <div style="border-top: 1px solid black; padding: 8px;">
+                <span style="font-size: 12px;">Cuenta Soles CAJA HUANCAYO</span> <br>
+                <span style="font-weight: normal;">N° 107066211000651746</span> <br><br>
+
+                <span>Código Interbancario CCI es </span> <br>
+                <span style="font-weight: normal;">80806621100065174655</span>
+            </div>
+        </div>
+    </div>
 </body>
 <footer>
     <div style="font-size: 11px; line-height: 12px; padding-top: 5px;">EL PRESENTE ES PARA INFORMAR RESPECTO A LOS HONORARIOS POR SERVICIOS QUE NOS ADEUDA HASTA LA FECHA. <br> Ante cualquier duda o consulta, sírvase comunicarse con nosotros al celular <span style="color: red;">N° 973896051 / 951415451</span> a los señores José Luis MELENDRES CÓNDOR y/o <br> Rita Cindy MIRANDA RAMOS, o al correo <span style="color: blue;">melendres.auditores@hotmail.com</span></div>

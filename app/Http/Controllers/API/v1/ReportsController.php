@@ -180,7 +180,12 @@ class ReportsController extends Controller
             $data1 = file_get_contents($path);
             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.report-all-periods', compact('pic'), $data);
+            $path1 = base_path('resources/views/icon.png');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.reports-alls-periods', compact('pic', 'pic1'), $data);
 
             return $pdf->stream();
         } catch (Exception $e) {
@@ -219,8 +224,13 @@ class ReportsController extends Controller
         }
     }
 
-    public function getAllBussinesAndVisitorsByDate(Request $request){
+    public function getAllBussinesAndVisitorsByDate(Request $request)
+    {
 
+
+
+
+        
         $array=DB::select(
             '
             select * from ( SELECT date_trunc(\'day\', dd):: date "apptmDatePrint"
@@ -257,6 +267,42 @@ class ReportsController extends Controller
 
             $result = Array($seriesBusiness, $seriesVisitors);
 
+
+
+
+            /*
+
+        $array = DB::select(
+            'select
+                date("apptmDateTimePrint")
+                "apptmDatePrint",
+                sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business,
+                sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors
+
+                from appointment GROUP BY date("apptmDateTimePrint") ORDER BY date("apptmDateTimePrint") desc;'
+        );
+
+
+        $seriesBusiness = array();
+        $seriesBusiness['name'] = "Clientes";
+        $seriesBusiness['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->business];
+        }, $array);
+
+        $seriesVisitors = array();
+        $seriesBusiness['name'] = "Visitantes";
+        $seriesVisitors['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->visitors];
+        }, $array);
+
+        $arrayLineChart = array($seriesBusiness, $seriesVisitors);*/
+
+
+
+
+
+
+
             /** */
             $xAxisLabel = 'Últimos 30 dias';
             $yAxisLabel = 'Tickets de atención';
@@ -273,16 +319,6 @@ class ReportsController extends Controller
             'msg'=>'Listado correctamente',
             'data'=>$graph
         ],200);  
+           
     }
-
-
-
-
-
-
-
-
-
-
-
 }
