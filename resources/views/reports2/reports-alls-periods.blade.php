@@ -60,33 +60,49 @@
             <h2 style="text-align: right; font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">Pasco, {{ $date }}</h2>
 
             @foreach($d_business_period as $key => $value)
-            <table style="width: 100%;" border="1" cellspacing="0">
-                <tr>
-                    <th colspan="4" style="font-size: 20px; letter-spacing: 8px;">EJERCICIO {{ $value->periods['prdsNameShort'] }}</th>
-                </tr>
-                <tr>
-                    <th>MESES</th>
-                    <th>DESCRIPCIÓN</th>
-                    <th colspan="2">DEUDA</th>
 
-                </tr>
-                @foreach($value['serviceProvided'] as $key=> $val)
-                <tr>
-                    <th style="font-weight: lighter;">{{ $val->periodPayments['ppayName'] }}</th>
-                    <th style="width: 45%; font-weight: lighter;">{{ $val->services['svName'] }}</th>
+            
+                @if($value->dbpDebt >0.0)
+                    
+                    <table style="width: 100%;" border="1" cellspacing="0">
+                        <tr>
+                            <th colspan="4" style="font-size: 20px; letter-spacing: 8px;">EJERCICIO {{ $value->periods['prdsNameShort'] }}</th>
+                        </tr>
+                        <tr>
+                            <th>MESES</th>
+                            <th>DESCRIPCIÓN</th>
+                            <th colspan="2">DEUDA</th>
 
-                    <th style="width: 1px; font-weight: lighter; border-right: 1px solid white;">&nbspS/</th>
-                    <th style="width: 25%; font-weight: lighter; text-align: right;">{{ $val['spDebt'] }}</th>
-                </tr>
-                @endforeach
-                <tr>
-                    <th colspan="2" style="width: 35%;">TOTAL</th>
-                    <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                    <th style="width: 25%; text-align: right;">{{ $value['dbpDebt'] }}</th>
+                        </tr>
+                        @foreach($value['serviceProvided'] as $key=> $val)
 
-                </tr>
-            </table>
-            <br><br>
+
+                            @if($val->spDebt > 0.0)
+                                <tr>
+                                    <th style="font-weight: lighter;">{{ $val->periodPayments['ppayName'] }}</th>
+                                    <th style="width: 45%; font-weight: lighter;">{{ $val->services['svName'] }}</th>
+
+                                    <th style="width: 1px; font-weight: lighter; border-right: 1px solid white;">&nbspS/</th>
+                                    <th style="width: 25%; font-weight: lighter; text-align: right;">{{ $val['spDebt'] }}</th>
+                                </tr>
+                            @endif
+                            
+                       
+                        
+                        @endforeach
+
+                        <tr>
+                            <th colspan="2" style="width: 35%;">TOTAL</th>
+                            <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
+                            <th style="width: 25%; text-align: right;">{{ $value['dbpDebt'] }}</th>
+
+                        </tr>
+                    </table>
+
+                    <br><br>
+
+                @endif
+
             @endforeach
 
             <table align="center" style="width: 50%;" border="1" cellspacing="0">
@@ -111,11 +127,15 @@
                 $total1 += $value['dbpPaid'];
                 $total2 += $value['dbpDebt'];
                 @endphp
-                <tr>
-                    <th style="font-weight: lighter;">{{ $value->periods['prdsNameShort'] }}</th>
-                    <th style="width: 1px; border-right: 1px solid white; font-weight: lighter;">&nbspS/</th>
-                    <th style="width: 50%; text-align: right; font-weight: lighter;">{{ $value['dbpDebt'] }}</th>
-                </tr>
+
+                @if($value['dbpDebt'] > 0.0)
+                    <tr>
+                        <th style="font-weight: lighter;">{{ $value->periods['prdsNameShort'] }}</th>
+                        <th style="width: 1px; border-right: 1px solid white; font-weight: lighter;">&nbspS/</th>
+                        <th style="width: 50%; text-align: right; font-weight: lighter;">{{ $value['dbpDebt'] }}</th>
+                    </tr>
+                @endif
+
                 @endforeach
                 <tr>
                     <th>TOTAL</th>

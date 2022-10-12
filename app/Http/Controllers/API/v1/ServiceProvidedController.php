@@ -75,7 +75,7 @@ class ServiceProvidedController extends Controller
         $user=$request->user();
         $sp=ServiceProvided::where('spId', $spId)->first();
 
-        \App\Helpers\LogActivity::add($request->user()->email.' en control de ejercicio, ha modificado el registro con id '.$sp->spId, null, json_encode($request->all()));
+        \App\Helpers\LogActivity::add($request->user()->email.' en control de ejercicio, ha modificado el registro con id '.$sp->spId, json_encode($sp), json_encode($request->all()));
         
         $sp->update(array_merge($request->all(),['updated_by'=>$user->id]));
         return response()->json([
