@@ -43,7 +43,7 @@
 
 <body>
     <div id="watermark">
-        <img src="../resources/views/icon.png" height="100%" width="100%" />
+        <img src="<?php echo $pic1 ?>" height="100%" width="100%" />
     </div>
     <header>
         <div style="text-align: right; margin-bottom: 5px;">

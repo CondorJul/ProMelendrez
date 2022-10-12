@@ -180,7 +180,12 @@ class ReportsController extends Controller
             $data1 = file_get_contents($path);
             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.reports-alls-periods', compact('pic'), $data);
+            $path1 = base_path('resources/views/icon.png');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.reports-alls-periods', compact('pic', 'pic1'), $data);
 
             return $pdf->stream();
         } catch (Exception $e) {
