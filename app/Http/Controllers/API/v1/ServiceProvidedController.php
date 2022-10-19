@@ -93,8 +93,13 @@ class ServiceProvidedController extends Controller
      * @return \Illuminate\Http\Response
      */
   
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
+     
+        $sp=ServiceProvided::whereIn('spId', explode(',', $id))->get();
+
+        \App\Helpers\LogActivity::add($request->user()->email.' en control de ejercicio, ha eliminado los registros con ids '.$id, json_encode($sp), null);
+
         $a = ServiceProvided::whereIn('spId', explode(',', $id))
             ->delete();
         return response()->json([

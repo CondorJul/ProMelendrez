@@ -38,6 +38,15 @@ class BusinessController extends Controller
             ->setStatusCode(200);*/
         return Business::select('bussId', 'bussRUC', 'bussName', 'bussFileNumber')->get();
     }
+
+    public function allFileNumbers()
+    {
+        /*return bussinesResource::collection(Business::with('person')->get())
+            ->additional(['msg' => "lista", 'res' => true])
+            ->response()
+            ->setStatusCode(200);*/
+        return Business::select('bussId','bussState', 'bussFileNumber')->orderBy('bussFileNumber', 'ASC')->get();
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -80,14 +89,29 @@ class BusinessController extends Controller
      */
     public function destroy(Request $request, $bussId)
     {
+        $p=Business::find($bussId)->periods;
         $b = Business::where('bussId', $bussId)->first();
+        $c=0;
+        $msg='';
+        $res=false;
+        if(count($p)==0){
+            \LogActivity::add($request->user()->email.' ha eliminado el cliente con id '.$bussId.', RUC='.$b->bussRUC.', NAME='.$b->bussName,null, json_encode($request->all()));
+            $c=$b->delete();
+            $res=true;
+            $msg='Se ha eliminado '.$c.' registro(s).';
+        } else {
+            \LogActivity::add($request->user()->email.' ha intentado eliminar el cliente con id '.$bussId.', RUC='.$b->bussRUC.', NAME='.$b->bussName,null, json_encode($request->all()));
+            $msg='Al parecer este cliente cuenta con información y no es posible eliminar.';
+            $res=false;
 
-        \LogActivity::add($request->user()->email.' ha eliminado el cliente con id '.$bussId.', RUC='.$b->bussRUC.', NAME='.$b->bussName,null, json_encode($request->all()));
+        }
 
-        $c=$b->delete();
+        
+
+
         return response()->json([
-            'res' => true,
-            'msg' => 'Se ha eliminado '.$c.' registro(s).',
+            'res' => $res,
+            'msg' => $msg,
             'data' => $c
         ], 200);
     }
@@ -304,9 +328,9 @@ class BusinessController extends Controller
         }
 
         if(!empty($request->q)){
-            $queryWhere.=' and (lower("bussName" ) like lower(?) or "bussRUC" like ?)';
+            $queryWhere.=' and (lower("bussName" ) like lower(?) or "bussRUC" like ? or "bussFileNumber"::text = ? )';
             $q='%'.$request->q.'%';
-            array_push($params,$q, $q);
+            array_push($params,$q, $q, $request->q);
         }
 
         /*if ($request->tellId == 0) {
@@ -314,9 +338,16 @@ class BusinessController extends Controller
         } else {
             $data = Business::with('person')->where('tellId', $request->tellId)->get();
         }*/
+        $h='%'.$request->q.'%';
+
         $data=Business::select()
         ->with('person')
+  
+        //->with('person')
         ->whereRaw(' 1=1 '.$queryWhere,[$params])
+        /*->whereHas('person', function($q) use($h) {
+            $q->whereRaw(' lower("perName" ) like lower(?) ',[$h]);
+        })*/
         ->orderBy("bussName", 'ASC')
         ->get();
 
@@ -351,4 +382,22 @@ class BusinessController extends Controller
             'data' => $a,
         ], 200);
     }
+
+    /*Funciones añadidas el 16/10/2022 */
+    public function updateBusinessComment($ids, Request $request)
+    {
+        $b= Business::select()->whereIn('bussId', explode(',', $ids),)->get();
+
+        \LogActivity::add($request->user()->email.' ha actualizado el comentario de los clientes con  ids '.$ids,json_encode($b), json_encode($request->all()));
+        
+        $a = Business::whereIn('bussId', explode(',', $ids),)->update($request->all());
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => $a,
+        ], 200);
+    }
+
+
 }

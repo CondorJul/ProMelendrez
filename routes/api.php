@@ -160,14 +160,19 @@ Route::put('v1/appointment-temps/{ids}/teller', [AppointmentTempController::clas
 
 /* Bussines*/
 Route::put('v1/business/{ids}/updStateBuss', [BusinessController::class, 'updateBusinessState'])->middleware(['auth:sanctum']);
+Route::put('v1/business/{ids}/updCommentBuss', [BusinessController::class, 'updateBusinessComment'])->middleware(['auth:sanctum']);
+
 Route::put('v1/business/{ids}/updTeller', [BusinessController::class, 'updateBusinessTeller'])->middleware(['auth:sanctum']);
 Route::get('v1/business/getBusinessJoinTeller', [BusinessController::class, 'getBusinessOfTeller']);
 Route::get('v1/business/getCantTellerUsers', [BusinessController::class, 'getTellerJoinUsers']);
 Route::get('v1/bussines', [BusinessController::class, 'index']);
 Route::get('v1/bussines/all-summarized', [BusinessController::class, 'allSummarized']);
+Route::get('v1/bussines/all-file-numbers', [BusinessController::class, 'allFileNumbers']);
+
+
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
 Route::post('v1/business/exist-fileNumber', [BusinessController::class, 'existFileNumber']);
-Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson']);
+Route::post('v1/business/add-business-with-person', [BusinessController::class, 'addBusinessWithPerson'])->middleware(['auth:sanctum']);
 Route::get('/v1/business/{bussId}', [BusinessController::class, 'viewBusinessPerson'])->middleware(['auth:sanctum']);
 Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusinessData'])->middleware(['auth:sanctum']);;
 Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData'])->middleware(['auth:sanctum']);;

@@ -118,7 +118,7 @@ INNER JOIN payment_details ON payments."payId"= payment_details."payId"
 INNER JOIN services_provided ON payment_details."spId"=services_provided."spId"
 INNER JOIN d_bussines_periods on services_provided."dbpId"=d_bussines_periods."dbpId"
 INNER JOIN periods ON d_bussines_periods."prdsId"=periods."prdsId"
-where "payState"=3 AND  "payIsCanceled"=2 and services_provided."svId"=1 ORDER BY d_bussines_periods."bussId", periods."prdsNameShort" DESC, services_provided."svId" ASC, services_provided."ppayId" DESC) lp ON b."bussId" = lp."_bussId" ORDER BY "payId" ASC NULLS LAST;
+where "payState"=3 AND  "payIsCanceled"=2 and services_provided."svId"=1 ORDER BY d_bussines_periods."bussId", periods."prdsNameShort" DESC, services_provided."svId" ASC, services_provided."ppayId" DESC) lp ON b."bussId" = lp."_bussId" ORDER BY RIGHT("bussRUC",1) ASC;
         ', $params);
 return response()->json([
     'res'=>true,

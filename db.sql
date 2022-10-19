@@ -1723,4 +1723,19 @@ ALTER TABLE appointment_temp ADD COLUMN "apptmTokenToQualify" VARCHAR(200);
 
 ALTER TABLE appointment ADD COLUMN "apptmTokenToQualify" varchar(200);
 
+/*modificado 15/10/2022*/
+ALTER TABLE bussines ADD COLUMN "bussComment" varchar(500);
+ALTER TABLE bussines ADD COLUMN "bussCommentColor" varchar(20);
+ALTER TABLE d_bussines_periods ADD FOREIGN KEY ("bussId") REFERENCES bussines("bussId");
+ALTER TABLE  bussines ALTER COLUMN "bussState" SET DEFAULT 1;
+/*ALTER TABLE  bussines ALTER COLUMN "bussState" SET DEFAULT 1;
+ALTER TABLE  bussines ALTER COLUMN "buss" SET DEFAULT 1;*/
+
+
+
+
+
+
+
+
 

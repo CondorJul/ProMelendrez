@@ -38,9 +38,14 @@ class Business extends Model
         'bussEmail',
         'bussObservation',
         'perId',
-        'tellId'
+        'tellId',
+
+        /*Campos añadidos el 16/10/2022 */
+        'bussComment',
+        'bussCommentColor',
     ];
 
+    
     public function person()
     {
         return $this->belongsTo(Person::class, 'perId', 'perId');
