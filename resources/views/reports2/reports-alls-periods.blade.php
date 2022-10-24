@@ -55,9 +55,10 @@
     </footer>
     <main>
         <div style="font-size: 12px; font-family: Arial, Helvetica, sans-serif;">
-            <h1 style="text-align: center; font-size: 35px; font-family: Arial, Helvetica, sans-serif; text-decoration: underline; margin: 5px;">{{ $business['bussName'] }}</h1>
+            <h1 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; text-decoration: underline; margin: 5px;">{{ $business['bussName'] }}</h1>
             <h2 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">RUC: {{ $business['bussRUC'] }}</h2>
             <h2 style="text-align: right; font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">Pasco, {{ $date }}</h2>
+            <h2 style="text-align: left; font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">REPRESENTANTE LEGAL: <span style="font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">{{ $business->person['perName'] }}</span></h2>
 
             @foreach($d_business_period as $key => $value)
 
@@ -153,36 +154,25 @@
                     <th>CÓDIGO INTERBANCARIO CCI</th>
                 </tr>
                 <tr>
-                    <th rowspan="2" style="text-align: center;">BBVA Banco Continental</th>
-                    <th style="text-align: center; font-weight: lighter;">Cuenta de Ahorros</th>
-                    <th rowspan="2" style="text-align: center;">011-321-000200838764-75</th>
+                    <th style="text-align: center;">BBVA Banco Continental</th>
+                    <th style="text-align: center;"><span style="font-weight: lighter;">Cuenta de Ahorros</span> <br> N° 0011 0321 0200838764
+                    </th>
+                    <th style="text-align: center;">011-321-000200838764-75</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center;">N° 0011 0321 0200838764</th>
+                    <th style="text-align: center;">BCP Banco de credito del Perú</th>
+                    <th style="text-align: center;"> <span style="font-weight: lighter;">Cuenta digital</span> <br> N° 280-94036878-0-05</th>
+                    <th style="text-align: center;">002-28019403687800568</th>
                 </tr>
                 <tr>
-                    <th rowspan="2" style="text-align: center;">BCP Banco de credito del Perú</th>
-                    <th style="text-align: center; font-weight: lighter;">Cuenta digital</th>
-                    <th rowspan="2" style="text-align: center;">002-28019403687800568</th>
+                    <th style="text-align: center;">Banco Interbank</th>
+                    <th style="text-align: center;"> <span style="font-weight: lighter;">Cuenta simple</span> <br> N° 5903116283167</th>
+                    <th style="text-align: center;">003-590-013116283167-74</th>
                 </tr>
                 <tr>
-                    <th style="text-align: center;">N° 280-94036878-0-05</th>
-                </tr>
-                <tr>
-                    <th rowspan="2" style="text-align: center;">Banco Interbank</th>
-                    <th style="text-align: center; font-weight: lighter;">Cuenta simple</th>
-                    <th rowspan="2" style="text-align: center;">003-590-013116283167-74</th>
-                </tr>
-                <tr>
-                    <th style="text-align: center;">N° 5903116283167</th>
-                </tr>
-                <tr>
-                    <th rowspan="2" style="text-align: center;">Caja Huancayo</th>
-                    <th style="text-align: center; font-weight: lighter;">Cuenta de Ahorros</th>
-                    <th rowspan="2" style="text-align: center;">80806621100065174655</th>
-                </tr>
-                <tr>
-                    <th style="text-align: center;">N° 107066211000651746</th>
+                    <th style="text-align: center;">Caja Huancayo</th>
+                    <th style="text-align: center;"> <span style="font-weight: lighter;">Cuenta de ahorros</span> <br> N° 107066211000651746</th>
+                    <th style="text-align: center;">80806621100065174655</th>
                 </tr>
             </table>
         </div>
