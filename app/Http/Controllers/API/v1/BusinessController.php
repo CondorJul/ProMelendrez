@@ -139,7 +139,11 @@ class BusinessController extends Controller
 
     public function existFileNumber(ExistFileNumberRequest $request)
     {
-        return $user = Business::where('bussFileNumber', $request->bussFileNumber)->first();
+        /*Obttener numeros de archivadores duplicados de clientes activos o suspendidos*/
+
+        return $user = Business::where('bussFileNumber', $request->bussFileNumber)
+        ->whereIn('bussState', [1, 2])
+        ->first();
     }
 
     public function addBusinessWithPerson(AddBusinessWithPersonRequest $request)

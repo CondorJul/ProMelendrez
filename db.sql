@@ -520,7 +520,8 @@ limit
 
 /*Verificamos que exi*/
 
-IF _tellId IS NULL THEN RAISE EXCEPTION '<msg>Lo sentimos, en este momento no disponemos de ventanillas para este servicio.<msg>';
+IF _tellId IS NULL THEN 
+    RAISE EXCEPTION '<msg>Lo sentimos, en este momento no disponemos de ventanillas para este servicio.<msg>';
 
 END IF;
 
@@ -1732,10 +1733,89 @@ ALTER TABLE  bussines ALTER COLUMN "bussState" SET DEFAULT 1;
 ALTER TABLE  bussines ALTER COLUMN "buss" SET DEFAULT 1;*/
 
 
+/*Cambios incrustados 26/10/2022*/
+
+
+CREATE FUNCTION tf_b_i_bussines() 
+    RETURNS TRIGGER 
+    LANGUAGE PLPGSQL 
+AS $$ 
+DECLARE 
+    _bussFileNumber integer;
+    _bussName varchar(300);
+BEGIN
+    select
+        "bussFileNumber", "bussName" INTO _bussFileNumber, _bussName
+    FROM
+        bussines
+    WHERE
+        "bussFileNumber" = NEW."bussFileNumber" AND "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/);
+
+    if _bussFileNumber is not null THEN
+        RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente.<msg>';
+    END IF;
+
+RETURN NEW;
+
+END;
+
+$$
+/*
+drop TRIGGER t_b_i_category on category;
+drop FUNCTION tf_b_i_category;*/
+CREATE TRIGGER t_b_i_bussines BEFORE
+INSERT
+    ON bussines FOR EACH ROW EXECUTE PROCEDURE tf_b_i_bussines();
 
 
 
 
 
 
+CREATE FUNCTION tf_b_u_bussines()
+   RETURNS TRIGGER
+   LANGUAGE PLPGSQL
+AS $$
+DECLARE
+    _bussFileNumber integer;
+    _bussName varchar(300)
 
+BEGIN
+
+
+  select
+        "bussFileNumber", "bussName" INTO _bussFileNumber, _bussName
+    FROM
+        bussines
+    WHERE
+        "bussRUC"<> NEW."bussRUC" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
+
+    if _bussFileNumber is not null THEN
+        RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;
+    END IF;
+
+RETURN NEW;
+END;
+$$
+
+ CREATE TRIGGER t_b_u_bussines BEFORE
+UPDATE
+    ON bussines FOR EACH ROW EXECUTE PROCEDURE tf_b_u_bussines();
+
+    ALTER TABLE bussines DROP CONSTRAINT bussines_bussFileNumber_key;
+
+
+    /*SELECT conname
+FROM pg_constraint
+WHERE conrelid =
+    (SELECT oid 
+    FROM pg_class
+    WHERE relname LIKE 'd_busines');*/
+
+    /*SELECT *
+FROM information_schema.constraint_table_usage
+WHERE table_name = 'customers'*/
+
+/*ALTER TABLE customers DROP CONSTRAINT customers_dni_key;
+
+*/
