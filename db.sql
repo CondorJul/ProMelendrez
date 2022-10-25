@@ -1778,7 +1778,7 @@ CREATE FUNCTION tf_b_u_bussines()
 AS $$
 DECLARE
     _bussFileNumber integer;
-    _bussName varchar(300)
+    _bussName varchar(300);
 
 BEGIN
 
@@ -1802,7 +1802,7 @@ $$
 UPDATE
     ON bussines FOR EACH ROW EXECUTE PROCEDURE tf_b_u_bussines();
 
-    ALTER TABLE bussines DROP CONSTRAINT bussines_bussFileNumber_key;
+    /*ALTER TABLE bussines DROP CONSTRAINT bussines_bussFileNumber_key;*/
 
 
     /*SELECT conname

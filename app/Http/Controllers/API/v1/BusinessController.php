@@ -142,7 +142,11 @@ class BusinessController extends Controller
         /*Obttener numeros de archivadores duplicados de clientes activos o suspendidos*/
 
         return $user = Business::where('bussFileNumber', $request->bussFileNumber)
-        ->whereIn('bussState', [1, 2])
+        ->where(function ($query) {
+            $query->whereIn('bussState',['1', '2'])
+                ->orWhereNull('bussState');
+        })
+        //->whereIn('bussState', ['1', '2'])
         ->first();
     }
 
@@ -158,8 +162,15 @@ class BusinessController extends Controller
         $business->bussFileNumber = $request->business['bussFileNumber'];
         $business->bussDateStartedAct = $request->business['bussDateStartedAct'];
         $business->bussDateMembership = $request->business['bussDateMembership'];
+
+        
         $business->tellId = $request->business['tellId'];
         $business->perId = $person->perId;
+
+        /** */
+        $business->bussState=$request->business['bussState'];;
+        $business->bussStateDate=$request->business['bussStateDate'];
+        /* */
 
         $business->save();
         

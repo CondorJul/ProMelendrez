@@ -36,7 +36,11 @@ class AddBusinessWithPersonRequest extends FormRequest
             'person.perKindDoc' => 'required',
             'person.perName' => 'required',
             'person.perNumberDoc' => 'required|unique:person,perNumberDoc',
-            'person.perTel' => ''
+            'person.perTel' => '',
+
+            'business.bussState' => 'required',
+            'business.bussStateDate' => 'required',
+
         ];
     }
 }
