@@ -1751,7 +1751,7 @@ BEGIN
     WHERE
         "bussFileNumber" = NEW."bussFileNumber" AND "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/);
 
-    if _bussFileNumber is not null THEN
+    if _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
         RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente.<msg>';
     END IF;
 
@@ -1760,17 +1760,14 @@ RETURN NEW;
 END;
 
 $$
-/*
-drop TRIGGER t_b_i_category on category;
-drop FUNCTION tf_b_i_category;*/
+
 CREATE TRIGGER t_b_i_bussines BEFORE
 INSERT
     ON bussines FOR EACH ROW EXECUTE PROCEDURE tf_b_i_bussines();
 
-
-
-
-
+/*
+drop TRIGGER t_b_i_bussines on bussines;
+drop FUNCTION tf_b_i_bussines;*/
 
 CREATE FUNCTION tf_b_u_bussines()
    RETURNS TRIGGER
@@ -1790,7 +1787,7 @@ BEGIN
     WHERE
         "bussRUC"<> NEW."bussRUC" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
 
-    if _bussFileNumber is not null THEN
+    if _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
         RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;
     END IF;
 
@@ -1801,6 +1798,12 @@ $$
  CREATE TRIGGER t_b_u_bussines BEFORE
 UPDATE
     ON bussines FOR EACH ROW EXECUTE PROCEDURE tf_b_u_bussines();
+
+    /*
+drop TRIGGER t_b_u_bussines on bussines;
+drop FUNCTION tf_b_u_bussines;*/
+
+
 
     /*ALTER TABLE bussines DROP CONSTRAINT bussines_bussFileNumber_key;*/
 

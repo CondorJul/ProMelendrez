@@ -58,7 +58,7 @@
             <h1 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; text-decoration: underline; margin: 5px;">{{ $business['bussName'] }}</h1>
             <h2 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">RUC: {{ $business['bussRUC'] }}</h2>
             <h2 style="text-align: right; font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">Pasco, {{ $date }}</h2>
-            <h2 style="text-align: left; font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">REPRESENTANTE LEGAL: <span style="font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">{{ $business->person['perName'] }}</span></h2>
+            <h2 style="text-align: left; font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">RESPONSABLE: <span style="font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">{{ $business->person['perName'] }}</span></h2>
 
             @foreach($d_business_period as $key => $value)
 
