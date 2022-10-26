@@ -343,9 +343,9 @@ class BusinessController extends Controller
         }
 
         if(!empty($request->q)){
-            $queryWhere.=' and (lower("bussName" ) like lower(?) or "bussRUC" like ? or "bussFileNumber"::text = ? ) AND EXISTS(select 1 from person where lower("perName") like (?) OR "perNumberDoc" = ?)';
+            $queryWhere.=' and (lower("bussName" ) like lower(?) or "bussRUC" like ? or "bussFileNumber"::text = ?  OR EXISTS(select "perName" from person where person."perId"=bussines."perId" and (lower("perName") like lower(?) or lower("perNumberDoc") like lower(?) ) ))';
             $q='%'.$request->q.'%';
-            array_push($params,$q, $q, $request->q, $q, $request->q);
+            array_push($params,$q, $q, $request->q, $q, $q);
         }
 
         /*if ($request->tellId == 0) {
