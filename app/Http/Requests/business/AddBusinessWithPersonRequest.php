@@ -35,7 +35,8 @@ class AddBusinessWithPersonRequest extends FormRequest
             'business.tellId' => 'required',
             'person.perKindDoc' => 'required',
             'person.perName' => 'required',
-            'person.perNumberDoc' => 'required|unique:person,perNumberDoc',
+            'person.perNumberDoc' => 'required',
+            //'person.perNumberDoc' => 'required|unique:person,perNumberDoc',
             'person.perTel' => '',
 
             'business.bussState' => 'required',

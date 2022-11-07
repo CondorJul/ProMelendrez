@@ -242,7 +242,7 @@ Route::post('/v1/appointments/{token}/qualify-service', [AppointmentController::
 Route::get('/v1/business/{bussId}/periods', [BusinessController::class, 'allPeriods']);
 Route::post('/v1/business/{bussId}/periods', [BusinessController::class, 'updPeriod']);
 //Route::put('/v1/business/{bussId}/periods/{prdsId}', [DBusinessPeriodController::class, 'update']);
-Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::class, 'delPeriod']);
+Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::class, 'delPeriod'])->middleware(['auth:sanctum']);
 
 
 /*Periodos */

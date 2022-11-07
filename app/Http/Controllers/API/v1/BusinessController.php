@@ -12,7 +12,9 @@ use App\Http\Requests\business\updBussDataRequest;
 use App\Http\Requests\business\updPerDataRequest;
 use Illuminate\Http\Request;
 use App\Models\Business;
+use App\Models\DBusinessPeriod;
 use App\Models\Person;
+use App\Models\ServiceProvided;
 use Illuminate\Support\Facades\DB;
 
 class BusinessController extends Controller
@@ -152,7 +154,18 @@ class BusinessController extends Controller
 
     public function addBusinessWithPerson(AddBusinessWithPersonRequest $request)
     {
-        $person = Person::create($request->person);
+        $person=Person::where( 'perKindDoc',$request->person['perKindDoc'])
+        ->where('perNumberDoc',$request->person['perNumberDoc'])
+        ->first();
+        
+        if($person){
+            $person->perName=$request->person['perName'];
+            $person->perTel=$request->person['perTel'];
+            $person->save();
+        }else{
+            $person = Person::create($request->person);
+        }
+        
         $business = new Business();
         $business->bussKind = $request->business['bussKind'];
         $business->bussName = $request->business['bussName'];
@@ -295,13 +308,25 @@ class BusinessController extends Controller
         ], 200);
     }
 
-    public function delPeriod($bussId, $prdsId)
+    public function delPeriod($bussId, $prdsId, Request $request)
     {
-        $q = Business::find($bussId);
-        $q->periods()->detach($prdsId);
+        
+        $q = DBusinessPeriod::where('bussId', $bussId)->where('prdsId', $prdsId)->first();
+        $sp=ServiceProvided::where('dbpId', $q->dbpId)->get();
+        if(count($sp)>0){
+            $res=false;
+            $msg='Al parecer contiene '.count($sp).' registros y no es posible eliminar. ';
+        }else {
+            $q = Business::find($bussId);
+            $q->periods()->detach($prdsId);
+
+
+            $res=true;
+            $msg='Eliminado correctamente';
+        }
         return response()->json([
-            'res' => true,
-            'msg' => 'Eliminado correctamente',
+            'res' => $res,
+            'msg' => $msg,
             'data' => Business::find($bussId)->periods
         ], 200);
     }
@@ -342,6 +367,11 @@ class BusinessController extends Controller
             array_push($params,$request->bussState);
         }
 
+        if(isset($request->lastDigit) && $request->lastDigit!=-1){
+            $queryWhere.=' and RIGHT("bussRUC",1)=?';
+            array_push($params,$request->lastDigit);
+        }
+
         if(!empty($request->q)){
             $queryWhere.=' and (lower("bussName" ) like lower(?) or "bussRUC" like ? or "bussFileNumber"::text = ?  OR EXISTS(select "perName" from person where person."perId"=bussines."perId" and (lower("perName") like lower(?) or lower("perNumberDoc") like lower(?) ) ))';
             $q='%'.$request->q.'%';
@@ -359,11 +389,11 @@ class BusinessController extends Controller
         ->with('person')
   
         //->with('person')
-        ->whereRaw(' 1=1 '.$queryWhere,[$params])
+        ->whereRaw(' 1=1 '.$queryWhere.' ORDER BY RIGHT("bussRUC",1) ASC',[$params])
         /*->whereHas('person', function($q) use($h) {
             $q->whereRaw(' lower("perName" ) like lower(?) ',[$h]);
         })*/
-        ->orderBy("bussName", 'ASC')
+        //->orderBy("bussName", 'ASC')
         ->get();
 
         return response()->json([
