@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\DBusinessPeriod;
 use App\Models\Period;
+use App\Models\Teller;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\Arrays;
 
@@ -227,11 +229,7 @@ class ReportsController extends Controller
     public function getAllBussinesAndVisitorsByDate(Request $request)
     {
 
-
-
-
-        
-        $array=DB::select(
+        $array = DB::select(
             '
             select * from ( SELECT date_trunc(\'day\', dd):: date "apptmDatePrint"
             FROM generate_series
@@ -243,34 +241,34 @@ class ReportsController extends Controller
 
             left join
             (
-            select  
+            select
                 date("apptmDateTimePrint")
-                "_apptmDatePrint", 
-                sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business, 
-                sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors 
-            
+                "_apptmDatePrint",
+                sum(CASE WHEN "apptKindClient"=1 THEN 1 ELSE 0 END) as business,
+                sum(CASE WHEN "apptKindClient"=2 THEN 1 ELSE 0 END) as visitors
+
                 from appointment where "apptmDateTimePrint" >= (CURRENT_DATE - INTERVAL \'1 months\') GROUP BY date("apptmDateTimePrint") ORDER BY date("apptmDateTimePrint") desc) e on d."apptmDatePrint"=e."_apptmDatePrint"'
-            );
-           
-
-            $seriesBusiness=Array();
-            $seriesBusiness['name']="Clientes";
-            $seriesBusiness['series']= array_map(function($element) {
-                return ['name'=>$element->apptmDatePrint,'value'=> $element->business  | 0];
-            },$array); 
-
-            $seriesVisitors=Array();
-            $seriesVisitors['name']="Visitantes";
-            $seriesVisitors['series']= array_map(function($element) {
-                return ['name'=>$element->apptmDatePrint,'value'=> $element->visitors | 0];
-            },$array); 
-
-            $result = Array($seriesBusiness, $seriesVisitors);
+        );
 
 
+        $seriesBusiness = array();
+        $seriesBusiness['name'] = "Clientes";
+        $seriesBusiness['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->business  | 0];
+        }, $array);
+
+        $seriesVisitors = array();
+        $seriesVisitors['name'] = "Visitantes";
+        $seriesVisitors['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->visitors | 0];
+        }, $array);
+
+        $result = array($seriesBusiness, $seriesVisitors);
 
 
-            /*
+
+
+        /*
 
         $array = DB::select(
             'select
@@ -303,22 +301,80 @@ class ReportsController extends Controller
 
 
 
-            /** */
-            $xAxisLabel = 'Últimos 30 dias';
-            $yAxisLabel = 'Tickets de atención';
+        /** */
+        $xAxisLabel = 'Últimos 30 dias';
+        $yAxisLabel = 'Tickets de atención';
 
-            $graph=Array(
-                'xAxisLabel'=>$xAxisLabel,
-                'yAxisLabel'=>$yAxisLabel, 
-                'results'=>$result
-            );
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $result
+        );
 
 
         return response()->json([
-            'res'=>true,
-            'msg'=>'Listado correctamente',
-            'data'=>$graph
-        ],200);  
-           
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $graph
+        ], 200);
+    }
+
+    public function getPaymentsMethodsByWindows(Request $request)
+    {
+
+        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"');
+        $array2 = Teller::select()->orderBy('tellId', 'ASC')->get();
+
+        $array3 = array();
+
+        foreach ($array2 as $key => $value) {
+            $aux = array();
+            $aux['name'] = $value->tellName;
+
+            $aux1 = array_filter($array, function ($element) use ($value) {
+                //return ['name' => $element->apptmDatePrint, 'value' => $element->business  | 0];
+                return $element->tellId == $value->tellId;
+            });
+            $aux['series'] = array();
+            $aux4 = array_map(function ($element1) {
+                return ['name' => $element1->paymthdsName, 'value' => $element1->total];
+            }, $aux1);
+            $aux['series'] = array_values($aux4);
+            array_push($array3, $aux);
+        }
+
+        /*$seriesBusiness = array();
+        $seriesBusiness['name'] = "Clientes";
+        $seriesBusiness['series'] = array_map(function ($element) {
+            return ['name' => $element->apptmDatePrint, 'value' => $element->business  | 0];
+        }, $array);*/
+
+        /*$seriesPayments = array();
+        $seriesPayments['name'] = "Ventanilla 1";
+        $seriesPayments['series'] = array_map(function ($element) {
+            return ['name' => $element->paymthdsName, 'value' => $element->total | 0];
+        }, $array);
+
+
+        $result = array($seriesPayments);
+
+
+        $xAxisLabel = 'Últimos 30 dias';
+        $yAxisLabel = 'Tickets de atención';
+
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $result
+        );*/
+
+
+        return $array3;
+
+        /*return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $array
+        ], 200);*/
     }
 }

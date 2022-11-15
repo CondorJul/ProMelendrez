@@ -312,6 +312,8 @@ Route::get('/v1/reports/all-periods-json/{bussId}', [ReportsController::class, '
 
 /*Reportes añadidos el 17/08/2022 */
 Route::get('/v1/reports/get-all-bussines-and-visitors-by-date', [ReportsController::class, 'getAllBussinesAndVisitorsByDate']);
+/*Reportes despues deñ 28/10/2022*/
+Route::get('/v1/reports/get-payments-methods-by-windows', [ReportsController::class, 'getPaymentsMethodsByWindows']);
 
 
 
