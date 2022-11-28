@@ -18,7 +18,7 @@ class ServicesController extends Controller
     
     public function index()
     {
-        return Services::all();
+        return Services::orderBy('svNumberOfOrder', 'asc')->get();
     }
 
     
@@ -35,7 +35,7 @@ class ServicesController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',
-            'data' => Services::where('svId', $service->svId)->get()
+            'data' => Services::orderBy('svNumberOfOrder', 'asc')->where('svId', $service->svId)->get()
         ], 200);
     }
 
@@ -66,7 +66,7 @@ class ServicesController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Servicio Actualizado correctamente',
-            'data' => Services::where('svId', $request->svId)->get()
+            'data' => Services::orderBy('svNumberOfOrder', 'asc')->where('svId', $request->svId)->get()
         ], 200);
     }
 
@@ -94,6 +94,24 @@ class ServicesController extends Controller
         return response()->json([
             'res' => true,
             'msg' => 'Actualizado Correctamente.',
+        ], 200);
+    }
+
+    public function reOrder($ids, Request $request)
+    {
+        $array=explode(',', $ids);
+        for ($i = 0; $i < count($array); ++$i) {
+            Services::where('svId', $array[$i])
+            ->update([
+                'svNumberOfOrder' => $i+1
+             ]);
+        }
+        
+        //$s = Services::whereIn('svId', explode(',', $id),)->delete();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Se ha actualizado correctamente.',
+            'data' => []
         ], 200);
     }
 

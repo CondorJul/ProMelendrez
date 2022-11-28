@@ -12,6 +12,7 @@ class Services extends Model
     protected $table = 'services';
     protected $fillable = [
         'svName',
-        'svState'
+        'svState',
+        'svNumberOfOrder'
     ];
 }

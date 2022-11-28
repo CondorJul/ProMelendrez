@@ -21,10 +21,17 @@ class ServiceProvidedController extends Controller
         //
     }
     public function allByDBP(Request $request){
-        $r=ServiceProvided::where('dbpId', $request->dbpId)
+        /*$r=ServiceProvided::where('dbpId', $request->dbpId)
         ->orderBy('svId','ASC')
         ->orderBy('ppayId','ASC')
+        ->get();*/
+
+        $r = ServiceProvided::select()
+        ->join('services', 'services_provided.svId', '=', 'services.svId')
+        ->where('services_provided.dbpId', $request->dbpId)
+        ->orderBy('services.svNumberOfOrder', 'ASC')
         ->get();
+
         return response()->json([
             'res' => true,
             'msg' => 'Seleccionado correctamente',

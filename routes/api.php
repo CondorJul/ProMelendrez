@@ -285,6 +285,9 @@ Route::put('v1/services/updServices', [ServicesController::class, 'update'])->mi
 Route::delete('v1/services/delServices/{svId}', [ServicesController::class, 'destroy'])->middleware(['auth:sanctum']);
 Route::delete('v1/services/stateServices/{svId}', [ServicesController::class, 'stateService'])->middleware(['auth:sanctum']);
 
+Route::put('v1/services/{ids}/re-order', [ServicesController::class, 'reOrder'])->middleware(['auth:sanctum']);
+
+
 /*Pagos */
 /*Detalle negocio y periodo */
 Route::get('/v1/payments', [PaymentController::class, 'all'])->middleware(['auth:sanctum']);
@@ -298,6 +301,7 @@ Route::put('/v1/payments/{payId}/receipt-honorary', [PaymentController::class, '
 /**Deudas y Pagos */
 Route::get('/v1/debts-and-paids', [DebtsAndPaidsController::class, 'index'])->middleware(['auth:sanctum']);
 Route::get('/v1/debts-and-paids/last-payment-by-client', [DebtsAndPaidsController::class, 'getLastPaymentByClient'])->middleware(['auth:sanctum']);
+Route::get('/v1/debts-and-paids/old-debt-by-client', [DebtsAndPaidsController::class, 'getOldDebtByClient'])->middleware(['auth:sanctum']);
 
 
 

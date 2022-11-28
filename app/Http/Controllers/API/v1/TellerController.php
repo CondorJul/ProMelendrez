@@ -209,7 +209,7 @@ class TellerController extends Controller
         return response()->json([
             'res'=>true,
             'msg'=>'Leido Correctamente',
-            'data'=>DB::select('select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending"  from teller left join users on teller."userId"=users."id" left join person on users.id=person."perId" where teller."hqId"=?',[$request->hqId])
+            'data'=>DB::select('select teller.*, person.*, (select count(*) from appointment_temp where "apptmState"=1 and "tellId"=teller."tellId" ) as "callPending"  from teller left join users on teller."userId"=users."id" left join person on users."perId"=person."perId" where teller."hqId"=?',[$request->hqId])
         ]);
     }
 

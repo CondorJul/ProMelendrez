@@ -1822,3 +1822,6 @@ WHERE table_name = 'customers'*/
 /*ALTER TABLE customers DROP CONSTRAINT customers_dni_key;
 
 */
+
+/*19/11/2022*/
+ALTER TABLE services ADD COLUMN "svNumberOfOrder" int;
