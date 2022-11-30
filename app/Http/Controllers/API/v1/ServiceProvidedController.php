@@ -30,6 +30,7 @@ class ServiceProvidedController extends Controller
         ->join('services', 'services_provided.svId', '=', 'services.svId')
         ->where('services_provided.dbpId', $request->dbpId)
         ->orderBy('services.svNumberOfOrder', 'ASC')
+        ->orderBy('services_provided.ppayId','ASC')
         ->get();
 
         return response()->json([
