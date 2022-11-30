@@ -32,6 +32,8 @@ class ServicesController extends Controller
     public function store(AddServicesRequest $request)
     {
         $service = Services::create($request->all());
+        \LogActivity::add($request->user()->email.' ha creado un registro en servicios.', null, json_encode($request->all()));
+
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',
@@ -60,9 +62,14 @@ class ServicesController extends Controller
     public function update(UpdServicesRequest $request)
     {
         $service = Services::where('svId', $request->svId)->first();
+
+        \LogActivity::add($request->user()->email.' ha actualizado un registro en servicios con id '.$service->svId.'.', json_encode($service), json_encode($request->all()));
+
+
         $service->svName = $request->svName;
         $service->svState = $request->svState;
         $service->save();
+
         return response()->json([
             'res' => true,
             'msg' => 'Servicio Actualizado correctamente',
@@ -78,6 +85,7 @@ class ServicesController extends Controller
      */
     public function destroy($id)
     {
+        
         $s = Services::whereIn('svId', explode(',', $id),)->delete();
         return response()->json([
             'res' => true,

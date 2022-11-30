@@ -1785,7 +1785,7 @@ BEGIN
     FROM
         bussines
     WHERE
-        "bussRUC"<> NEW."bussRUC" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
+        "bussId"<> NEW."bussId" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
 
     if _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
         RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;

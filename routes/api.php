@@ -111,22 +111,22 @@ Route::get('/v1/tellers/get-join-person-by-hq', [TellerController::class, 'getJo
 Route::get('v1/tellers/all-by-hq', [TellerController::class, 'allByHQ']);
 Route::get('v1/tellers/{id}', [TellerController::class, 'find']);
 Route::get('v1/tellers', [TellerController::class, 'index']);
-Route::post('v1/tellers', [TellerController::class, 'store']);
+Route::post('v1/tellers', [TellerController::class, 'store'])->middleware(['auth:sanctum']);
 Route::get('v1/tellers', [TellerController::class, 'index']);
 
-Route::put('v1/tellers', [TellerController::class, 'update']);
-Route::delete('v1/tellers/{id}', [TellerController::class, 'destroy']);
+Route::put('v1/tellers', [TellerController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('v1/tellers/{id}', [TellerController::class, 'destroy'])->middleware(['auth:sanctum']);
 Route::get('/v1/tellers/search-by-code/{code}', [TellerController::class, 'searchByCode']);
-Route::put('/v1/tellers/{id}/upd-user', [TellerController::class, 'updUser']);
-Route::delete('/v1/tellers/{id}/remove-user', [TellerController::class, 'removeUser']);
+Route::put('/v1/tellers/{id}/upd-user', [TellerController::class, 'updUser'])->middleware(['auth:sanctum']);
+Route::delete('/v1/tellers/{id}/remove-user', [TellerController::class, 'removeUser'])->middleware(['auth:sanctum']);
 
-Route::put('/v1/tellers/{id}/upd-state', [TellerController::class, 'updState']);
+Route::put('/v1/tellers/{id}/upd-state', [TellerController::class, 'updState'])->middleware(['auth:sanctum']);
 
 
 /*pivot categories */
-Route::get('/v1/tellers/{id}/get-categories', [TellerController::class, 'getCategories']);
-Route::put('/v1/tellers/{id}/attach-category', [TellerController::class, 'attachCategory']);
-Route::delete('/v1/tellers/{id}/detach-category/{catId}', [TellerController::class, 'detachCategory']);
+Route::get('/v1/tellers/{id}/get-categories', [TellerController::class, 'getCategories'])->middleware(['auth:sanctum']);
+Route::put('/v1/tellers/{id}/attach-category', [TellerController::class, 'attachCategory'])->middleware(['auth:sanctum']);
+Route::delete('/v1/tellers/{id}/detach-category/{catId}', [TellerController::class, 'detachCategory'])->middleware(['auth:sanctum']);
 /** */
 
 /*appointment_temp */

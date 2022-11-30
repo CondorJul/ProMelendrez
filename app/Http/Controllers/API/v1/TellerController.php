@@ -62,6 +62,8 @@ class TellerController extends Controller
     public function store(AddTellerRequest $request)
     {
         $teller = Teller::create($request->all());
+        \LogActivity::add($request->user()->email.' ha creado un registro en ventanilla con id '.$teller->tellId.'.', null, json_encode($request->all()));
+
         return response()->json([
             'res' => true,
             'msg' => 'Guardado correctamente',
@@ -93,6 +95,8 @@ class TellerController extends Controller
         /*$teller=Teller::where('catId', $request->catId)
             ->update($request->all());*/
         $teller = Teller::where('tellId', $request->tellId)->first();
+        \LogActivity::add($request->user()->email.' ha actualizado un registro en ventanilla con id '.$teller->tellId.'.', json_encode($teller), json_encode($request->all()));
+
         $teller->tellCode = $request->tellCode;
         $teller->tellName = $request->tellName;
 
@@ -107,6 +111,8 @@ class TellerController extends Controller
     public function updState($id, Request $request)
     {
         $teller = Teller::find($id);
+        \LogActivity::add($request->user()->email.' ha actualizado el estado en ventanilla con id '.$teller->tellId.'.', json_encode($teller), json_encode($request->all()));
+
         $teller->tellState = $request->tellState;
         $teller->save();
 
@@ -120,6 +126,9 @@ class TellerController extends Controller
     public function updUser($id, Request $request)
     {
         $teller = Teller::find($id);
+
+        \LogActivity::add($request->user()->email.' ha actualizado el usuario asignado en ventanilla con id '.$teller->tellId.'.', json_encode($teller), json_encode($request->all()));
+
         $teller->userId = $request->userId;
         $teller->save();
 

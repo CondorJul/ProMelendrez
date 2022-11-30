@@ -80,8 +80,9 @@ class DebtsAndPaidsController extends Controller
                     FROM d_bussines_periods 
                     LEFT JOIN services_provided 
                         ON d_bussines_periods."dbpId"=services_provided."dbpId" '.$queryWhereSerPro.') sp 
-            ON   b."bussId"=sp."_bussId" ORDER BY "prdsId" ASC NULLS LAST, "svId" ASC NULLS LAST, "ppayId" ASC NULLS LAST',$params);
-        return response()->json([
+            ON   b."bussId"=sp."_bussId" ORDER BY RIGHT("bussRUC",1) ASC, "bussRUC" ASC,  "prdsId" ASC NULLS LAST, "svId" ASC NULLS LAST, "ppayId" ASC NULLS LAST',$params);
+        
+            return response()->json([
             'res'=>true,
             'msg'=>'Listado correctamente ',
             'data'=>$r//DB::select('select *,  EXTRACT(EPOCH FROM current_timestamp-"apptmDateTimePrint") as "elapsedSeconds" from appointment_temp where "apptmState"=1 '.$queryWhere.' order by "elapsedSeconds" DESC',$params)
