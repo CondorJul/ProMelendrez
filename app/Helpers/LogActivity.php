@@ -27,7 +27,7 @@ class LogActivity
     	$log['adtUserAgent'] = Request::header('user-agent');
 		$log['adtDataOld'] = $adtDataOld;
 		$log['adtDataNew'] = $adtDataNew;
-    	$log['created_by'] = auth()->check() ? auth()->user()->id : 1;
+    	$log['created_by'] = auth()->check() ? auth()->user()->id : null;
 
     	LogActivityModel::create($log);
         //$request->user()->id

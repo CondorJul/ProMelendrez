@@ -319,10 +319,23 @@ class ReportsController extends Controller
         ], 200);
     }
 
-    public function getPaymentsMethodsByWindows(Request $request)
+    public function getPaymentsMethodsByTeller(Request $request)
     {
 
-        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"');
+        $params=[];
+        $queryWhere='';
+        if($request->dateStart && $request->dateEnd){
+            $queryWhere.=' and date("payDatePrint") between ? and ? ';
+            array_push($params,$request->dateStart, $request->dateEnd);
+        }else if($request->dateStart){
+            $queryWhere.=' and date("payDatePrint")>? ';
+            array_push($params,$request->dateStart);
+        }else if($request->dateEnd){
+            $queryWhere.=' and date("payDatePrint")<? ';
+            array_push($params,$request->dateEnd);
+        }
+
+        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" where 1=1 '.$queryWhere.' GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"', $params);
         $array2 = Teller::select()->orderBy('tellId', 'ASC')->get();
 
         $array3 = array();
@@ -337,7 +350,7 @@ class ReportsController extends Controller
             });
             $aux['series'] = array();
             $aux4 = array_map(function ($element1) {
-                return ['name' => $element1->paymthdsName, 'value' => $element1->total];
+                return ['name' => $element1->paymthdsName, 'value' => doubleval($element1->total)];
             }, $aux1);
             $aux['series'] = array_values($aux4);
             array_push($array3, $aux);
@@ -369,12 +382,21 @@ class ReportsController extends Controller
         );*/
 
 
-        return $array3;
+        //return $array3;
+        $xAxisLabel = 'Ventanillas';
+        $yAxisLabel = 'S/.';
 
-        /*return response()->json([
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $array3,
+            'data'=>$array
+        );
+
+        return response()->json([
             'res' => true,
             'msg' => 'Listado correctamente',
-            'data' => $array
-        ], 200);*/
+            'data' => $graph
+        ], 200);
     }
 }

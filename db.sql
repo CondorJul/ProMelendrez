@@ -1825,3 +1825,64 @@ WHERE table_name = 'customers'*/
 
 /*19/11/2022*/
 ALTER TABLE services ADD COLUMN "svNumberOfOrder" int;
+
+
+/*Cambios */
+
+create table annual_resume(
+    "arId" SERIAL PRIMARY KEY,
+    "arDescription" varchar(300), 
+    "arState" int default 1,  /*1=Editable, 2=No editable,*/
+
+    "prdsId" integer not null, 
+    "bussId" integer not null, 
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp,
+    FOREIGN KEY ("prdsId") REFERENCES periods("prdsId"), 
+    FOREIGN KEY ("bussId") REFERENCES bussines("bussId"), 
+    UNIQUE("prdsId", "bussId")
+
+
+);
+
+
+
+create table annual_resume_details(
+    "ardId" SERIAL PRIMARY KEY,
+    "arId" integer, 
+    "ardMonth" int, 
+    "ardTaxBase" decimal(12,2),
+    "ardTax" decimal(12,2), 
+    "ardTotal" decimal(12,2), 
+    "ardPlame" integer, 
+    "ardFee" decimal(12,2), 
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp,
+
+    FOREIGN KEY ("arId") REFERENCES annual_resume("arId")  
+
+);
+
+/*01/01/2023*/
+insert into permissions(name, guard_name, name_to_see) values ('SI_ACCOUNTING_MODULE', 'web', 'Modulo Contabilidad');
+insert into permissions(name, guard_name, name_to_see) values ('SI_ACCOUNTING_SEE', 'web', 'Ver Contabilidad');
+insert into permissions(name, guard_name, name_to_see) values ('SI_ACCOUNTING_XLS_DWL', 'web', 'Descargar Excel Contabilidad');
+/**/
+insert into permissions(name, guard_name, name_to_see) values ('SI_DEBTS_AND_PAIDS_SEE', 'web', 'Ver Deudas y Pagos');
+insert into permissions(name, guard_name, name_to_see) values ('SI_DEBTS_AND_PAIDS_XLS_DWL', 'web', 'Descargar Excel Deudas y Pagos');
+
+/**/
+insert into permissions(name, guard_name, name_to_see) values ('SI_LAST_PAYMENT_BY_CLIENT_SEE', 'web', 'Ver Último Pago');
+insert into permissions(name, guard_name, name_to_see) values ('SI_LAST_PAYMENT_BY_CLIENT_XLS_DWL', 'web', 'Descargar Excel Último Pago');
+
+insert into permissions(name, guard_name, name_to_see) values ('SI_OLD_DEBT_BY_CLIENT_SEE', 'web', 'Ver Debe Desde');
+insert into permissions(name, guard_name, name_to_see) values ('SI_OLD_DEBT_BY_CLIENT_XLS_DWL', 'web', 'Descargar Excel Debe Desde');
+/*clientes*/
+insert into permissions(name, guard_name, name_to_see) values ('SI_CLIENTS_XLS_DWL', 'web', 'Descargar Excel Clientes');
+
