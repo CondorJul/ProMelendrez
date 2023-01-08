@@ -1886,3 +1886,15 @@ insert into permissions(name, guard_name, name_to_see) values ('SI_OLD_DEBT_BY_C
 /*clientes*/
 insert into permissions(name, guard_name, name_to_see) values ('SI_CLIENTS_XLS_DWL', 'web', 'Descargar Excel Clientes');
 
+
+/*Permisos reprote */
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_MODULE', 'web', 'Modulo Reportes');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_WAITING_LINE_GRAPH', 'web', 'Graficas de Linea de Espera');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_ACCOUNTING_GRAPH', 'web', 'Graficas de Contabilidad');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_CLIENTS_GRAPH', 'web', 'Graficas de Clientes');
+
+
+/*CAMBIAR NOMBRE DE VARIABLE*/
+
+ALTER TABLE users 
+RENAME COLUMN status TO state;

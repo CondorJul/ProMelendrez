@@ -385,10 +385,12 @@ class ReportsController extends Controller
         //return $array3;
         $xAxisLabel = 'Ventanillas';
         $yAxisLabel = 'S/.';
+        $legendTitle = 'Años';
 
         $graph = array(
             'xAxisLabel' => $xAxisLabel,
             'yAxisLabel' => $yAxisLabel,
+            'legendTitle'=>$legendTitle,
             'results' => $array3,
             'data'=>$array
         );
@@ -399,4 +401,158 @@ class ReportsController extends Controller
             'data' => $graph
         ], 200);
     }
+
+
+    public function getBillingBalanceByMonth(Request $request)
+    {
+
+        $array = DB::select('
+            select extract(month from "payDatePrint") as month, extract(year from "payDatePrint") as year,sum("payTotal") as "sumPayTotal" from payments where "payIsCanceled"=2 AND extract(year from "payDatePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc
+        '
+        );
+
+        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        //$fecha = Carbon::parse(date('m/d/y'));
+        //$mes = $meses[($fecha->format('m')) - 1];
+        
+        $seriesB = array();
+        for($i=0; $i<count($nameMonths);$i++){
+            $idMonth=$i+1;
+            $serieB=array();
+            $serieB['name']=$nameMonths[$i];
+
+            $aux1 = array_filter($array, function ($element) use ($idMonth) {
+                //return ['name' => $element->apptmDatePrint, 'value' => $element->business  | 0];
+                return $element->month==$idMonth;// element->tellId == $value->tellId;
+            });
+
+
+            $aux2= array_map(function ($element) {
+                return ['name' => $element->year, 'value' => doubleval($element->sumPayTotal)];
+            }, $aux1);
+            $serieB['series'] =array_values($aux2);
+            array_push($seriesB, $serieB);
+        }
+
+        /** */
+        $xAxisLabel = 'Meses';
+        $yAxisLabel = 'S/.';
+
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $seriesB, 
+            'data'=>$array
+
+        );
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $graph
+        ], 200);
+    }
+
+
+    public function getTicketsByMonth(Request $request)
+    {
+
+        $array = DB::select('
+            select extract(month from "apptmDateTimePrint") as month, extract(year from "apptmDateTimePrint") as year,count(*) as "countTotal" from appointment where extract(year from "apptmDateTimePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc      
+        '
+        );
+        
+        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        
+        $seriesB = array();
+        for($i=0; $i<count($nameMonths);$i++){
+            $idMonth=$i+1;
+            $serieB=array();
+            $serieB['name']=$nameMonths[$i];
+
+            $aux1 = array_filter($array, function ($element) use ($idMonth) {
+                return $element->month==$idMonth;
+            });
+
+
+            $aux2= array_map(function ($element) {
+                return ['name' => $element->year, 'value' => intval($element->countTotal)];
+            }, $aux1);
+            $serieB['series'] =array_values($aux2);
+            array_push($seriesB, $serieB);
+        }
+
+        $xAxisLabel = 'Meses';
+        $yAxisLabel = 'Tickets (n)';
+
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $seriesB, 
+            'data'=>$array
+
+        );
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $graph
+        ], 200);
+    }
+    public function getClientByState(Request $request)
+    {
+
+        $array = DB::select('
+            select "bussState", count(*) as "countTotal" from bussines group by "bussState" order by "bussState" asc
+        '
+        );
+        
+        $states = array("1"=>"Activo", "2"=>"Suspendido", "3"=>"Retirado");
+
+        $aux2= array_map(function ($element) use ($states) {
+
+            return ['name' => $states[$element->bussState], 'value' => intval($element->countTotal)];
+        }, $array);
+
+
+        $seriesB = array();
+
+
+        /*for($i=0; $i<count($nameMonths);$i++){
+            $idMonth=$i+1;
+            $serieB=array();
+            $serieB['name']=$nameMonths[$i];
+
+            $aux1 = array_filter($array, function ($element) use ($idMonth) {
+                return $element->month==$idMonth;
+            });
+
+
+            $aux2= array_map(function ($element) {
+                return ['name' => $element->year, 'value' => intval($element->countTotal)];
+            }, $aux1);
+            $serieB['series'] =array_values($aux2);
+            array_push($seriesB, $serieB);
+        }*/
+
+        $xAxisLabel = 'Meses';
+        $yAxisLabel = 'Tickets (n)';
+
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $aux2, 
+            'data'=>$array
+
+        );
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $graph
+        ], 200);
+    }
+
+    
+
 }

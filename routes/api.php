@@ -103,6 +103,8 @@ Route::post('v1/users/exist-email', [AuthController::class, 'existEmail']);
 Route::put('v1/users/{id}/change-password', [AuthController::class, 'changePassword']);
 Route::put('v1/users/upd-user-with-person', [AuthController::class, 'updUserWithPerson']);
 Route::get('v1/users/{id}', [AuthController::class, 'find']);
+Route::put('v1/users/{id}/change-state', [AuthController::class, 'changeState'])->middleware(['auth:sanctum']);
+
 
 /* Ventanilla*/
 Route::get('/v1/tellers/get-join-person', [TellerController::class, 'getJoinPerson']);
@@ -318,6 +320,11 @@ Route::get('/v1/reports/all-periods-json/{bussId}', [ReportsController::class, '
 Route::get('/v1/reports/get-all-bussines-and-visitors-by-date', [ReportsController::class, 'getAllBussinesAndVisitorsByDate']);
 /*Reportes despues deñ 28/10/2022*/
 Route::get('/v1/reports/get-payments-methods-by-teller', [ReportsController::class, 'getPaymentsMethodsByTeller']);
+
+Route::get('/v1/reports/get-billing-balance-by-month', [ReportsController::class, 'getBillingBalanceByMonth']);
+Route::get('/v1/reports/get-tickets-by-month', [ReportsController::class, 'getTicketsByMonth']);
+Route::get('/v1/reports/get-client-by-state', [ReportsController::class, 'getClientByState']);
+
 
 
 

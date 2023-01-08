@@ -21,6 +21,7 @@ class PaymentMail extends Mailable
     public function __construct($details)
     {
         $this->details=$details;
+       
     }
 
     /**
@@ -30,7 +31,9 @@ class PaymentMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Prueba de correo auditores melendres')->view('mails.test');
+       
+        $pdf=file_get_contents('https://api.melendresauditores.com/v1/payments/ZYWuVuflVbIs652/proof-of-payment');
+        return $this->subject('Prueba kkkkkkkde correo auditores melendres')->view('mails.test')->attachData($pdf, "test.pdf");;
         //return $this->view('view.name');
     }
 }

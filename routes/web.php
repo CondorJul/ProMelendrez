@@ -25,3 +25,9 @@ Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class
 
 Route::get('/v1/reports/{prdsId}/exercise-monitoring/{bussId}', [ReportsController::class, 'reportControlMonitoring'])->middleware(['cors']);
 Route::get('/v1/reports/all-periods/{bussId}', [ReportsController::class, 'reportAllPeriods'])->middleware(['cors']);
+
+Route::get('/mail/test', function () {
+    //return redirect()->intended('http:');
+
+    return view('mails.test');
+});

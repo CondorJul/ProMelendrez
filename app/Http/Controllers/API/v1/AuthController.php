@@ -124,6 +124,14 @@ class AuthController extends Controller
                 'msg' => ['Las credenciales proporcionados son incorrectos'],
             ]);
         }
+
+        if($user->state==2){
+            \LogActivity::add($request->email.' con cuenta suspendida ha intentado iniciar sesión sin exito.', null, null);
+            
+            throw ValidationException::withMessages([
+                'msg' => ['Tu cuenta está suspendida, comunicate con el administrador.'],
+            ]);
+        }
      
         $user->img=($user->img!=null)?URL::to('/').'/storage/profile-images/'.$user->img:URL::to('/').'/storage/profile-images/pi-default.png';
 
@@ -210,6 +218,17 @@ class AuthController extends Controller
             'data'=>User::where('id', $user->id)->with('person')->with('roles')->get()
         ], 200);
   
+    }
+
+    public function changeState($id, Request $request)
+    {
+        $q = User::where('id', $id)->first();
+        $q->state = $request->state;
+        $q->save();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado Correctamente.',
+        ], 200);
     }
     
 }
