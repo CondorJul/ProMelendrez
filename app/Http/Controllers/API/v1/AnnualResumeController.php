@@ -79,11 +79,11 @@ class AnnualResumeController extends Controller
                         'ardMonth'=>$value['ardMonth']
                     ])->first();
                     if($t){
-                        $t->ardTaxBase=$request->ardTaxBase;
-                        $t->ardTax=$request->ardTax;
-                        $t->ardTotal=$request->ardTotal;
-                        $t->ardPlame=$request->ardPlame;
-                        $t->ardFee=$request->ardFee;
+                        $t->ardTaxBase=$value['ardTaxBase'];
+                        $t->ardTax=$value['ardTax'];
+                        $t->ardTotal=$value['ardTotal'];
+                        $t->ardPlame=$value['ardPlame'];
+                        $t->ardFee=$value['ardFee'];
                         $t->updated_by=$user->id;
                         $t->save();
                     }else{
