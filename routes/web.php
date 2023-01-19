@@ -18,12 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     //return redirect()->intended('http:');
 
- //   return view('welcome');
+    //   return view('welcome');
 });
 
 Route::get('/v1/payments/{payToken}/proof-of-payment', [PaymentController::class, 'proofOfPayment'])->middleware(['cors']);
 
 Route::get('/v1/reports/{prdsId}/exercise-monitoring/{bussId}', [ReportsController::class, 'reportControlMonitoring'])->middleware(['cors']);
+Route::get('/v1/reports/all-periods/{bussId}', [ReportsController::class, 'reportAllPeriods'])->middleware(['cors']);
 Route::get('/v1/reports/all-periods/{bussId}', [ReportsController::class, 'reportAllPeriods'])->middleware(['cors']);
 
 Route::get('/mail/test', function () {
@@ -31,6 +32,5 @@ Route::get('/mail/test', function () {
 
     return view('mails.test');
 });
-Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
