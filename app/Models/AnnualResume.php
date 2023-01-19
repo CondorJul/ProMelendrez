@@ -31,4 +31,9 @@ class AnnualResume extends Model
     {
         return $this->hasMany(AnnualResumeDetails::class, 'arId', 'arId');
     }
+    
+    public function period()
+    {
+        return $this->belongsTo(Period::class, 'prdsId', 'prdsId');
+    }
 }

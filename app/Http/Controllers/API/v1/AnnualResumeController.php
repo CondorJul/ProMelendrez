@@ -27,7 +27,10 @@ class AnnualResumeController extends Controller
             'res' => true,
             'msg' => 'Actualizado correctamente',
             'data' => AnnualResume::select()
-                ->with('annualResumeDetails')
+                //->with('annualResumeDetails')
+                ->with(array('annualResumeDetails' => function($query) {
+                    $query->orderBy('ardMonth', 'ASC');
+                }))
                 ->where([
                     'prdsId'=>$request->prdsId,
                     'bussId'=>$request->bussId
@@ -79,11 +82,11 @@ class AnnualResumeController extends Controller
                         'ardMonth'=>$value['ardMonth']
                     ])->first();
                     if($t){
-                        $t->ardTaxBase=$value['ardTaxBase'];
-                        $t->ardTax=$value['ardTax'];
-                        $t->ardTotal=$value['ardTotal'];
-                        $t->ardPlame=$value['ardPlame'];
-                        $t->ardFee=$value['ardFee'];
+                        $t->ardTaxBase=isset($value['ardTaxBase'])?$value['ardTaxBase']:null;
+                        $t->ardTax=isset($value['ardTax'])?$value['ardTaxBase']:null;
+                        $t->ardTotal=isset($value['ardTotal'])?$value['ardTotal']:null;
+                        $t->ardPlame=isset($value['ardPlame'])?$value['ardPlame']:null;
+                        $t->ardFee=isset($value['ardFee'])?$value['ardFee']:null;
                         $t->updated_by=$user->id;
                         $t->save();
                     }else{

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\AnnualResume;
 use App\Models\Business;
 use App\Models\DBusinessPeriod;
 use App\Models\Period;
@@ -499,6 +500,7 @@ class ReportsController extends Controller
             'data' => $graph
         ], 200);
     }
+
     public function getClientByState(Request $request)
     {
 
@@ -545,6 +547,118 @@ class ReportsController extends Controller
             'data'=>$array
 
         );
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => $graph
+        ], 200);
+    }
+
+
+
+    public function getAnnualResumeByMonth(Request $request)
+    {
+        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+
+        $arPrevious=AnnualResume::select()->with('period')->where([
+            'prdsId'=>$request->prdsIdPrevious,
+            'bussId'=>$request->bussId
+        ])->first();
+
+
+        $arCurrent=AnnualResume::select()->with('period')->where([
+            'prdsId'=>$request->prdsIdCurrent,
+            'bussId'=>$request->bussId
+        ])->first();
+
+        
+        $arrayPrevious=DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc',[$arPrevious->arId]);
+        $arrayCurrent=DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc',[$arCurrent->arId]);
+
+        $seriePrevious=array();
+        $serieCurrent=array();
+        
+        $seriePrevious['name']=$arPrevious->period->prdsNameShort;
+        $serieCurrent['name']=$arCurrent->period->prdsNameShort;
+        
+        //previos
+        $fPrevious=array_filter($arrayPrevious, function ($element) {
+            return intval($element->ardMonth)<=12;
+        });
+        $valuesPrevious= array_map(function ($element) use ($nameMonths){
+            return ['name' => $nameMonths[intval($element->ardMonth)-1], 'value' => doubleval($element->ardTotal)];
+        }, $fPrevious);
+        $seriePrevious['series']= array_values ($valuesPrevious);
+
+        //actual
+        $fCurrent=array_filter($arrayCurrent, function ($element) {
+            return intval($element->ardMonth)<=12;
+        });
+        $valuesCurrent=array_map(function ($element) use ($nameMonths){
+            return ['name' => $nameMonths[intval($element->ardMonth)-1], 'value' => doubleval($element->ardTotal)];
+        }, $fCurrent);
+        $serieCurrent['series']= array_values($valuesCurrent);
+        
+        $array=array($seriePrevious, $serieCurrent);
+
+
+
+        
+        //$u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
+
+/*
+        $array = DB::select('
+            
+
+            select extract(month from "payDatePrint") as month, extract(year from "payDatePrint") as year,sum("payTotal") as "sumPayTotal" from payments where "payIsCanceled"=2 AND extract(year from "payDatePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc
+        '
+        );
+
+        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        //$fecha = Carbon::parse(date('m/d/y'));
+        //$mes = $meses[($fecha->format('m')) - 1];
+        
+        $seriesB = array();
+        for($i=0; $i<count($nameMonths);$i++){
+            $idMonth=$i+1;
+            $serieB=array();
+            $serieB['name']=$nameMonths[$i];
+
+            $aux1 = array_filter($array, function ($element) use ($idMonth) {
+                //return ['name' => $element->apptmDatePrint, 'value' => $element->business  | 0];
+                return $element->month==$idMonth;// element->tellId == $value->tellId;
+            });
+
+
+            $aux2= array_map(function ($element) {
+                return ['name' => $element->year, 'value' => doubleval($element->sumPayTotal)];
+            }, $aux1);
+            $serieB['series'] =array_values($aux2);
+            array_push($seriesB, $serieB);
+        }
+
+        $xAxisLabel = 'Meses';
+        $yAxisLabel = 'S/.';
+
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $seriesB, 
+            'data'=>$array
+
+        );
+    */
+    $xAxisLabel = 'Meses';
+    $yAxisLabel = 'Tickets (n)';
+
+    $graph = array(
+        'xAxisLabel' => $xAxisLabel,
+        'yAxisLabel' => $yAxisLabel,
+        'results' => $array, 
+        'data'=>$array
+
+    );
 
         return response()->json([
             'res' => true,

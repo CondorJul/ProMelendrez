@@ -1898,3 +1898,10 @@ insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_CLIENT
 
 ALTER TABLE users 
 RENAME COLUMN status TO state;
+
+
+
+ALTER TABLE annual_resume_details ALTER COLUMN "ardMonth" TYPE integer USING ("ardMonth"::integer);
+
+
+Fuente: https://www.iteramos.com/pregunta/44800/cambiar-el-tipo-de-campo-varchar-a-entero-quotno-se-puede-convertir-automaticamente-al-tipo-enteroquot
