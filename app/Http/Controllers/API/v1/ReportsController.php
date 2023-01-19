@@ -323,20 +323,20 @@ class ReportsController extends Controller
     public function getPaymentsMethodsByTeller(Request $request)
     {
 
-        $params=[];
-        $queryWhere='';
-        if($request->dateStart && $request->dateEnd){
-            $queryWhere.=' and date("payDatePrint") between ? and ? ';
-            array_push($params,$request->dateStart, $request->dateEnd);
-        }else if($request->dateStart){
-            $queryWhere.=' and date("payDatePrint")>? ';
-            array_push($params,$request->dateStart);
-        }else if($request->dateEnd){
-            $queryWhere.=' and date("payDatePrint")<? ';
-            array_push($params,$request->dateEnd);
+        $params = [];
+        $queryWhere = '';
+        if ($request->dateStart && $request->dateEnd) {
+            $queryWhere .= ' and date("payDatePrint") between ? and ? ';
+            array_push($params, $request->dateStart, $request->dateEnd);
+        } else if ($request->dateStart) {
+            $queryWhere .= ' and date("payDatePrint")>? ';
+            array_push($params, $request->dateStart);
+        } else if ($request->dateEnd) {
+            $queryWhere .= ' and date("payDatePrint")<? ';
+            array_push($params, $request->dateEnd);
         }
 
-        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" where 1=1 '.$queryWhere.' GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"', $params);
+        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" where 1=1 ' . $queryWhere . ' GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"', $params);
         $array2 = Teller::select()->orderBy('tellId', 'ASC')->get();
 
         $array3 = array();
@@ -391,9 +391,9 @@ class ReportsController extends Controller
         $graph = array(
             'xAxisLabel' => $xAxisLabel,
             'yAxisLabel' => $yAxisLabel,
-            'legendTitle'=>$legendTitle,
+            'legendTitle' => $legendTitle,
             'results' => $array3,
-            'data'=>$array
+            'data' => $array
         );
 
         return response()->json([
@@ -407,7 +407,8 @@ class ReportsController extends Controller
     public function getBillingBalanceByMonth(Request $request)
     {
 
-        $array = DB::select('
+        $array = DB::select(
+            '
             select extract(month from "payDatePrint") as month, extract(year from "payDatePrint") as year,sum("payTotal") as "sumPayTotal" from payments where "payIsCanceled"=2 AND extract(year from "payDatePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc
         '
         );
@@ -415,23 +416,23 @@ class ReportsController extends Controller
         $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
         //$fecha = Carbon::parse(date('m/d/y'));
         //$mes = $meses[($fecha->format('m')) - 1];
-        
+
         $seriesB = array();
-        for($i=0; $i<count($nameMonths);$i++){
-            $idMonth=$i+1;
-            $serieB=array();
-            $serieB['name']=$nameMonths[$i];
+        for ($i = 0; $i < count($nameMonths); $i++) {
+            $idMonth = $i + 1;
+            $serieB = array();
+            $serieB['name'] = $nameMonths[$i];
 
             $aux1 = array_filter($array, function ($element) use ($idMonth) {
                 //return ['name' => $element->apptmDatePrint, 'value' => $element->business  | 0];
-                return $element->month==$idMonth;// element->tellId == $value->tellId;
+                return $element->month == $idMonth; // element->tellId == $value->tellId;
             });
 
 
-            $aux2= array_map(function ($element) {
+            $aux2 = array_map(function ($element) {
                 return ['name' => $element->year, 'value' => doubleval($element->sumPayTotal)];
             }, $aux1);
-            $serieB['series'] =array_values($aux2);
+            $serieB['series'] = array_values($aux2);
             array_push($seriesB, $serieB);
         }
 
@@ -442,8 +443,8 @@ class ReportsController extends Controller
         $graph = array(
             'xAxisLabel' => $xAxisLabel,
             'yAxisLabel' => $yAxisLabel,
-            'results' => $seriesB, 
-            'data'=>$array
+            'results' => $seriesB,
+            'data' => $array
 
         );
 
@@ -458,28 +459,29 @@ class ReportsController extends Controller
     public function getTicketsByMonth(Request $request)
     {
 
-        $array = DB::select('
-            select extract(month from "apptmDateTimePrint") as month, extract(year from "apptmDateTimePrint") as year,count(*) as "countTotal" from appointment where extract(year from "apptmDateTimePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc      
+        $array = DB::select(
+            '
+            select extract(month from "apptmDateTimePrint") as month, extract(year from "apptmDateTimePrint") as year,count(*) as "countTotal" from appointment where extract(year from "apptmDateTimePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc
         '
         );
-        
+
         $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
-        
+
         $seriesB = array();
-        for($i=0; $i<count($nameMonths);$i++){
-            $idMonth=$i+1;
-            $serieB=array();
-            $serieB['name']=$nameMonths[$i];
+        for ($i = 0; $i < count($nameMonths); $i++) {
+            $idMonth = $i + 1;
+            $serieB = array();
+            $serieB['name'] = $nameMonths[$i];
 
             $aux1 = array_filter($array, function ($element) use ($idMonth) {
-                return $element->month==$idMonth;
+                return $element->month == $idMonth;
             });
 
 
-            $aux2= array_map(function ($element) {
+            $aux2 = array_map(function ($element) {
                 return ['name' => $element->year, 'value' => intval($element->countTotal)];
             }, $aux1);
-            $serieB['series'] =array_values($aux2);
+            $serieB['series'] = array_values($aux2);
             array_push($seriesB, $serieB);
         }
 
@@ -489,8 +491,8 @@ class ReportsController extends Controller
         $graph = array(
             'xAxisLabel' => $xAxisLabel,
             'yAxisLabel' => $yAxisLabel,
-            'results' => $seriesB, 
-            'data'=>$array
+            'results' => $seriesB,
+            'data' => $array
 
         );
 
@@ -504,14 +506,15 @@ class ReportsController extends Controller
     public function getClientByState(Request $request)
     {
 
-        $array = DB::select('
+        $array = DB::select(
+            '
             select "bussState", count(*) as "countTotal" from bussines group by "bussState" order by "bussState" asc
         '
         );
-        
-        $states = array("1"=>"Activo", "2"=>"Suspendido", "3"=>"Retirado");
 
-        $aux2= array_map(function ($element) use ($states) {
+        $states = array("1" => "Activo", "2" => "Suspendido", "3" => "Retirado");
+
+        $aux2 = array_map(function ($element) use ($states) {
 
             return ['name' => $states[$element->bussState], 'value' => intval($element->countTotal)];
         }, $array);
@@ -543,8 +546,8 @@ class ReportsController extends Controller
         $graph = array(
             'xAxisLabel' => $xAxisLabel,
             'yAxisLabel' => $yAxisLabel,
-            'results' => $aux2, 
-            'data'=>$array
+            'results' => $aux2,
+            'data' => $array
 
         );
 
@@ -668,5 +671,44 @@ class ReportsController extends Controller
     }
 
     
+    public function reportAnnualSummary($bussId)
+    {
+        try {
+            $dbp = DBusinessPeriod::select()
+                ->join('periods', 'periods.prdsId', '=', 'd_bussines_periods.prdsId')
+                ->with('serviceProvided')
+                ->with('periods')
+                ->with('serviceProvided.services')
+                ->with('serviceProvided.periodPayments')
+                ->where('bussId', $bussId)
+                ->orderBy('periods.prdsNameShort', 'ASC')->get();
+            $b = Business::with('person')->where('bussId', $bussId)->first();
+            $meses = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $meses[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
 
+            $data = [
+                'd_business_period' => $dbp,
+                'business' => $b,
+                'date' => $f
+            ];
+            $path = base_path('resources/views/v1.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+            $path1 = base_path('resources/views/icon.png');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'landscape')->loadView('reports2.reports-annual-summary', compact('pic', 'pic1'), $data);
+
+            return $pdf->stream();
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
+    }
 }

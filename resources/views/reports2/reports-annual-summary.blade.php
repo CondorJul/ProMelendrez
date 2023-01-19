@@ -28,8 +28,8 @@
 
         #watermark {
             position: fixed;
-            right: 5%;
-            bottom: 25%;
+            right: 20%;
+            bottom: 5%;
             width: 15cm;
             height: 15cm;
             z-index: -1000;
@@ -37,6 +37,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        .a {
+            /*border: 2px solid black;*/
+            width: 49%;
+        }
+
+        .b {
+            /*border: 2px solid black;*/
+            width: 50%;
+            margin-left: 3px;
+        }
+
+        .contenedor {
+            margin: 0 auto;
+        }
+
+        .contenedor .a,
+        .contenedor .b {
+            display: inline-block;
         }
     </style>
 </head>
@@ -59,122 +79,67 @@
             <h2 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">RUC: {{ $business['bussRUC'] }}</h2>
             <h2 style="text-align: right; font-size: 12px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">Pasco, {{ $date }}</h2>
             <h2 style="text-align: left; font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">RESPONSABLE: <span style="font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">{{ $business->person['perName'] }}</span></h2>
-
-            @foreach($d_business_period as $key => $value)
-
-
-            @if($value->dbpDebt >0.0)
-
-            <table style="width: 100%;" border="1" cellspacing="0">
-                <tr>
-                    <th colspan="4" style="font-size: 20px; letter-spacing: 8px;">EJERCICIO {{ $value->periods['prdsNameShort'] }}</th>
-                </tr>
-                <tr>
-                    <th>MESES</th>
-                    <th>DESCRIPCIÓN</th>
-                    <th colspan="2">DEUDA</th>
-
-                </tr>
-                @foreach($value['serviceProvided'] as $key=> $val)
-
-
-                @if($val->spDebt > 0.0)
-                <tr>
-                    <th style="font-weight: lighter;">{{ $val->periodPayments['ppayName'] }}</th>
-                    <th style="width: 45%; font-weight: lighter;">{{ $val->services['svName'] }}</th>
-
-                    <th style="width: 1px; font-weight: lighter; border-right: 1px solid white;">&nbspS/</th>
-                    <th style="width: 25%; font-weight: lighter; text-align: right;">{{ $val['spDebt'] }}</th>
-                </tr>
-                @endif
-
-
-
-                @endforeach
-
-                <tr>
-                    <th colspan="2" style="width: 35%;">TOTAL</th>
-                    <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                    <th style="width: 25%; text-align: right;">{{ $value['dbpDebt'] }}</th>
-
-                </tr>
-            </table>
-
-            <br><br>
-
-            @endif
-
-            @endforeach
-
-            <table align="center" style="width: 50%;" border="1" cellspacing="0">
-                <tr>
-                    <th colspan="3" style="font-size: 16px; letter-spacing: 5px;">RESUMEN GENERAL</th>
-
-                </tr>
-                <tr>
-                    <th>AÑOS</th>
-
-                    <th colspan="2">DEUDA</th>
-
-                </tr>
-                @php
-                $total = 0;
-                $total1 = 0;
-                $total2 = 0;
-                @endphp
-                @foreach($d_business_period as $key => $value)
-                @php
-                $total += $value['dbpCost'];
-                $total1 += $value['dbpPaid'];
-                $total2 += $value['dbpDebt'];
-                @endphp
-
-                @if($value['dbpDebt'] > 0.0)
-                <tr>
-                    <th style="font-weight: lighter;">{{ $value->periods['prdsNameShort'] }}</th>
-                    <th style="width: 1px; border-right: 1px solid white; font-weight: lighter;">&nbspS/</th>
-                    <th style="width: 50%; text-align: right; font-weight: lighter;">{{ $value['dbpDebt'] }}</th>
-                </tr>
-                @endif
-
-                @endforeach
-                <tr>
-                    <th>TOTAL</th>
-                    <th style="width: 1px; border-right: 1px solid white;">&nbspS/</th>
-                    <th style="width: 50%; text-align: right;">{{ number_format($total2, 2, '.', '')}}</th>
-                </tr>
-            </table>
+            <h2 style="text-align: left; font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px;">CONTACTO: <span style="font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">{{ $business['bussTel'] }} - {{ $business['bussTel2'] }} - {{ $business['bussTel3'] }}</span></h2>
         </div>
-        <br><br>
+        <br>
         <div class="contenedor" style="font-size: 12px; font-family: Arial, Helvetica, sans-serif;">
-            <table style="width: 100%;" border="1" cellspacing="0">
-                <tr>
-                    <th>ENTIDAD BANCARIA</th>
-                    <th>CUENTA SOLES</th>
-                    <th>CÓDIGO INTERBANCARIO CCI</th>
-                </tr>
-                <tr>
-                    <th style="text-align: center;">BBVA Banco Continental</th>
-                    <th style="text-align: center;"><span style="font-weight: lighter;">Cuenta de Ahorros</span> <br> N° 0011 0321 0200838764
-                    </th>
-                    <th style="text-align: center;">011-321-000200838764-75</th>
-                </tr>
-                <tr>
-                    <th style="text-align: center;">BCP Banco de credito del Perú</th>
-                    <th style="text-align: center;"> <span style="font-weight: lighter;">Cuenta digital</span> <br> N° 280-94036878-0-05</th>
-                    <th style="text-align: center;">002-28019403687800568</th>
-                </tr>
-                <tr>
-                    <th style="text-align: center;">Banco Interbank</th>
-                    <th style="text-align: center;"> <span style="font-weight: lighter;">Cuenta simple</span> <br> N° 5903116283167</th>
-                    <th style="text-align: center;">003-590-013116283167-74</th>
-                </tr>
-                <tr>
-                    <th style="text-align: center;">Caja Huancayo</th>
-                    <th style="text-align: center;"> <span style="font-weight: lighter;">Cuenta de ahorros</span> <br> N° 107066211000651746</th>
-                    <th style="text-align: center;">80806621100065174655</th>
-                </tr>
-            </table>
+            <div class="a">
+                <table style="width: 100%;" border="1" cellspacing="0">
+                    <tr>
+                        <th colspan="6" style="font-size: 20px;">EJERCICIO 2020</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">MESES</th>
+                        <th colspan="3">VENTAS</th>
+                        <th rowspan="2">PLAME</th>
+                        <th rowspan="2">HONORARIOS</th>
+                    </tr>
+                    <tr>
+                        <th>BASE IMPONIBLE</th>
+                        <th>I.G.V</th>
+                        <th>TOTAL</th>
+                    </tr>
+
+                    <tr>
+                        <th style="font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                        <th style="width: 10%; font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                    </tr>
+                </table>
+            </div>
+            <div class="b">
+                <table style="width: 100%;" border="1" cellspacing="0">
+                    <tr>
+                        <th colspan="6" style="font-size: 20px;">EJERCICIO 2020</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">MESES</th>
+                        <th colspan="3">VENTAS</th>
+                        <th rowspan="2">PLAME</th>
+                        <th rowspan="2">HONORARIOS</th>
+                    </tr>
+                    <tr>
+                        <th>BASE IMPONIBLE</th>
+                        <th>I.G.V</th>
+                        <th>TOTAL</th>
+                    </tr>
+
+                    <tr>
+                        <th style="font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                        <th style="width: 10%; font-weight: lighter;">-</th>
+                        <th style="width: 15%; font-weight: lighter;">-</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div>
+            <img style="margin-top: 30px;" src="https://quickchart.io/chart?c={type:'line',data:{labels:['January','February','March','April','May'],datasets:[{label:'Dogs',data:[50,60,70,180,190],fill:false,borderColor:'blue'},{label:'Cats',data:[100,200,300,400,500],fill:false,borderColor:'green'}]}}" width="100%">
         </div>
     </main>
 </body>

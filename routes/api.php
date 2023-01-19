@@ -316,6 +316,7 @@ Route::get('/v1/payments/{payToken}/proof-of-payment-json', [PaymentController::
 
 Route::get('/v1/report/{prdsId}/control-monitoring-json/{bussId}', [ReportsController::class, 'controlMonitoringJson']);
 Route::get('/v1/reports/all-periods-json/{bussId}', [ReportsController::class, 'reportAllPeriodsJson']);
+Route::get('/v1/reports/annual-summary-json/{bussId}', [ReportsController::class, 'reportAnnualSummary']);
 
 /*Reportes añadidos el 17/08/2022 */
 Route::get('/v1/reports/get-all-bussines-and-visitors-by-date', [ReportsController::class, 'getAllBussinesAndVisitorsByDate']);
@@ -341,7 +342,7 @@ Route::delete('/v1/period-payments/{id}', [PeriodPaymentController::class, 'dest
 
 
 /*Annual Resume */
-Route::get('/v1/annual-resume/find-by', [AnnualResumeController::class, 'findBy']);//->middleware(['auth:sanctum']);
+Route::get('/v1/annual-resume/find-by', [AnnualResumeController::class, 'findBy']); //->middleware(['auth:sanctum']);
 Route::post('/v1/annual-resume/create-update', [AnnualResumeController::class, 'createUpdate'])->middleware(['auth:sanctum']);
 
 

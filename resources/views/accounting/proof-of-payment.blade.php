@@ -15,7 +15,7 @@
         td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
-            background-color: white;
+            /*background-color: white;*/
         }
 
         /*h5,
@@ -37,21 +37,43 @@
             padding-top: 3px;
             padding-bottom: 3px;
         }
+
+        #watermark {
+            position: fixed;
+            left: 8%;
+            bottom: 20%;
+            width: 3cm;
+            height: 3cm;
+            z-index: -1000;
+            opacity: 0.5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: red;
+            transform: rotate(-50deg);
+            letter-spacing: 30px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
+    @if($payment['payIsCanceled'] == 1)
+    <div id="watermark" style="font-size: 40px; font-family: Arial, Helvetica, sans-serif;">
+        ANULADO
+    </div>
+    @endif
     <div style="text-align: center; padding: 15px;">
         <img src="<?php echo $pic ?>" alt="" width="270px">
         <!--
         <h2 style="font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px;">RUC: 20542566630</h2>
         <h5 style="font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-weight: lighter;">Av. Daniel Alcides Carrión N° 204(Segundo Piso) <br> Urb. San Juan-Yanacancha-Pasco <br> <span style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">E-mail: melendres.auditores@hotmail.com<br>Cel: 999918316 / 999918376 / 999918498</span></h5>
         -->
-        
+
         <h2 style="font-size: 14px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px;">RUC: {{$headquarter['hqRUC']}}</h2>
         <h5 style="font-size: 11px; font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-weight: lighter;">{!!$headquarter['hqAddress']!!} <br> <span style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">E-mail: {{$headquarter['hqEmail']}}<br>Cel: {{$headquarter['hqTel']}}</span></h5>
-        
-        
+
+
         <table style="margin: 5 0 5 0;">
             <tr>
                 <th style="width: 270px; font-size: 2px; border-top: 1px dashed;"></th>
