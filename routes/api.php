@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\v1\AuthController;
 use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\v1\AnnualResumeController;
 use App\Http\Controllers\API\v1\AppointmentController;
 use App\Http\Controllers\API\v1\AppointmentTempController;
 use App\Http\Controllers\API\v1\BusinessController;
@@ -334,6 +335,12 @@ Route::get('/v1/period-payments', [PeriodPaymentController::class, 'index'])->mi
 Route::post('/v1/period-payments', [PeriodPaymentController::class, 'store'])->middleware(['auth:sanctum']);
 Route::put('/v1/period-payments/{id}', [PeriodPaymentController::class, 'update'])->middleware(['auth:sanctum']);
 Route::delete('/v1/period-payments/{id}', [PeriodPaymentController::class, 'destroy'])->middleware(['auth:sanctum']);
+
+
+/*Annual Resume */
+Route::get('/v1/annual-resume/find-by', [AnnualResumeController::class, 'findBy']);//->middleware(['auth:sanctum']);
+Route::post('/v1/annual-resume/create-update', [AnnualResumeController::class, 'createUpdate'])->middleware(['auth:sanctum']);
+
 
 
 /*Copy to clipboard */

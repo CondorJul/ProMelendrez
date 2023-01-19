@@ -8,7 +8,7 @@ use App\Models\AnnualResume;
 use App\Models\AnnualResumeDetails;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-
+use PDOException;
 
 class AnnualResumeController extends Controller
 {
@@ -19,17 +19,21 @@ class AnnualResumeController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
-    public function find(Request $request, $arId){
+    public function findBy(Request $request){
         return response()->json([
             'res' => true,
             'msg' => 'Actualizado correctamente',
-            'data' => AnnualResume::select()->with('annualResumeDetails')->where([
-                'prdsId'=>$request->prdsId,
-                'bussId'=>$request->bussId
-            ])->orWhere('arId', $request->arId)->first()
+            'data' => AnnualResume::select()
+                ->with('annualResumeDetails')
+                ->where([
+                    'prdsId'=>$request->prdsId,
+                    'bussId'=>$request->bussId
+                ])
+                ->orWhere('arId', $request->arId)
+                ->first()
 
         ], 200);
     }
@@ -44,10 +48,10 @@ class AnnualResumeController extends Controller
     {
        
     }
-
-    public function create_update(Request $request)
+    public function createUpdate(Request $request)
     {
-        $user= $request->user()->id;
+        //echo( json_encode($request->all()));
+        $user= $request->user();
         try {
             DB::connection()->beginTransaction();
             $ar=AnnualResume::where([
@@ -58,7 +62,7 @@ class AnnualResumeController extends Controller
             if(!$ar){
                 $p = AnnualResume::create(array_merge($request->all(),['created_by'=>$user->id]));
                 $p->annualResumeDetails()->createMany($request->annualResumeDetails);
-                \LogActivity::add($request->user()->email.' realizó el registro de resumen anual '.$p->arId, null, json_encode($request->all()));
+               // \LogActivity::add($request->user()->email.' realizó el registro de resumen anual '.$p->arId, null, json_encode($request->all()));
 
             }elseif($ar->arState==1){
                 $ar=AnnualResume::updateOrCreate([
@@ -72,7 +76,7 @@ class AnnualResumeController extends Controller
                 foreach ($request->annualResumeDetails as $key => $value) {
                     $t=AnnualResumeDetails::where([
                         'arId'=>$ar->arId , 
-                        'ardMonth'=>$value->ardMonth
+                        'ardMonth'=>$value['ardMonth']
                     ])->first();
                     if($t){
                         $t->ardTaxBase=$request->ardTaxBase;
@@ -89,7 +93,7 @@ class AnnualResumeController extends Controller
                     //"created_by" BIGINT,
                     //"updated_by" BIGINT,
                 }
-                \LogActivity::add($request->user()->email.' realizó la actualización de resumen anual '.$p->arId, null, json_encode($request->all()));
+               // \LogActivity::add($request->user()->email.' realizó la actualización de resumen anual '.$p->arId, null, json_encode($request->all()));
 
             }
 
@@ -105,7 +109,7 @@ class AnnualResumeController extends Controller
             ], 200);
         } catch (PDOException $e) {
             DB::connection()->rollBack();
-            \LogActivity::add($request->user()->email.' trató de realizar un registro o actualización de resumen anual sin éxito.', null, json_encode($request->all()));
+          //  \LogActivity::add($request->user()->email.' trató de realizar un registro o actualización de resumen anual sin éxito.', null, json_encode($request->all()));
             return response()->json([
                 'res' => false,
                 'msg' => $e->getMessage(),
@@ -115,6 +119,7 @@ class AnnualResumeController extends Controller
 
             throw $e;
         }
+        
 
     }
 
