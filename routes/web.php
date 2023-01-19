@@ -31,3 +31,6 @@ Route::get('/mail/test', function () {
 
     return view('mails.test');
 });
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
