@@ -62,6 +62,10 @@
         .espacio {
             height: 30px;
         }
+
+        .espacio2 {
+            height: 10px;
+        }
     </style>
 </head>
 
@@ -151,13 +155,22 @@
                         <tr>
                             <th colspan="10" class="espacio" style="border-left-style: hidden; border-right-style: hidden;"></th>
                         </tr>
-                        <tr>
+                        @foreach($e['annualResumeDetails'] as $key => $val)
+                        @if($loop->index === 13) <tr>
                             <th colspan="5">BALANCE ANUAL EJERCICIO {{ $e['period']['prdsNameShort'] }}</th>
                             <th style="width: 1%; border-right-style: hidden;">&nbspS/</th>
                             <th></th>
                             <th></th>
                             <th style="width: 1%; border-right-style: hidden;">&nbspS/</th>
-                            <th></th>
+                            <th>{{ $val['ardFee'] }}</th>
+                        </tr>
+                        @endif
+                        @endforeach
+                        <tr>
+                            <th colspan="10" class="espacio2" style="border-left-style: hidden; border-right-style: hidden;"></th>
+                        </tr>
+                        <tr>
+                            <th colspan="10" style="text-align: left;">Nota:</th>
                         </tr>
                 </table>
             </div>
