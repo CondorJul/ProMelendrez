@@ -329,6 +329,8 @@ Route::get('/v1/reports/get-client-by-state', [ReportsController::class, 'getCli
 
 Route::get('/v1/reports/get-annual-resume-by-month', [ReportsController::class, 'getAnnualResumeByMonth']);
 
+Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
+
 
 
 

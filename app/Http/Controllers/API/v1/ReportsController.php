@@ -711,4 +711,40 @@ class ReportsController extends Controller
             return 'Surgio un error, intente más tarde';
         }
     }
+
+    public function myFormatDJJson(Request $request)
+    {
+        //seleeciona el mes
+        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        
+        //consulta base de datos
+        $teller=Teller:: select()->where('tellId', $request->tellId)->get(); 
+        $businesses=Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState]) ->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
+        $period=Period::select()->where('prdsId', $request->prdsId)->first();
+
+        $dataGrouped=Array();
+
+        
+        for ($i=0; $i <10 ; $i++) { 
+            $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
+                return intval($element['_lastDigit']) == intval($i); 
+            });
+            $dataGrouped["digit-".$i]=array_values($aux1);
+        }
+        
+        
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data'=>[
+                'teller' => $teller, 
+                'businesses' => $businesses,
+                'groupeds'=>$dataGrouped, 
+                'period'=>$period,
+                'month'=>$nameMonths[$request->month-1]
+            ]
+
+        ], 200);
+    }
 }

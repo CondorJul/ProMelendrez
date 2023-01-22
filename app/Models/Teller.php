@@ -25,5 +25,16 @@ class Teller extends Model
         return $this->belongsToMany(Category::class,'d_category_teller', 'tellId','catId' );
     }
 
+    public function businesses()
+    {
+        return $this->hasMany(Business::class, 'tellId', 'tellId');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id', 'id');
+    }
+
+
     
 }
