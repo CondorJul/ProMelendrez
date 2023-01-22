@@ -564,55 +564,55 @@ class ReportsController extends Controller
     {
         $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
 
-        $arPrevious=AnnualResume::select()->with('period')->where([
-            'prdsId'=>$request->prdsIdPrevious,
-            'bussId'=>$request->bussId
+        $arPrevious = AnnualResume::select()->with('period')->where([
+            'prdsId' => $request->prdsIdPrevious,
+            'bussId' => $request->bussId
         ])->first();
 
 
-        $arCurrent=AnnualResume::select()->with('period')->where([
-            'prdsId'=>$request->prdsIdCurrent,
-            'bussId'=>$request->bussId
+        $arCurrent = AnnualResume::select()->with('period')->where([
+            'prdsId' => $request->prdsIdCurrent,
+            'bussId' => $request->bussId
         ])->first();
 
-        
-        $arrayPrevious=DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc',[$arPrevious->arId]);
-        $arrayCurrent=DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc',[$arCurrent->arId]);
 
-        $seriePrevious=array();
-        $serieCurrent=array();
-        
-        $seriePrevious['name']=$arPrevious->period->prdsNameShort;
-        $serieCurrent['name']=$arCurrent->period->prdsNameShort;
-        
+        $arrayPrevious = DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc', [$arPrevious->arId]);
+        $arrayCurrent = DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc', [$arCurrent->arId]);
+
+        $seriePrevious = array();
+        $serieCurrent = array();
+
+        $seriePrevious['name'] = $arPrevious->period->prdsNameShort;
+        $serieCurrent['name'] = $arCurrent->period->prdsNameShort;
+
         //previos
-        $fPrevious=array_filter($arrayPrevious, function ($element) {
-            return intval($element->ardMonth)<=12;
+        $fPrevious = array_filter($arrayPrevious, function ($element) {
+            return intval($element->ardMonth) <= 12;
         });
-        $valuesPrevious= array_map(function ($element) use ($nameMonths){
-            return ['name' => $nameMonths[intval($element->ardMonth)-1], 'value' => doubleval($element->ardTotal)];
+        $valuesPrevious = array_map(function ($element) use ($nameMonths) {
+            return ['name' => $nameMonths[intval($element->ardMonth) - 1], 'value' => doubleval($element->ardTotal)];
         }, $fPrevious);
-        $seriePrevious['series']= array_values ($valuesPrevious);
+        $seriePrevious['series'] = array_values($valuesPrevious);
 
         //actual
-        $fCurrent=array_filter($arrayCurrent, function ($element) {
-            return intval($element->ardMonth)<=12;
+        $fCurrent = array_filter($arrayCurrent, function ($element) {
+            return intval($element->ardMonth) <= 12;
         });
-        $valuesCurrent=array_map(function ($element) use ($nameMonths){
-            return ['name' => $nameMonths[intval($element->ardMonth)-1], 'value' => doubleval($element->ardTotal)];
+        $valuesCurrent = array_map(function ($element) use ($nameMonths) {
+            return ['name' => $nameMonths[intval($element->ardMonth) - 1], 'value' => doubleval($element->ardTotal)];
         }, $fCurrent);
-        $serieCurrent['series']= array_values($valuesCurrent);
-        
-        $array=array($seriePrevious, $serieCurrent);
+        $serieCurrent['series'] = array_values($valuesCurrent);
+
+        $array = array($seriePrevious, $serieCurrent);
 
 
 
-        
+
         //$u = User::select('id', 'perId')->with('person')->where('id', $p->userId)->first();
 
-/*
+        /*
         $array = DB::select('
-            
+
 
             select extract(month from "payDatePrint") as month, extract(year from "payDatePrint") as year,sum("payTotal") as "sumPayTotal" from payments where "payIsCanceled"=2 AND extract(year from "payDatePrint")>=(extract(year from CURRENT_DATE)-2) group by year, month ORDER BY month asc, year asc
         '
@@ -621,7 +621,7 @@ class ReportsController extends Controller
         $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
         //$fecha = Carbon::parse(date('m/d/y'));
         //$mes = $meses[($fecha->format('m')) - 1];
-        
+
         $seriesB = array();
         for($i=0; $i<count($nameMonths);$i++){
             $idMonth=$i+1;
@@ -647,21 +647,21 @@ class ReportsController extends Controller
         $graph = array(
             'xAxisLabel' => $xAxisLabel,
             'yAxisLabel' => $yAxisLabel,
-            'results' => $seriesB, 
+            'results' => $seriesB,
             'data'=>$array
 
         );
     */
-    $xAxisLabel = 'Meses';
-    $yAxisLabel = 'Tickets (n)';
+        $xAxisLabel = 'Meses';
+        $yAxisLabel = 'Tickets (n)';
 
-    $graph = array(
-        'xAxisLabel' => $xAxisLabel,
-        'yAxisLabel' => $yAxisLabel,
-        'results' => $array, 
-        'data'=>$array
+        $graph = array(
+            'xAxisLabel' => $xAxisLabel,
+            'yAxisLabel' => $yAxisLabel,
+            'results' => $array,
+            'data' => $array
 
-    );
+        );
 
         return response()->json([
             'res' => true,
@@ -670,29 +670,60 @@ class ReportsController extends Controller
         ], 200);
     }
 
-    
-    public function reportAnnualSummary($bussId)
+
+    public function reportAnnualSummary(Request $request)
     {
         try {
-            $dbp = DBusinessPeriod::select()
-                ->join('periods', 'periods.prdsId', '=', 'd_bussines_periods.prdsId')
-                ->with('serviceProvided')
-                ->with('periods')
-                ->with('serviceProvided.services')
-                ->with('serviceProvided.periodPayments')
-                ->where('bussId', $bussId)
-                ->orderBy('periods.prdsNameShort', 'ASC')->get();
-            $b = Business::with('person')->where('bussId', $bussId)->first();
-            $meses = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+            $b = Business::with('person')->where('bussId', $request->bussId)->first();
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Total", "Balance Anual");
             $fecha = Carbon::parse(date('m/d/y'));
-            $mes = $meses[($fecha->format('m')) - 1];
+            $mes = $nameMonths[($fecha->format('m')) - 1];
             $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
 
+            $sales1 = AnnualResume::select()->with('period')->with(array('annualResumeDetails' => function ($query) {
+                $query->orderBy('ardMonth', 'ASC');
+            }))
+                ->where([
+                    'prdsId' => $request->prdsIdPrevious,
+                    'bussId' => $request->bussId
+                ])
+                ->first();
+
+            $aux = array_map(function ($element) use ($nameMonths) {
+                return array_merge($element, ['nameMonth' => $nameMonths[intval($element['ardMonth']) - 1]]);
+            }, $sales1->annualResumeDetails->toArray());
+
+            $sales1 = array_merge($sales1->toArray(), ['annualResumeDetails' => $aux]);
+
+
+            $sales2 = AnnualResume::select()->with('period')->with(array('annualResumeDetails' => function ($query) {
+                $query->orderBy('ardMonth', 'ASC');
+            }))
+                ->where([
+                    'prdsId' => $request->prdsIdCurrent,
+                    'bussId' => $request->bussId
+                ])
+                ->first();
+
+            $aux1 = array_map(function ($element) use ($nameMonths) {
+                return array_merge($element, ['nameMonth' => $nameMonths[intval($element['ardMonth']) - 1]]);
+            }, $sales2->annualResumeDetails->toArray());
+
+            $sales2 = array_merge($sales2->toArray(), ['annualResumeDetails' => $aux1]);
+
+
+
             $data = [
-                'd_business_period' => $dbp,
                 'business' => $b,
-                'date' => $f
+                'date' => $f,
+                'salesPrev' => $sales1,
+                'salesCur' => $sales2,
+                'evaluateIsset' => function ($num) {
+                    return isset($num) ? $num : '-';
+                }
             ];
+
             $path = base_path('resources/views/v1.png');
             $type = pathinfo($path, PATHINFO_EXTENSION);
             $data1 = file_get_contents($path);
@@ -746,5 +777,67 @@ class ReportsController extends Controller
             ]
 
         ], 200);
+    }
+    public function reportAnnualSummaryJson(Request $request)
+    {
+        try {
+            $b = Business::with('person')->where('bussId', $request->bussId)->first();
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Total", "Balance Anual");
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $nameMonths[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
+
+            $sales1 = AnnualResume::select()->with('period')->with(array('annualResumeDetails' => function ($query) {
+                $query->orderBy('ardMonth', 'ASC');
+            }))
+                ->where([
+                    'prdsId' => $request->prdsIdPrevious,
+                    'bussId' => $request->bussId
+                ])
+                ->first();
+
+            $aux = array_map(function ($element) use ($nameMonths) {
+                return array_merge($element, ['nameMonth' => $nameMonths[intval($element['ardMonth']) - 1]]);
+            }, $sales1->annualResumeDetails->toArray());
+
+            $sales1 = array_merge($sales1->toArray(), ['annualResumeDetails' => $aux]);
+
+
+            $sales2 = AnnualResume::select()->with('period')->with(array('annualResumeDetails' => function ($query) {
+                $query->orderBy('ardMonth', 'ASC');
+            }))
+                ->where([
+                    'prdsId' => $request->prdsIdCurrent,
+                    'bussId' => $request->bussId
+                ])
+                ->first();
+
+            $aux1 = array_map(function ($element) use ($nameMonths) {
+                return array_merge($element, ['nameMonth' => $nameMonths[intval($element['ardMonth']) - 1]]);
+            }, $sales2->annualResumeDetails->toArray());
+
+            $sales2 = array_merge($sales2->toArray(), ['annualResumeDetails' => $aux1]);
+
+            $data = [
+                'business' => $b,
+                'date' => $f,
+                'salesPrev' => $sales1,
+                'salesCur' => $sales2,
+                'empty2' => function ($num) {
+                    return isset($num) ? $num : '-';
+                }
+            ];
+
+            return response()->json($data);
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
+    }
+
+    public static function empty2($num)
+    {
+        return (isset($num)) ? $num : '-';
     }
 }
