@@ -743,41 +743,6 @@ class ReportsController extends Controller
         }
     }
 
-    public function myFormatDJJson(Request $request)
-    {
-        //seleeciona el mes
-        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
-        
-        //consulta base de datos
-        $teller=Teller:: select()->where('tellId', $request->tellId)->get(); 
-        $businesses=Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState]) ->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
-        $period=Period::select()->where('prdsId', $request->prdsId)->first();
-
-        $dataGrouped=Array();
-
-        
-        for ($i=0; $i <10 ; $i++) { 
-            $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
-                return intval($element['_lastDigit']) == intval($i); 
-            });
-            $dataGrouped["digit-".$i]=array_values($aux1);
-        }
-        
-        
-
-        return response()->json([
-            'res' => true,
-            'msg' => 'Listado correctamente',
-            'data'=>[
-                'teller' => $teller, 
-                'businesses' => $businesses,
-                'groupeds'=>$dataGrouped, 
-                'period'=>$period,
-                'month'=>$nameMonths[$request->month-1]
-            ]
-
-        ], 200);
-    }
     public function reportAnnualSummaryJson(Request $request)
     {
         try {
@@ -836,8 +801,105 @@ class ReportsController extends Controller
         }
     }
 
-    public static function empty2($num)
+    public function reportFormatDeclaration(Request $request)
     {
-        return (isset($num)) ? $num : '-';
+        try {
+            //seleeciona el mes
+            $nameMonths = array("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
+
+            //consulta base de datos
+            $teller = Teller::select()->where('tellId', $request->tellId)->first();
+            $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
+            $period = Period::select()->where('prdsId', $request->prdsId)->first();
+
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $nameMonths[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
+
+            $dataGrouped = array();
+
+
+            for ($i = 0; $i < 10; $i++) {
+                $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
+                    return intval($element['_lastDigit']) == intval($i);
+                });
+                $aux2 = array_values($aux1);
+                $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => ''], ['bussName' => '', 'bussFileNumber' => ''], ['bussName' => '', 'bussFileNumber' => '']]);
+                $temp = array();
+                $temp['name'] = 'RUC ' . $i;
+                $temp['values'] = $temp2;
+                $dataGrouped["digit-" . $i] = $temp;
+            }
+
+            $data = [
+                'teller' => $teller,
+                'businesses' => $businesses,
+                'groupeds' => $dataGrouped,
+                'period' => $period,
+                'month' => $nameMonths[$request->month - 1],
+                'date' => $f,
+                'substring' => function ($str) {
+                    return substr($str, 0, 31);
+                }
+            ];
+
+            $path = base_path('resources/views/v1.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+            $path1 = base_path('resources/views/icon.png');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'portrait')->loadView('reports2.reports-format-declaration', compact('pic', 'pic1'), $data);
+
+            return $pdf->stream();
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
+    }
+
+    public function myFormatDJJson(Request $request)
+    {
+        //seleeciona el mes
+        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+
+        //consulta base de datos
+        $teller = Teller::select()->where('tellId', $request->tellId)->first();
+        $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
+        $period = Period::select()->where('prdsId', $request->prdsId)->first();
+
+        $dataGrouped = array();
+
+
+        for ($i = 0; $i < 10; $i++) {
+            $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
+                return intval($element['_lastDigit']) == intval($i);
+            });
+            $aux2 = array_values($aux1);
+            $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => ''], ['bussName' => '', 'bussFileNumber' => '']]);
+            $temp = array();
+            $temp['name'] = 'RUC ' . $i;
+            $temp['values'] = $temp2;
+            $dataGrouped["digit-" . $i] = $temp;
+        }
+
+
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => [
+                'teller' => $teller,
+                'businesses' => $businesses,
+                'groupeds' => $dataGrouped,
+                'period' => $period,
+                'month' => $nameMonths[$request->month - 1]
+            ]
+
+        ], 200);
     }
 }
