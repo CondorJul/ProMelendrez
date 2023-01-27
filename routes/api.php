@@ -327,7 +327,8 @@ Route::get('/v1/reports/get-billing-balance-by-month', [ReportsController::class
 Route::get('/v1/reports/get-tickets-by-month', [ReportsController::class, 'getTicketsByMonth']);
 Route::get('/v1/reports/get-client-by-state', [ReportsController::class, 'getClientByState']);
 
-Route::get('/v1/reports/get-annual-resume-by-month', [ReportsController::class, 'getAnnualResumeByMonth']);
+Route::get('/v1/reports/annual-summary', [ReportsController::class, 'reportAnnualSummary']);
+Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 
 Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 

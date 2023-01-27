@@ -83,7 +83,7 @@ class AnnualResumeController extends Controller
                     ])->first();
                     if($t){
                         $t->ardTaxBase=isset($value['ardTaxBase'])?$value['ardTaxBase']:null;
-                        $t->ardTax=isset($value['ardTax'])?$value['ardTaxBase']:null;
+                        $t->ardTax=isset($value['ardTax'])?$value['ardTax']:null;
                         $t->ardTotal=isset($value['ardTotal'])?$value['ardTotal']:null;
                         $t->ardPlame=isset($value['ardPlame'])?$value['ardPlame']:null;
                         $t->ardFee=isset($value['ardFee'])?$value['ardFee']:null;

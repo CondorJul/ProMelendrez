@@ -753,7 +753,7 @@ class ReportsController extends Controller
         $businesses=Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState]) ->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
         $period=Period::select()->where('prdsId', $request->prdsId)->first();
 
-        $dataGrouped=Array();
+        $dataGrouped=array();
 
         
         for ($i=0; $i <10 ; $i++) { 
