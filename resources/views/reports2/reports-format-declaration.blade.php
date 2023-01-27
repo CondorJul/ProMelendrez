@@ -3,7 +3,7 @@
 <head>
     <style type="text/css">
         @page {
-            margin: 80px 50px 74px 50px;
+            margin: 95px 50px 74px 50px;
         }
 
         header {
@@ -33,7 +33,7 @@
             width: 15cm;
             height: 15cm;
             z-index: -1000;
-            opacity: 0.3;
+            opacity: 0.2;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -80,7 +80,7 @@
         }
 
         .espacio {
-            height: 30px;
+            height: 20px;
         }
     </style>
 </head>
@@ -100,8 +100,11 @@
         </div>
     </header>
     <footer>
-        <h2 style="text-align: center; font-size: 8px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px; font-weight: lighter;
-        ">{{ $date }}</h2>
+        <h2 style="text-align: left; font-size: 8px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px; font-weight: lighter;
+        ">{{ $date }} <span style="margin-left: 65%; font-size: 9px; font-family: Arial, Helvetica, sans-serif; margin-top: 5px; font-weight: lighter;
+        ">
+                {{ $teller->user->person['perName'] }} </span>
+        </h2>
     </footer>
     <main>
         <div style="font-size: 12px; font-family: 'Arial Narrow'">
@@ -116,31 +119,31 @@
                     @if($loop->index < 5) <table style="width: 100%;" border="1" cellspacing="0">
 
                         <tr>
-                            <th colspan="6" style="font-size: 14px; letter-spacing: 5px; background-color: #ff3b19;">{{$value['name']}}</th>
+                            <th colspan="7" style="font-size: 14px; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$value['name']}}</th>
                         </tr>
 
-                        <tr>
-                            <th>#</th>
+                        <tr style="background-color: rgb(254 240 9);">
+                            <th style="height: 15px;">#</th>
                             <th>EMPRESA</th>
-                            <th>ARCH</th>
-
-                            <th>DECL</th>
-                            <th>LIB.</th>
-                            <th>PLAME</th>
+                            <th>ARC</th>
+                            <th>REG</th>
+                            <th>DCL</th>
+                            <th>LIB</th>
+                            <th>PL</th>
                         </tr>
                         @foreach($value['values'] as $key => $val)
                         <tr>
                             <th style="font-weight: lighter;">{{$loop->index + 1}}</th>
-                            <th style="width: 53%; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
+                            <th style="width: 54%; height: 15px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussFileNumber'] }}</th>
-
-                            <th style="width: 10%; font-weight: lighter;"></th>
-                            <th style="width: 10%; font-weight: lighter;"></th>
-                            <th style="width: 12%; font-weight: lighter;"></th>
+                            <th style="width: 8%; font-weight: lighter;">{{ $val['bussRegime'] }}</th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
                         </tr>
                         @endforeach
                         <tr>
-                            <th colspan="6" class="espacio" style="border-left-style: hidden; border-right-style: hidden; border-bottom-style: hidden;"></th>
+                            <th colspan="7" class="espacio" style="border-left-style: hidden; border-right-style: hidden; border-bottom-style: hidden;"></th>
                         </tr>
 
                         </table>
@@ -154,31 +157,31 @@
                     <table style="width: 100%;" border="1" cellspacing="0">
 
                         <tr>
-                            <th colspan="6" style="font-size: 14px; letter-spacing: 5px; background-color: #ff3b19;">{{$value['name']}}</th>
+                            <th colspan="7" style="font-size: 14px; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$value['name']}}</th>
                         </tr>
 
-                        <tr>
-                            <th>#</th>
+                        <tr style="background-color: rgb(254 240 9);">
+                            <th style="height: 15px;">#</th>
                             <th>EMPRESA</th>
-                            <th>ARCH</th>
-
-                            <th>DECL</th>
-                            <th>LIB.</th>
-                            <th>PLAME</th>
+                            <th>ARC</th>
+                            <th>REG</th>
+                            <th>DCL</th>
+                            <th>LIB</th>
+                            <th>PL</th>
                         </tr>
                         @foreach($value['values'] as $key => $val)
                         <tr>
                             <th style="font-weight: lighter;">{{$loop->index + 1}}</th>
-                            <th style="width: 53%; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
+                            <th style="width: 54%; height: 15px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussFileNumber'] }}</th>
-
-                            <th style="width: 10%; font-weight: lighter;"></th>
-                            <th style="width: 10%; font-weight: lighter;"></th>
-                            <th style="width: 12%; font-weight: lighter;"></th>
+                            <th style="width: 8%; font-weight: lighter;">{{ $val['bussRegime'] }}</th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
                         </tr>
                         @endforeach
                         <tr>
-                            <th colspan="6" class="espacio" style="border-left-style: hidden; border-right-style: hidden; border-bottom-style: hidden;"></th>
+                            <th colspan="7" class="espacio" style="border-left-style: hidden; border-right-style: hidden; border-bottom-style: hidden;"></th>
                         </tr>
 
                     </table>
@@ -186,6 +189,7 @@
                     @endforeach
                 </div>
             </div>
+
         </div>
         <br><br>
     </main>

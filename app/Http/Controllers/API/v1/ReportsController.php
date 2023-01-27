@@ -808,7 +808,7 @@ class ReportsController extends Controller
             $nameMonths = array("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
 
             //consulta base de datos
-            $teller = Teller::select()->where('tellId', $request->tellId)->first();
+            $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
             $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
             $period = Period::select()->where('prdsId', $request->prdsId)->first();
 
@@ -824,7 +824,7 @@ class ReportsController extends Controller
                     return intval($element['_lastDigit']) == intval($i);
                 });
                 $aux2 = array_values($aux1);
-                $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => ''], ['bussName' => '', 'bussFileNumber' => ''], ['bussName' => '', 'bussFileNumber' => '']]);
+                $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => ''], ['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '']]);
                 $temp = array();
                 $temp['name'] = 'RUC ' . $i;
                 $temp['values'] = $temp2;
@@ -868,7 +868,7 @@ class ReportsController extends Controller
         $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
 
         //consulta base de datos
-        $teller = Teller::select()->where('tellId', $request->tellId)->first();
+        $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
         $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
         $period = Period::select()->where('prdsId', $request->prdsId)->first();
 
@@ -880,7 +880,7 @@ class ReportsController extends Controller
                 return intval($element['_lastDigit']) == intval($i);
             });
             $aux2 = array_values($aux1);
-            $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => ''], ['bussName' => '', 'bussFileNumber' => '']]);
+            $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => ''], ['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '']]);
             $temp = array();
             $temp['name'] = 'RUC ' . $i;
             $temp['values'] = $temp2;

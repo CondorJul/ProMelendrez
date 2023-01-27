@@ -12,7 +12,7 @@ class Teller extends Model
     protected $primaryKey = 'tellId';
     protected $table = 'teller';
     protected $fillable = [
-        'tellCode', 
+        'tellCode',
         'tellName',
         'tellMaxInWait',
         'tellState',
@@ -20,9 +20,10 @@ class Teller extends Model
         'userId'
     ];
 
-    public function categories(){
-        
-        return $this->belongsToMany(Category::class,'d_category_teller', 'tellId','catId' );
+    public function categories()
+    {
+
+        return $this->belongsToMany(Category::class, 'd_category_teller', 'tellId', 'catId');
     }
 
     public function businesses()
@@ -32,9 +33,6 @@ class Teller extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id', 'id');
+        return $this->belongsTo(User::class, 'userId', 'id');
     }
-
-
-    
 }
