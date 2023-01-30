@@ -123,7 +123,7 @@
                         </tr>
 
                         <tr style="background-color: rgb(254 240 9);">
-                            <th style="height: 15px;">#</th>
+                            <th style="height: 12px;">#</th>
                             <th>EMPRESA</th>
                             <th>ARC</th>
                             <th>REG</th>
@@ -134,7 +134,7 @@
                         @foreach($value['values'] as $key => $val)
                         <tr>
                             <th style="font-weight: lighter;">{{$loop->index + 1}}</th>
-                            <th style="width: 54%; height: 15px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
+                            <th style="width: 54%; height: 12px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussFileNumber'] }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussRegime'] }}</th>
                             <th style="width: 8%; font-weight: lighter;"></th>
@@ -161,7 +161,7 @@
                         </tr>
 
                         <tr style="background-color: rgb(254 240 9);">
-                            <th style="height: 15px;">#</th>
+                            <th style="height: 12px;">#</th>
                             <th>EMPRESA</th>
                             <th>ARC</th>
                             <th>REG</th>
@@ -172,7 +172,7 @@
                         @foreach($value['values'] as $key => $val)
                         <tr>
                             <th style="font-weight: lighter;">{{$loop->index + 1}}</th>
-                            <th style="width: 54%; height: 15px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
+                            <th style="width: 54%; height: 12px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussFileNumber'] }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussRegime'] }}</th>
                             <th style="width: 8%; font-weight: lighter;"></th>
