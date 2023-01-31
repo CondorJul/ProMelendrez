@@ -183,7 +183,7 @@ class ReportsController extends Controller
             $data1 = file_get_contents($path);
             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-            $path1 = base_path('resources/views/icon.png');
+            $path1 = base_path('resources/views/icon.jpg');
             $type1 = pathinfo($path1, PATHINFO_EXTENSION);
             $data2 = file_get_contents($path1);
             $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
@@ -729,7 +729,7 @@ class ReportsController extends Controller
             $data1 = file_get_contents($path);
             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-            $path1 = base_path('resources/views/icon.png');
+            $path1 = base_path('resources/views/icon.jpg');
             $type1 = pathinfo($path1, PATHINFO_EXTENSION);
             $data2 = file_get_contents($path1);
             $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
@@ -904,7 +904,7 @@ public function reportAnnualSummaryJson(Request $request)
             $data1 = file_get_contents($path);
             $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
 
-            $path1 = base_path('resources/views/icon.png');
+            $path1 = base_path('resources/views/icon.jpg');
             $type1 = pathinfo($path1, PATHINFO_EXTENSION);
             $data2 = file_get_contents($path1);
             $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
