@@ -1903,5 +1903,57 @@ RENAME COLUMN status TO state;
 
 ALTER TABLE annual_resume_details ALTER COLUMN "ardMonth" TYPE integer USING ("ardMonth"::integer);
 
+/*Fuente: https://www.iteramos.com/pregunta/44800/cambiar-el-tipo-de-campo-varchar-a-entero-quotno-se-puede-convertir-automaticamente-al-tipo-enteroquot*/
 
-Fuente: https://www.iteramos.com/pregunta/44800/cambiar-el-tipo-de-campo-varchar-a-entero-quotno-se-puede-convertir-automaticamente-al-tipo-enteroquot
+
+/*Tablas añadidas al 31/02/2023*/
+
+
+create table tasks(
+    "tsksId" serial primary key,
+    "tsksName" varchar(150),
+    "tsksState" varchar(2), /*Habilitado, Deshabilitado*/
+    "tsksKindDecl" int, /*1=Mensual, 2=Anual  */ 
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp
+);
+
+
+
+create table done_by_month (
+    "dbmId" SERIAL PRIMARY KEY,
+    
+    "dbpId" INTEGER,
+    "dbmMonth" integer, /*Mes pude ser del uno al 13*/ 
+
+    "dbmState" int,
+    /**/
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp, 
+
+    FOREIGN KEY ("dbpId") REFERENCES d_bussines_periods("dbpId"), 
+);
+
+create table d_done_by_month_tasks(
+    "ddbmId" serial PRIMARY key, 
+    "tskbmId" integer,  
+    "tsksId" integer,
+     
+    "ddbmShortComment" VARCHAR(100), 
+    
+    "ddbmIsDoneTask" BOOLEAN DEFAULT false, 
+
+
+    "ddbmbDoneBy" BIGINT, 
+    "ddbmbClosedBy" BIGINT, 
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp,
+
+);
