@@ -174,7 +174,7 @@
                             <th style="font-weight: lighter;">{{$loop->index + 1}}</th>
                             <th style="width: 54%; height: 12px; font-weight: lighter; text-align: left;">{{ $substring($val['bussName']) }}</th>
                             <th style="width: 8%; font-weight: lighter;">{{ $val['bussFileNumber'] }}</th>
-                            <th style="width: 8%; font-weight: lighter;">{{ $val['bussRegime'] }}</th>
+                            <th style="width: 8%; font-weight: lighter;"></th>
                             <th style="width: 8%; font-weight: lighter;"></th>
                             <th style="width: 8%; font-weight: lighter;"></th>
                             <th style="width: 8%; font-weight: lighter;"></th>
