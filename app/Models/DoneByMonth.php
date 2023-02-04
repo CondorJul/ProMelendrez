@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class DoneByMonth extends Model
 {
     use HasFactory;
+    public static $snakeAttributes = false;
+
 
     protected $primaryKey = 'dbmId';
     protected $table = 'done_by_month';
@@ -22,4 +24,11 @@ class DoneByMonth extends Model
         "updated_at",
         "created_at"
     ];
+
+    public function dDoneByMonthTasks()
+    {
+        return $this->hasMany(DDoneByMonthTask::class, 'dbmId', 'dbmId')->orderBy('tsksId', 'asc');
+    }
+
+    
 }

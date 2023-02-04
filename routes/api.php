@@ -24,6 +24,7 @@ use App\Http\Controllers\API\v1\HeadquarterController;
 use App\Http\Controllers\API\v1\PeriodController;
 use App\Http\Controllers\API\v1\DBusinessPeriodController;
 use App\Http\Controllers\API\v1\DebtsAndPaidsController;
+use App\Http\Controllers\API\v1\DoneByMonthController;
 use App\Http\Controllers\API\v1\MailController;
 use App\Http\Controllers\API\v1\PaymentController;
 use App\Http\Controllers\API\v1\PaymentMethodController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\API\v1\PeriodPaymentController;
 use App\Http\Controllers\API\v1\ReportsController;
 use App\Http\Controllers\API\v1\ServicesController;
 use App\Http\Controllers\API\v1\ServiceProvidedController;
+use App\Http\Controllers\API\v1\TaskController;
 use Illuminate\Bus\BusServiceProvider;
 use Illuminate\Routing\RouteRegistrar;
 
@@ -197,6 +199,8 @@ Route::delete('v1/videos/stateVideo/{vidId}', [VideosController::class, 'stateVi
 
 /* Cards */
 Route::get('v1/cards', [CardsController::class, 'index']);
+Route::get('v1/cards/all-by', [CardsController::class, 'allBy']);
+
 Route::post('v1/cards/add-cards', [CardsController::class, 'store']);
 Route::put('v1/cards/upd_cards', [CardsController::class, 'update']);
 Route::delete('v1/cards/{cardId}', [CardsController::class, 'destroy']);
@@ -306,6 +310,23 @@ Route::get('/v1/debts-and-paids', [DebtsAndPaidsController::class, 'index'])->mi
 Route::get('/v1/debts-and-paids/last-payment-by-client', [DebtsAndPaidsController::class, 'getLastPaymentByClient'])->middleware(['auth:sanctum']);
 Route::get('/v1/debts-and-paids/old-debt-by-client', [DebtsAndPaidsController::class, 'getOldDebtByClient'])->middleware(['auth:sanctum']);
 
+
+
+
+/*Tareas */
+Route::get('v1/tasks', [TaskController::class, 'index']);
+Route::get('v1/tasks/all-by', [TaskController::class, 'allBy']);
+
+/*
+
+Route::post('v1/tasks/add-Task', [TaskController::class, 'store']);
+Route::put('v1/tasks/upd-Task', [TaskController::class, 'update']);
+Route::delete('v1/tasks/{vidId}', [TaskController::class, 'destroy']);
+Route::delete('v1/tasks/stateVideo/{vidId}', [TaskController::class, 'stateVideo']);
+*/
+
+Route::get('v1/done-by-months/find-by-business', [DoneByMonthController::class, 'findByBusiness']);
+Route::post('v1/done-by-months/add-upd', [DoneByMonthController::class, 'addUpd'])->middleware(['auth:sanctum']);
 
 
 

@@ -17,10 +17,23 @@ class DBusinessPeriod extends Model
     ];
     public function serviceProvided()
     {
-        return $this->hasMany(ServiceProvided::class, 'dbpId', 'dbpId')->orderBy('svId', 'asc')->orderBy('ppayId', 'asc');
+        return $this->hasMany(ServiceProvided::class, 'dbpId', 'dbpId')
+        ->orderBy('ppayId', 'asc')
+        //->orderBy('svId', 'asc');
+        //->orderByDesc(Services::select('svNumberOfOrder')->whereColumn('services.svId', 'services_provided.svId')->first());
+        ->orderByRaw('(select "svNumberOfOrder" from services where services."svId"=services_provided."svId") asc');
     }
     public function periods()
     {
         return $this->belongsTo(Period::class, 'prdsId', 'prdsId');
     }
 }
+
+/*
+$items = UserItems
+        ::where('user_id','=',$this->id)
+        ->where('quantity','>',0)
+        ->join('items', 'items.id', '=', 'user_items.item_id')
+        ->orderBy('items.type')
+        ->select('user_items.*') //see PS:
+        ->get();*/

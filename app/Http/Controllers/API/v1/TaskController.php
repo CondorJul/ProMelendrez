@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -14,15 +15,22 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        return Task::all();
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    public  function allBy(Request $request){
+        $a = Task::where('tsksState', $request->tsksState)
+            ->where('tsksKindDecl', $request->tsksKindDecl)
+            ->get();
+        return response()->json([
+            'res' => true,
+            'msg' => 'Seleccionado Correctamente.',
+            'data' => $a
+        ], 200);
+    }
+
+   
     public function store(Request $request)
     {
         //

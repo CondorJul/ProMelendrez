@@ -1905,20 +1905,32 @@ ALTER TABLE annual_resume_details ALTER COLUMN "ardMonth" TYPE integer USING ("a
 
 /*Fuente: https://www.iteramos.com/pregunta/44800/cambiar-el-tipo-de-campo-varchar-a-entero-quotno-se-puede-convertir-automaticamente-al-tipo-enteroquot*/
 
+/*Tablas creadas para historial de */
+
 
 /*Tablas añadidas al 31/02/2023*/
+
 
 
 create table tasks(
     "tsksId" serial primary key,
     "tsksName" varchar(150),
-    "tsksState" varchar(2), /*Habilitado, Deshabilitado*/
+    "tsksState" int, /*Habilitado, Deshabilitado*/
     "tsksKindDecl" int, /*1=Mensual, 2=Anual  */ 
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
     "created_at" timestamp
 );
+insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl") 
+    VALUES('PDT', 1,1), 
+    ('PLAME', 1,1), 
+    ('LIBRO', 1,1), 
+    ('B.A.', 1,2), 
+    ('SENCICO', 1,2), 
+    ('DAOT', 1,2), 
+    ('ITAN', 1,2), 
+    ('BENEFICIARIO FINAL', 1,2);
 
 
 
@@ -1928,32 +1940,35 @@ create table done_by_month (
     "dbpId" INTEGER,
     "dbmMonth" integer, /*Mes pude ser del uno al 13*/ 
 
-    "dbmState" int,
+    "dbmState" int /*1=Pendiente, 2=cerrado */,
+
+    /**/
     /**/
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
     "created_at" timestamp, 
 
-    FOREIGN KEY ("dbpId") REFERENCES d_bussines_periods("dbpId"), 
+    FOREIGN KEY ("dbpId") REFERENCES d_bussines_periods("dbpId") 
 );
 
 create table d_done_by_month_tasks(
-    "ddbmId" serial PRIMARY key, 
-    "tskbmId" integer,  
+    "ddbmtId" serial PRIMARY key, 
+    "dbmId" integer,  
     "tsksId" integer,
      
-    "ddbmShortComment" VARCHAR(100), 
+    "ddbmtShortComment" VARCHAR(100), 
     
-    "ddbmIsDoneTask" BOOLEAN DEFAULT false, 
+    "ddbmtIsDoneTask" BOOLEAN DEFAULT false, 
+    "ddbmtState" int/*1=Creado por primera vez,  2=pendiente, 3=guardado, 4=Cerrado*/, 
 
-
-    "ddbmbDoneBy" BIGINT, 
-    "ddbmbClosedBy" BIGINT, 
+    "ddbmtDoneBy" BIGINT, 
+    "ddbmtClosedBy" BIGINT, 
 
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
     "created_at" timestamp,
-
+    FOREIGN KEY ("dbmId") REFERENCES done_by_month("dbmId"),
+    FOREIGN KEY ("tsksId") REFERENCES tasks("tsksId")
 );

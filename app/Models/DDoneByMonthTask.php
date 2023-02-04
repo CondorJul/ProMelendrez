@@ -8,24 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 class DDoneByMonthTask extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'ddbmId';
+    protected $primaryKey = 'ddbmtId';
     protected $table = 'd_done_by_month_tasks';
     protected $fillable = [
-        "ddbmId" ,
-        "tskbmId",  
+        "ddbmtId" ,
+        "dbmId",  
         "tsksId",
          
-        "ddbmShortComment", 
+        "ddbmtShortComment", 
+        'ddbmtIsDoneTask',
         
-        "ddbmIsDoneTask", 
+        "ddbmtState",
     
-    
-        "ddbmbDoneBy", 
-        "ddbmbClosedBy" , 
+        "ddbmtDoneBy", 
+        "ddbmtClosedBy" , 
     
         "created_by" ,
         "updated_by" ,
         "updated_at" ,
         "created_at" ,
     ];
+
+    public function task(){
+        return $this->belongsTo(Task::class, 'tsksId', 'tsksId');
+    }  
+
 }
