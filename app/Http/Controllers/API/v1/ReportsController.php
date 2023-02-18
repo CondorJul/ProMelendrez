@@ -167,6 +167,7 @@ class ReportsController extends Controller
                 ->with('serviceProvided.periodPayments')
                 ->where('bussId', $bussId)
                 ->orderBy('periods.prdsNameShort', 'ASC')->get();
+                
             $b = Business::with('person')->where('bussId', $bussId)->first();
             $meses = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
             $fecha = Carbon::parse(date('m/d/y'));

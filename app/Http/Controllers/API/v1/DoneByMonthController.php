@@ -10,6 +10,8 @@ use App\Models\DoneByMonth;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class DoneByMonthController extends Controller
 {
@@ -23,12 +25,37 @@ class DoneByMonthController extends Controller
         
     }
 
+    public function allByDBussPeriod(Request $request){
+        $dbms=DoneByMonth::select()
+        ->with('dDoneByMonthTasks.task')
+        ->where('dbpId', $request->dbpId)
+        ->get();
+
+        $tasks = Task::where('tsksState', 1/*1=Activo*/)
+        //->where('tsksKindDecl', $request->tsksKindDecl)
+        ->get();
+
+        $users=User::select('id', 'perId')->with('person')->get();
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => [
+                'dbms'=>$dbms,
+                'tasks'=>$tasks,
+                'users'=>$users
+
+            ]
+        ], 200);
+    }
+
     public function findByBusiness(Request $request )
     {
         $b=Business::select()
             ->with('person')
             ->where('bussId', $request->bussId)
             ->first();
+
         $dbp=DBusinessPeriod::where('bussId', $request->bussId)
             ->where('prdsId', $request->prdsId)
             ->first();
@@ -39,10 +66,15 @@ class DoneByMonthController extends Controller
             ->where('dbmMonth', $request->dbmMonth)
             ->first();
 
+        /**1=mensual, 2=Anual */
+        $_tsksKindDecl=1;
+        if($request->dbmMonth>=13){
+            $_tsksKindDecl=2;
+        }
         
 
         $task = Task::where('tsksState', 1/*1=Activo*/)
-        ->where('tsksKindDecl', $request->tsksKindDecl)
+        ->where('tsksKindDecl',$_tsksKindDecl)
         ->get();
 
         $users=User::select('id', 'perId')->with('person')->get();
@@ -81,6 +113,8 @@ class DoneByMonthController extends Controller
      */
     public  function addUpd(Request $request)
     {
+        //"Undefined array key "ddbmtCant""
+
         $user= $request->user();
 
         $dbm=DoneByMonth::select()
@@ -90,20 +124,11 @@ class DoneByMonthController extends Controller
         if(!$dbm){
             $dbm = DoneByMonth::create(array_merge($request->all(),['created_by'=>$user->id]));
             foreach ($request->dDoneByMonthTasks as $key => $value) {
-                    $p=[
-                        'dbmId'=>$dbm->dbmId, /*Foreing key */
-                        'tsksId'=>$value['tsksId'], /*Foreign key */
-
-                        'ddbmtShortComment'=>isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null,
-                        'ddbmtIsDoneTask'=>$value['ddbmtIsDoneTask'],
-                        'ddbmtState'=>isset($value['ddbmtState'])?$value['ddbmtState']:null,
-
-                        'ddbmtDoneBy'=>($value['ddbmtIsDoneTask'])? $user->id:null,
-
-                        'ddbmtClosedBy'=>($value['ddbmtState']==4)? $user->id:null,
-                        'created_by'=>$user->id
-                    ];
-                    DDoneByMonthTask::create($p); 
+                
+                $p=$this->prepareArrayToCreate($value, $dbm, $user);
+                DDoneByMonthTask::create($p); 
+                
+            
             }
 
         }else{
@@ -118,35 +143,71 @@ class DoneByMonthController extends Controller
                 
                 if($d){
 
-                    if($d->ddbmtState!=4){ /*4 es cerrado y no se puede modificar */
+                    if($d->ddbmtState!=5 && $value['ddbmtState']==6){ /*6=pendiente de NO HECHO*/
+                        $d->ddbmtState=($value['ddbmtState']==6)?7:$value['ddbmtState'];
+                        
+                        $d->updated_by=$user->id;
+                        $d->save();
+                    }
+                    if($d->ddbmtState!=5 && $value['ddbmtState']==3){ /*5=es cerrado y no se puede modicar, 3=es disponible para monicar*/
 
+                        $d->ddbmtCant=isset($value['ddbmtCant'])?$value['ddbmtCant']:null;
+                        $d->ddbmtAmount=isset($value['ddbmtAmount'])?$value['ddbmtAmount']:null;
+                        $d->ddbmtOptionsByComa=isset($value['ddbmtOptionsByComa'])?($value['ddbmtOptionsByComa']):null;
                         $d->ddbmtShortComment=isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null;
-                        $d->ddbmtState=isset($value['ddbmtState'])?$value['ddbmtState']:null;
 
-                        if($d->ddbmtIsDoneTask<>$value['ddbmtIsDoneTask']){
+                        $d->ddbmtIsDoneTask=$value['ddbmtIsDoneTask'];
+
+                        if($value['ddbmtIsDoneTask']){
                             $d->ddbmtDoneBy=$user->id;
+                            $d->ddbmtDoneAt= DB::raw('now()');
                         }
-                        $d->ddbmtIsDoneTask=isset($value['ddbmtIsDoneTask'])?$value['ddbmtIsDoneTask']:null;
-                        $d->ddbmtClosedBy=($value['ddbmtState']==4)? $user->id:null;
+
+                        
+
+                        $d->ddbmtState=($value['ddbmtState']==3)?5:$value['ddbmtState'];
+
+                        /*$d->ddbmtClosedBy=($value['ddbmtState']==4)? $user->id:null;*/
+                        $d->updated_by=$user->id;
+                        $d->save();
+                    }
+                    if($d->ddbmtState==5 && $value['ddbmtRectified']==1/*1=pendiente para guardar*/){
+                        
+                        $d->ddbmtCant=isset($value['ddbmtCant'])?$value['ddbmtCant']:null;
+                        $d->ddbmtAmount=isset($value['ddbmtAmount'])?$value['ddbmtAmount']:null;
+                        $d->ddbmtOptionsByComa=isset($value['ddbmtOptionsByComa'])?($value['ddbmtOptionsByComa']):null;
+                        $d->ddbmtShortComment=isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null;
+
+                        $d->ddbmtRectifiedBy=$user->id;
+                        $d->ddbmtRectifiedAt = DB::raw('now()');
+
                         $d->updated_by=$user->id;
                         $d->save();
                     } 
 
                 }else{
-                    $p=[
-                        'dbmId'=>$dbm->dbmId, /*Foreing key */
-                        'tsksId'=>$value['tsksId'], /*Foreign key */
-
-                        'ddbmtShortComment'=>isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null,
-                        'ddbmtIsDoneTask'=>$value['ddbmtIsDoneTask'],
-                        'ddbmtState'=>isset($value['ddbmtState'])?$value['ddbmtState']:null,
-
-                        'ddbmtDoneBy'=>($value['ddbmtIsDoneTask'])? $user->id:null,
-
-                        'ddbmtClosedBy'=>($value['ddbmtState']==4)? $user->id:null,
-                        'created_by'=>$user->id
-                    ];
-                    DDoneByMonthTask::create($p); 
+                    if($value['ddbmtState']==6){
+                        $p=[
+                            'dbmId'=>$dbm->dbmId, /*Foreing key */
+                            'tsksId'=>$value['tsksId'], /*Foreign key */
+    
+                            'ddbmtState'=>($value['ddbmtState']==6)?7:$value['ddbmtState'],
+                            /*1=Creado por primera vez,  2=pendiente, 3=pendiente para guardar   4=guardado, 5=Cerrado*/
+    
+                            /*'ddbmtDoneBy'=>($value['ddbmtIsDoneTask'])? $user->id:null,
+                            'ddbmtDoneAt'=>($value['ddbmtIsDoneTask'])? DB::raw('now()'):null,*/
+                            /*'ddbmtRectifiedBy'=>($value['ddbmtRectifiedBy'])?$user->id:null,*/
+    
+                            /*'ddbmtClosedBy'=>($value['ddbmtState']==4)? $user->id:null,*/
+                            'created_by'=>$user->id
+                        ];
+                        DDoneByMonthTask::create($p); 
+    
+                    }else{
+                        $p=$this->prepareArrayToCreate($value, $dbm, $user);
+                        DDoneByMonthTask::create($p); 
+                    }    
+                    
 
                 }
                 
@@ -171,12 +232,57 @@ class DoneByMonthController extends Controller
         ], 200);
     }
 
+    public function  prepareArrayToCreate($value, $dbm, $user){
+        if($value['ddbmtState']==6){
+            $p=[
+                'dbmId'=>$dbm->dbmId, /*Foreing key */
+                'tsksId'=>$value['tsksId'], /*Foreign key */
+
+                'ddbmtState'=>($value['ddbmtState']==6)?7:$value['ddbmtState'],
+                /*1=Creado por primera vez,  2=pendiente, 3=pendiente para guardar   4=guardado, 5=Cerrado*/
+
+                /*'ddbmtDoneBy'=>($value['ddbmtIsDoneTask'])? $user->id:null,
+                'ddbmtDoneAt'=>($value['ddbmtIsDoneTask'])? DB::raw('now()'):null,*/
+                /*'ddbmtRectifiedBy'=>($value['ddbmtRectifiedBy'])?$user->id:null,*/
+
+                /*'ddbmtClosedBy'=>($value['ddbmtState']==4)? $user->id:null,*/
+                'created_by'=>$user->id
+            ];
+            return $p;
+            //DDoneByMonthTask::create($p); 
+
+        }else{
+            $p=[
+                'dbmId'=>$dbm->dbmId, /*Foreing key */
+                'tsksId'=>$value['tsksId'], /*Foreign key */
+
+                'ddbmtCant'=>isset($value['ddbmtCant'])?$value['ddbmtCant']:null,
+                'ddbmtAmount'=>isset($value['ddbmtAmount'])?$value['ddbmtAmount']:null,
+                'ddbmtOptionsByComa'=> isset($value['ddbmtOptionsByComa'])?($value['ddbmtOptionsByComa']):null,
+                'ddbmtShortComment'=>isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null,
+
+
+                'ddbmtIsDoneTask'=>$value['ddbmtIsDoneTask'],
+                'ddbmtState'=>($value['ddbmtState']==3)?5:$value['ddbmtState'],//  isset($value['ddbmtState'])?$value['ddbmtState']:null,
+                /*1=Creado por primera vez,  2=pendiente, 3=pendiente para guardar   4=guardado, 5=Cerrado*/
+
+                'ddbmtDoneBy'=>($value['ddbmtIsDoneTask'])? $user->id:null,
+                'ddbmtDoneAt'=>($value['ddbmtIsDoneTask'])? DB::raw('now()'):null,
+                /*'ddbmtRectifiedBy'=>($value['ddbmtRectifiedBy'])?$user->id:null,*/
+
+                /*'ddbmtClosedBy'=>($value['ddbmtState']==4)? $user->id:null,*/
+                'created_by'=>$user->id
+            ];
+            //DDoneByMonthTask::create($p); 
+            return $p;
+        }    
+    }
+
      public function store(Request $request)
     {
         
     }
 
-//    "SQLSTATE[42703]: Undefined column: 7 ERROR:  no existe la columna «ddbmId»\nLINE 1: ...($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning \"ddbmId\"\n 
 
     /**
      * Display the specified resource.
@@ -211,4 +317,10 @@ class DoneByMonthController extends Controller
     {
         //
     }
+
+    public function issetMAA($v = null){
+        return isset($v)?$v:null;
+    }
+
+   
 }

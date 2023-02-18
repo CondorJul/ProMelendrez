@@ -15,13 +15,24 @@ class DDoneByMonthTask extends Model
         "dbmId",  
         "tsksId",
          
+        "ddbmtCant",
+        "ddbmtAmount",
+        "ddbmtOptionsByComa",
         "ddbmtShortComment", 
+
+
         'ddbmtIsDoneTask',
-        
         "ddbmtState",
     
         "ddbmtDoneBy", 
-        "ddbmtClosedBy" , 
+        "ddbmtRectifiedBy",
+
+        "ddbmtRectified",
+
+        "ddbmtDoneAt", 
+        "ddbmtRectifiedAt",
+        
+        /*ddbmtClosedBy" , */
     
         "created_by" ,
         "updated_by" ,

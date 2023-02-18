@@ -1905,7 +1905,72 @@ ALTER TABLE annual_resume_details ALTER COLUMN "ardMonth" TYPE integer USING ("a
 
 /*Fuente: https://www.iteramos.com/pregunta/44800/cambiar-el-tipo-de-campo-varchar-a-entero-quotno-se-puede-convertir-automaticamente-al-tipo-enteroquot*/
 
-/*Tablas creadas para historial de */
+/*Tablas creadas para historial de bussines*/
+
+ALTER TABLE bussines ADD COLUMN "created_by" BIGINT;
+ALTER TABLE bussines ADD COLUMN "updated_by" BIGINT;
+
+
+
+CREATE TABLE h_business_states(
+    "hbusssId" SERIAL PRIMARY KEY, 
+ 
+    "bussId" INTEGER, 
+    "bussState" VARCHAR(5),
+    /*Activo, suspendido, renicio */
+    "bussStateDate" timestamp,
+    "bussComment" varchar(500),
+
+    "created_by" BIGINT,
+    "updated_by" BIGINT,
+    "updated_at" timestamp,
+    "created_at" timestamp DEFAULT now(), 
+
+    FOREIGN KEY ("bussId") REFERENCES bussines("bussId") 
+
+
+);
+
+CREATE OR REPLACE FUNCTION public.tf_b_u_bussines()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    _bussFileNumber integer;
+    _bussName varchar(300);
+
+
+BEGIN
+
+    /*Verificacion para migrar data a tabla historial de estado de negocio */
+    IF  (NEW."bussState"<>OLD."bussState") or (DATE(NEW."bussStateDate") <>DATE(OLD."bussStateDate")) THEN 
+        /*Agarramos el id de updated_by para crear el siguiente registro*/
+        IF false = (DATE(OLD."bussStateDate") <=DATE(NEW."bussStateDate") && DATE(NEW."bussStateDate")<=DATE(NOW())) THEN
+            /*RAISE EXCEPTION '<msg>La nueva fecha tiene que ser mayor a la fecha actual.<msg>'*/
+        END IF;
+
+        INSERT INTO h_business_states ("bussId", "bussState", "bussStateDate", "bussComment", "created_by" ) values( OLD."bussId", OLD."bussState", OLD."bussStateDate", OLD."bussComment", NEW."updated_by" );
+    END IF;
+
+    /*Fin de vericación*/
+
+  select
+        "bussFileNumber", "bussName" INTO _bussFileNumber, _bussName
+    FROM
+        bussines
+    WHERE
+        "bussId"<> NEW."bussId" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
+
+    if _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
+        RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;
+    END IF;
+
+RETURN NEW;
+END;
+$function$
+
+
+
 
 
 /*Tablas añadidas al 31/02/2023*/
@@ -1917,20 +1982,39 @@ create table tasks(
     "tsksName" varchar(150),
     "tsksState" int, /*Habilitado, Deshabilitado*/
     "tsksKindDecl" int, /*1=Mensual, 2=Anual  */ 
+    
+    "tsksTypeInput" int, /*1=numero, 2=decimal,  3=array de opciones, 4=texto, 20=ninguno*/  
+    "tsksLabelInput" varchar(50), /**/ 
+    
+    "tsksOptionsValue" text,/*Es cuando el type de entrada es 3*/
+    "tsksOptionsSplit" varchar(50),/*Selecciona como separador*/ 
+
+    /*Enlazado a total de annual_resume*/
+    "tsksLinkedAnnualResumeDetails" int default 20, /* 1=total, 2=plame, 20=ninguno*/
+    
+
+    /*Envi*/
+    "tsksRectify" int default 2, /*1=si, 2=no*/
+    "tsksElseAlternative" int, /*1='No tiene', 2='No envia'*/ 
+
     "created_by" BIGINT,
     "updated_by" BIGINT,
     "updated_at" timestamp,
     "created_at" timestamp
 );
-insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl") 
-    VALUES('PDT', 1,1), 
-    ('PLAME', 1,1), 
-    ('LIBRO', 1,1), 
-    ('B.A.', 1,2), 
-    ('SENCICO', 1,2), 
-    ('DAOT', 1,2), 
-    ('ITAN', 1,2), 
-    ('BENEFICIARIO FINAL', 1,2);
+
+insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl", "tsksTypeInput", "tsksLabelInput","tsksLinkedAnnualResumeDetails", "tsksRectify", "tsksElseAlternative"  ) 
+    VALUES('PDT', 1,1, 2, 'Total (S/)',1, 1, NULL), 
+    ('PLAME', 1,1,1, 'Planilla',2, 1, 1), 
+    ('B.A.', 1,2, 2, 'Total (S/)',1, 2, NULL ), 
+    ('SENCICO', 1,2,4, 'Comentario',20, 2, NULL), 
+    ('DAOT', 1,2, 4, 'Comentario',20, 2, NULL), 
+    ('ITAN', 1,2, 4, 'Comentario',20, 2, NULL), 
+    ('BENEFICIARIO FINAL', 1,2, 4, 'Comentario',20, 2, NULL);
+
+insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl", "tsksTypeInput", "tsksLabelInput","tsksLinkedAnnualResumeDetails", "tsksOptionsSplit" ,"tsksOptionsValue", "tsksRectify", "tsksElseAlternative"   ) 
+        values('LIBRO', 1,1,/*Array de Opciones*/3, '',20,';','Ventas;Compras;Diario Simplificado;Libro Mayor',2, 2  ); 
+
 
 
 
@@ -1957,13 +2041,24 @@ create table d_done_by_month_tasks(
     "dbmId" integer,  
     "tsksId" integer,
      
-    "ddbmtShortComment" VARCHAR(100), 
-    
+    "ddbmtCant" integer, /*1=si es una cantidad*/ 
+    "ddbmtAmount" DECIMAL(12,2), /*2=Si desea agregar un monto */
+    "ddbmtOptionsByComa" VARCHAR(100), /*3=Agregar opciones por coma*/
+    "ddbmtShortComment" VARCHAR(100), /*4=Si agregar un comentario*/
+
+
     "ddbmtIsDoneTask" BOOLEAN DEFAULT false, 
-    "ddbmtState" int/*1=Creado por primera vez,  2=pendiente, 3=guardado, 4=Cerrado*/, 
+    "ddbmtState" int/*1=Creado por primera vez,  2=pendiente, 3=pendiente para guardar   4=guardado, 5=Cerrado, 6=No realizado*/, 
 
     "ddbmtDoneBy" BIGINT, 
-    "ddbmtClosedBy" BIGINT, 
+    "ddbmtRectifiedBy" BIGINT,
+
+    "ddbmtRectified" int, /*1=pendiente para guardar, 2=rectificado*/
+    
+
+    "ddbmtDoneAt" TIMESTAMP, 
+    "ddbmtRectifiedAt" TIMESTAMP,
+    /*"ddbmtClosedBy" BIGINT, */
 
     "created_by" BIGINT,
     "updated_by" BIGINT,
@@ -1972,3 +2067,198 @@ create table d_done_by_month_tasks(
     FOREIGN KEY ("dbmId") REFERENCES done_by_month("dbmId"),
     FOREIGN KEY ("tsksId") REFERENCES tasks("tsksId")
 );
+
+
+
+
+CREATE OR REPLACE FUNCTION fu_create_annual_resume(_bussId integer, _prdsId integer) RETURNS integer AS
+$body$
+DECLARE
+    _arId integer;
+BEGIN
+
+    INSERT INTO annual_resume("bussId", "prdsId") VALUES(_bussId, _prdsId) RETURNING "arId" INTO _arId;
+    INSERT INTO annual_resume_details ("arId", "ardMonth") 
+                values(_arId, 1 ),(_arId, 2 ), (_arId, 3 ),
+                (_arId, 4 ),(_arId, 5 ), (_arId, 6 ),
+                (_arId, 7 ),(_arId, 8 ), (_arId, 9 ),
+                (_arId, 10 ),(_arId, 11 ), (_arId, 12 ),
+                (_arId, 13 );
+
+RETURN _arId;
+END;
+$body$
+LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER;
+
+
+
+CREATE OR REPLACE FUNCTION public.tf_a_i_d_done_by_month_tasks ()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    _tsksTypeInput int; 
+    _tsksLinkedAnnualResumeDetails int;
+
+    _prdsId integer;
+    _dbmMonth integer;
+    _bussId integer;
+    _sumTotalAmount decimal(12,2);
+    _sumTotalCant integer;
+    _arId integer;
+
+BEGIN
+
+/*SELECT periods."prdsId", done_by_month."dbmMonth" FROM done_by_month inner join 
+d_bussines_periods on done_by_month."dbpId"=d_bussines_periods."dbpId" INNER JOIN
+periods on  d_bussines_periods."prdsId"=periods."prdsId"  WHERE "dbmId"=1;*/
+
+    select "tsksTypeInput", "tsksLinkedAnnualResumeDetails" into _tsksTypeInput, _tsksLinkedAnnualResumeDetails from tasks where "tsksId"=new."tsksId";
+    /*1=numero, 2=decimal,  3=array de opciones, 4=texto, 20=ninguno*/
+    /*guarda en ddbmtshortcomment dependiendo al tipo de entrada*/
+    IF _tsksTypeInput=1 THEN
+        new."ddbmtShortComment":=new."ddbmtCant";
+    END IF;
+    IF _tsksTypeInput=2 THEN
+        new."ddbmtShortComment":=new."ddbmtAmount";
+    END IF;
+    IF _tsksTypeInput=3 THEN
+        new."ddbmtShortComment":=new."ddbmtOptionsByComa";
+    END IF;
+
+    /*actualiza en annual_resume_details*/
+    /* 1=total, 2=plame, 20=ninguno*/
+
+    IF _tsksLinkedAnnualResumeDetails is not null THEN 
+        SELECT periods."prdsId", done_by_month."dbmMonth", d_bussines_periods."bussId"
+        into _prdsId, _dbmMonth, _bussId  FROM done_by_month inner join 
+            d_bussines_periods on done_by_month."dbpId"=d_bussines_periods."dbpId" INNER JOIN
+            periods on  d_bussines_periods."prdsId"=periods."prdsId"  WHERE "dbmId"=new."dbmId";
+
+        select "arId" into _arId from annual_resume where "bussId"=_bussId and "prdsId"=_prdsId;
+
+        IF _arId is null THEN
+            select  fu_create_annual_resume(_bussId , _prdsId ) into _arId;
+        END IF;
+        /*select "arId" from annual_resume where "bussId"=9 and "prdsId"=5;*/
+        /*select * from annual_resume_details where "arId" = 10 and "ardMonth"=10
+        
+         element.ardTaxBase=(element.ardTotal/1.18)
+      element.ardTax=(element.ardTaxBase*0.18)
+        
+        */
+        IF _tsksLinkedAnnualResumeDetails=1 THEN 
+            select sum(COALESCE("ddbmtAmount", 0)) as "sumTotalAmount" into _sumTotalAmount from d_done_by_month_tasks 
+                inner join tasks on d_done_by_month_tasks."tsksId"=tasks."tsksId"
+                where d_done_by_month_tasks."dbmId"=new."dbmId"  
+                and tasks."tsksLinkedAnnualResumeDetails"=1/*total*/;
+            update annual_resume_details set  "ardTaxBase" = (_sumTotalAmount/1.18) , "ardTax"=((_sumTotalAmount/1.18)*0.18) , "ardTotal"=_sumTotalAmount where "arId"=_arId and "ardMonth"=_dbmMonth; 
+
+        END IF;
+        IF _tsksLinkedAnnualResumeDetails=2 THEN 
+            select sum(COALESCE("ddbmtCant", 0)) as "sumTotalCant" into _sumTotalCant from d_done_by_month_tasks 
+                inner join tasks on d_done_by_month_tasks."tsksId"=tasks."tsksId"
+                where d_done_by_month_tasks."dbmId"=new."dbmId"  
+                and tasks."tsksLinkedAnnualResumeDetails"=2/*plame*/;
+            update annual_resume_details set  "ardPlame" = _sumTotalCant where "arId"=_arId and "ardMonth"=_dbmMonth; 
+
+        END IF;
+
+    END IF;
+
+RETURN NEW;
+END;
+$function$
+/*
+drop TRIGGER t_b_i_category on category;
+drop FUNCTION tf_b_i_category;*/
+CREATE TRIGGER t_a_i_d_done_by_month_tasks AFTER
+INSERT
+    ON d_done_by_month_tasks FOR EACH
+    ROW EXECUTE PROCEDURE tf_a_i_d_done_by_month_tasks();
+
+
+CREATE OR REPLACE FUNCTION public.tf_a_u_d_done_by_month_tasks ()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    _tsksTypeInput int; 
+    _tsksLinkedAnnualResumeDetails int;
+
+    _prdsId integer;
+    _dbmMonth integer;
+    _bussId integer;
+    _sumTotalAmount decimal(12,2);
+    _sumTotalCant integer;
+    _arId integer;
+
+BEGIN
+
+/*SELECT periods."prdsId", done_by_month."dbmMonth" FROM done_by_month inner join 
+d_bussines_periods on done_by_month."dbpId"=d_bussines_periods."dbpId" INNER JOIN
+periods on  d_bussines_periods."prdsId"=periods."prdsId"  WHERE "dbmId"=1;*/
+
+    select "tsksTypeInput", "tsksLinkedAnnualResumeDetails" into _tsksTypeInput, _tsksLinkedAnnualResumeDetails from tasks where "tsksId"=new."tsksId";
+    /*1=numero, 2=decimal,  3=array de opciones, 4=texto, 20=ninguno*/
+    /*guarda en ddbmtshortcomment dependiendo al tipo de entrada*/
+    IF _tsksTypeInput=1 THEN
+        new."ddbmtShortComment":=new."ddbmtCant";
+    END IF;
+    IF _tsksTypeInput=2 THEN
+        new."ddbmtShortComment":=new."ddbmtAmount";
+    END IF;
+    IF _tsksTypeInput=3 THEN
+        new."ddbmtShortComment":=new."ddbmtOptionsByComa";
+    END IF;
+
+    /*actualiza en annual_resume_details*/
+    /* 1=total, 2=plame, 20=ninguno*/
+
+    IF _tsksLinkedAnnualResumeDetails is not null THEN 
+        SELECT periods."prdsId", done_by_month."dbmMonth", d_bussines_periods."bussId"
+        into _prdsId, _dbmMonth, _bussId  FROM done_by_month inner join 
+            d_bussines_periods on done_by_month."dbpId"=d_bussines_periods."dbpId" INNER JOIN
+            periods on  d_bussines_periods."prdsId"=periods."prdsId"  WHERE "dbmId"=new."dbmId";
+
+        select "arId" into _arId from annual_resume where "bussId"=_bussId and "prdsId"=_prdsId;
+
+        IF _arId is null THEN
+            select  fu_create_annual_resume(_bussId , _prdsId ) into _arId;
+        END IF;
+        /*select "arId" from annual_resume where "bussId"=9 and "prdsId"=5;*/
+        /*select * from annual_resume_details where "arId" = 10 and "ardMonth"=10
+        
+         element.ardTaxBase=(element.ardTotal/1.18)
+      element.ardTax=(element.ardTaxBase*0.18)
+        
+        */
+        IF _tsksLinkedAnnualResumeDetails=1 THEN 
+            select sum(COALESCE("ddbmtAmount", 0)) as "sumTotalAmount" into _sumTotalAmount from d_done_by_month_tasks 
+                inner join tasks on d_done_by_month_tasks."tsksId"=tasks."tsksId"
+                where d_done_by_month_tasks."dbmId"=new."dbmId"  
+                and tasks."tsksLinkedAnnualResumeDetails"=1/*total*/;
+            update annual_resume_details set  "ardTaxBase" = (_sumTotalAmount/1.18) , "ardTax"=((_sumTotalAmount/1.18)*0.18) , "ardTotal"=_sumTotalAmount where "arId"=_arId and "ardMonth"=_dbmMonth; 
+
+        END IF;
+        IF _tsksLinkedAnnualResumeDetails=2 THEN 
+            select sum(COALESCE("ddbmtCant", 0)) as "sumTotalCant" into _sumTotalCant from d_done_by_month_tasks 
+                inner join tasks on d_done_by_month_tasks."tsksId"=tasks."tsksId"
+                where d_done_by_month_tasks."dbmId"=new."dbmId"  
+                and tasks."tsksLinkedAnnualResumeDetails"=2/*plame*/;
+            update annual_resume_details set  "ardPlame" = _sumTotalCant where "arId"=_arId and "ardMonth"=_dbmMonth; 
+
+        END IF;
+
+    END IF;
+
+RETURN NEW;
+END;
+$function$
+/*
+drop TRIGGER t_b_i_category on category;
+drop FUNCTION tf_b_i_category;*/
+CREATE TRIGGER t_a_u_d_done_by_month_tasks AFTER
+UPDATE
+    ON d_done_by_month_tasks FOR EACH
+    ROW EXECUTE PROCEDURE tf_a_u_d_done_by_month_tasks();
