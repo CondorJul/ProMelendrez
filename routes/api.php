@@ -327,7 +327,7 @@ Route::delete('v1/tasks/stateVideo/{vidId}', [TaskController::class, 'stateVideo
 
 Route::get('v1/done-by-months/find-by-business', [DoneByMonthController::class, 'findByBusiness']);
 Route::post('v1/done-by-months/add-upd', [DoneByMonthController::class, 'addUpd'])->middleware(['auth:sanctum']);
-Route::get('v1/done-by-months/all-by-d-buss-period', [DoneByMonthController::class, 'allByDBussPeriod']);//->middleware(['auth:sanctum']);
+Route::get('v1/done-by-months/all-by-d-buss-period', [DoneByMonthController::class, 'allByDBussPeriod']); //->middleware(['auth:sanctum']);
 
 
 
@@ -356,7 +356,7 @@ Route::get('/v1/reports/get-annual-resume-by-month', [ReportsController::class, 
 
 Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 
-Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
+//Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 
 
 Route::get('/v1/reports/tasks-completed-json', [ReportsController::class, 'tasksCompletedJSON']);

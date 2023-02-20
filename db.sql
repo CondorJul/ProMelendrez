@@ -2016,7 +2016,7 @@ create table tasks(
 insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl", "tsksTypeInput", "tsksLabelInput","tsksLinkedAnnualResumeDetails", "tsksRectify", "tsksElseAlternative" , "tsksLabelSpan" ) 
     VALUES('PDT-621', 1,1, 2, 'Total (S/)',1, 1, NULL,'Total Ingr. (S/) :'), 
     ('PLAME-601', 1,1,1, 'Planilla',2, 1, 1, 'N° Trabajadores : '), 
-    ('BALANCE ANUAL', 1,2, 2, 'Total (S/)',1, 2, NULL,NULL), 
+    ('BALANCE ANUAL', 1,2, 2, 'Total (S/)',1, 1, NULL,'Ingreso Anual (S/) : '), 
     ('SENCICO', 1,2,4, 'Comentario',20, 2, NULL,NULL), 
     ('DAOT', 1,2, 4, 'Comentario',20, 2, NULL,NULL), 
     ('ITAN', 1,2, 4, 'Comentario',20, 2, NULL,NULL), 
@@ -2272,3 +2272,27 @@ CREATE TRIGGER t_a_u_d_done_by_month_tasks AFTER
 UPDATE
     ON d_done_by_month_tasks FOR EACH
     ROW EXECUTE PROCEDURE tf_a_u_d_done_by_month_tasks();
+
+
+    /*Para anular boleta */
+
+
+CREATE OR REPLACE FUNCTION fu_unlink_payment_from_services(_payId integer) RETURNS boolean AS
+$body$
+DECLARE
+    _bussId integer;
+    _payIsCanceled integer;
+    _state boolean;
+BEGIN
+    _state:=false;
+    select "bussId",  "payIsCanceled" into _bussId, _payIsCanceled from payments WHERE "payId"=_payId;
+    IF _payIsCanceled =1/*1=cancelado o anulado, 2=no cancelado*/ THEN
+        update payment_details set "spId" =NULL where  "payId"=_payId and "pdsIsCanceled"=1/*Es cancelado*/;
+        update payments set "bussId"=null  WHERE "payId"=_payId and "payIsCanceled"=1/*Es cancelado*/;
+        _state=true;
+    END IF; 
+RETURN _state;
+END;
+$body$
+LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER;
+

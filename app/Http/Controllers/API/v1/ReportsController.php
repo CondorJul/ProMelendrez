@@ -167,7 +167,7 @@ class ReportsController extends Controller
                 ->with('serviceProvided.periodPayments')
                 ->where('bussId', $bussId)
                 ->orderBy('periods.prdsNameShort', 'ASC')->get();
-                
+
             $b = Business::with('person')->where('bussId', $bussId)->first();
             $meses = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
             $fecha = Carbon::parse(date('m/d/y'));
@@ -337,7 +337,7 @@ class ReportsController extends Controller
             array_push($params, $request->dateEnd);
         }
 
-        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" where 1=1 ' . $queryWhere . ' GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"', $params);
+        $array = DB::select('SELECT p."tellId", (SELECT t."tellName" FROM teller t WHERE t."tellId"=p."tellId"), d."paymthdsId", m."paymthdsName", SUM(d."dppmAmount") AS total FROM payments p INNER JOIN d_payments_payment_methods d ON d."payId"=p."payId" INNER JOIN payment_methods m ON m."paymthdsId"=d."paymthdsId" where "payIsCanceled"=2  ' . $queryWhere . ' GROUP BY p."tellId", d."paymthdsId", m."paymthdsName" ORDER BY p."tellId", d."paymthdsId"', $params);
         $array2 = Teller::select()->orderBy('tellId', 'ASC')->get();
 
         $array3 = array();
@@ -746,61 +746,47 @@ class ReportsController extends Controller
 
 
 
-/*
-    
+    /*
     public function myFormatDJJson(Request $request)
     {
         //seleeciona el mes
         $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
-        
+
         //consulta base de datos
-        $teller=Teller:: select()->where('tellId', $request->tellId)->get(); 
+        $teller=Teller:: select()->where('tellId', $request->tellId)->get();
         $businesses=Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState]) ->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
         $period=Period::select()->where('prdsId', $request->prdsId)->first();
 
         $dataGrouped=array();
 
-        
-        for ($i=0; $i <10 ; $i++) { 
+
+        for ($i=0; $i <10 ; $i++) {
             $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
-                return intval($element['_lastDigit']) == intval($i); 
+                return intval($element['_lastDigit']) == intval($i);
             });
             $dataGrouped["digit-".$i]=array_values($aux1);
         }
-        
-        
+
+
 
         return response()->json([
             'res' => true,
             'msg' => 'Listado correctamente',
             'data'=>[
-                'teller' => $teller, 
+                'teller' => $teller,
                 'businesses' => $businesses,
-                'groupeds'=>$dataGrouped, 
+                'groupeds'=>$dataGrouped,
                 'period'=>$period,
                 'month'=>$nameMonths[$request->month-1]
             ]
 
         ], 200);
     }*/
-    
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-public function reportAnnualSummaryJson(Request $request)
+    public function reportAnnualSummaryJson(Request $request)
     {
         try {
             $b = Business::with('person')->where('bussId', $request->bussId)->first();
@@ -1024,5 +1010,42 @@ public function reportAnnualSummaryJson(Request $request)
         ], 200);
 
         */
+
+    }
+
+
+
+    public function reportTasks(Request $request)
+    {
+        try {
+            $b = Business::with('person')->where('bussId', $request->bussId)->first();
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Total", "Balance Anual");
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $nameMonths[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
+
+            $data = [
+                'business' => $b,
+                'date' => $f
+            ];
+
+            $path = base_path('resources/views/v1.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+            $path1 = base_path('resources/views/icon.jpg');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'landscape')->loadView('reports2.reports-tasks', compact('pic', 'pic1'), $data);
+
+            return $pdf->stream();
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
     }
 }

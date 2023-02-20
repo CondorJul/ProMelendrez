@@ -27,6 +27,7 @@ Route::get('/v1/reports/{prdsId}/exercise-monitoring/{bussId}', [ReportsControll
 Route::get('/v1/reports/all-periods/{bussId}', [ReportsController::class, 'reportAllPeriods'])->middleware(['cors']);
 Route::get('/v1/reports/annual-summary', [ReportsController::class, 'reportAnnualSummary'])->middleware(['cors']);
 Route::get('/v1/reports/my-format-declaration', [ReportsController::class, 'reportFormatDeclaration'])->middleware(['cors']);
+Route::get('/v1/reports/tasks', [ReportsController::class, 'reportTasks'])->middleware(['cors']);
 
 Route::get('/mail/test', function () {
     //return redirect()->intended('http:');
