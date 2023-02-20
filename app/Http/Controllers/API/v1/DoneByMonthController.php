@@ -146,6 +146,9 @@ class DoneByMonthController extends Controller
                     if($d->ddbmtState!=5 && $value['ddbmtState']==6){ /*6=pendiente de NO HECHO*/
                         $d->ddbmtState=($value['ddbmtState']==6)?7:$value['ddbmtState'];
                         
+                        $d->ddbmtDoneBy=$user->id;
+                        $d->ddbmtDoneAt= DB::raw('now()');
+                        
                         $d->updated_by=$user->id;
                         $d->save();
                     }

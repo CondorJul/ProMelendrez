@@ -1905,21 +1905,24 @@ ALTER TABLE annual_resume_details ALTER COLUMN "ardMonth" TYPE integer USING ("a
 
 /*Fuente: https://www.iteramos.com/pregunta/44800/cambiar-el-tipo-de-campo-varchar-a-entero-quotno-se-puede-convertir-automaticamente-al-tipo-enteroquot*/
 
-/*Tablas creadas para historial de bussines*/
+/*Tablas creadas para historial de bussinesm   */
 
 ALTER TABLE bussines ADD COLUMN "created_by" BIGINT;
 ALTER TABLE bussines ADD COLUMN "updated_by" BIGINT;
 
 
 
-CREATE TABLE h_business_states(
-    "hbusssId" SERIAL PRIMARY KEY, 
+CREATE TABLE business_states(
+    "busssId" SERIAL PRIMARY KEY, 
  
     "bussId" INTEGER, 
     "bussState" VARCHAR(5),
     /*Activo, suspendido, renicio */
     "bussStateDate" timestamp,
+
     "bussComment" varchar(500),
+
+    "busssState" int, /*1=Activo , 2=Desactivo, 3=ELiminado*/
 
     "created_by" BIGINT,
     "updated_by" BIGINT,
@@ -1927,9 +1930,9 @@ CREATE TABLE h_business_states(
     "created_at" timestamp DEFAULT now(), 
 
     FOREIGN KEY ("bussId") REFERENCES bussines("bussId") 
-
-
 );
+
+
 
 CREATE OR REPLACE FUNCTION public.tf_b_u_bussines()
  RETURNS trigger
@@ -1939,20 +1942,24 @@ DECLARE
     _bussFileNumber integer;
     _bussName varchar(300);
 
-
 BEGIN
 
-    /*Verificacion para migrar data a tabla historial de estado de negocio */
+  
     IF  (NEW."bussState"<>OLD."bussState") or (DATE(NEW."bussStateDate") <>DATE(OLD."bussStateDate")) THEN 
+      
+      
         /*Agarramos el id de updated_by para crear el siguiente registro*/
-        IF false = (DATE(OLD."bussStateDate") <=DATE(NEW."bussStateDate") && DATE(NEW."bussStateDate")<=DATE(NOW())) THEN
-            /*RAISE EXCEPTION '<msg>La nueva fecha tiene que ser mayor a la fecha actual.<msg>'*/
-        END IF;
+       --IF false = (DATE(OLD."bussStateDate") <=DATE(NEW."bussStateDate") && DATE(NEW."bussStateDate")<=DATE(NOW())) THEN
+        
+            --RAISE EXCEPTION '<msg>La nueva fecha tiene que ser mayor a la fecha actual.<msg>';
+        --END IF;
 
-        INSERT INTO h_business_states ("bussId", "bussState", "bussStateDate", "bussComment", "created_by" ) values( OLD."bussId", OLD."bussState", OLD."bussStateDate", OLD."bussComment", NEW."updated_by" );
+        INSERT INTO business_states ("bussId", "bussState", "bussStateDate", "bussComment", "created_by" ) 
+        values( OLD."bussId", OLD."bussState", OLD."bussStateDate", OLD."bussComment", NEW."updated_by" );
+    
     END IF;
 
-    /*Fin de vericación*/
+
 
   select
         "bussFileNumber", "bussName" INTO _bussFileNumber, _bussName
@@ -1961,7 +1968,7 @@ BEGIN
     WHERE
         "bussId"<> NEW."bussId" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
 
-    if _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
+    IF _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
         RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;
     END IF;
 
@@ -1973,9 +1980,11 @@ $function$
 
 
 
+
+
+
+
 /*Tablas añadidas al 31/02/2023*/
-
-
 
 create table tasks(
     "tsksId" serial primary key,
@@ -1985,6 +1994,7 @@ create table tasks(
     
     "tsksTypeInput" int, /*1=numero, 2=decimal,  3=array de opciones, 4=texto, 20=ninguno*/  
     "tsksLabelInput" varchar(50), /**/ 
+    "tsksLabelSpan" varchar(50), 
     
     "tsksOptionsValue" text,/*Es cuando el type de entrada es 3*/
     "tsksOptionsSplit" varchar(50),/*Selecciona como separador*/ 
@@ -2003,17 +2013,17 @@ create table tasks(
     "created_at" timestamp
 );
 
-insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl", "tsksTypeInput", "tsksLabelInput","tsksLinkedAnnualResumeDetails", "tsksRectify", "tsksElseAlternative"  ) 
-    VALUES('PDT', 1,1, 2, 'Total (S/)',1, 1, NULL), 
-    ('PLAME', 1,1,1, 'Planilla',2, 1, 1), 
-    ('B.A.', 1,2, 2, 'Total (S/)',1, 2, NULL ), 
-    ('SENCICO', 1,2,4, 'Comentario',20, 2, NULL), 
-    ('DAOT', 1,2, 4, 'Comentario',20, 2, NULL), 
-    ('ITAN', 1,2, 4, 'Comentario',20, 2, NULL), 
-    ('BENEFICIARIO FINAL', 1,2, 4, 'Comentario',20, 2, NULL);
+insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl", "tsksTypeInput", "tsksLabelInput","tsksLinkedAnnualResumeDetails", "tsksRectify", "tsksElseAlternative" , "tsksLabelSpan" ) 
+    VALUES('PDT-621', 1,1, 2, 'Total (S/)',1, 1, NULL,'Total Ingr. (S/) :'), 
+    ('PLAME-601', 1,1,1, 'Planilla',2, 1, 1, 'N° Trabajadores : '), 
+    ('BALANCE ANUAL', 1,2, 2, 'Total (S/)',1, 2, NULL,NULL), 
+    ('SENCICO', 1,2,4, 'Comentario',20, 2, NULL,NULL), 
+    ('DAOT', 1,2, 4, 'Comentario',20, 2, NULL,NULL), 
+    ('ITAN', 1,2, 4, 'Comentario',20, 2, NULL,NULL), 
+    ('BENEFICIARIO FINAL', 1,2, 4, 'Comentario',20, 2, NULL,NULL);
 
 insert into tasks( "tsksName", "tsksState" ,  "tsksKindDecl", "tsksTypeInput", "tsksLabelInput","tsksLinkedAnnualResumeDetails", "tsksOptionsSplit" ,"tsksOptionsValue", "tsksRectify", "tsksElseAlternative"   ) 
-        values('LIBRO', 1,1,/*Array de Opciones*/3, '',20,';','Ventas;Compras;Diario Simplificado;Libro Mayor',2, 2  ); 
+        values('LIBRO', 1,1,/*Array de Opciones*/3, '',20,';','Registro de Ventas;Registro Compras;Diario Simplificado;Libro Mayor;Libro Diario',2, 2  ); 
 
 
 

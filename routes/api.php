@@ -359,6 +359,7 @@ Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myForma
 Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 
 
+Route::get('/v1/reports/tasks-completed-json', [ReportsController::class, 'tasksCompletedJSON']);
 
 
 

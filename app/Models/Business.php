@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Business extends Model
 {
     use HasFactory;
+    public static $snakeAttributes = false;
+
     protected $primaryKey = 'bussId';
     protected $table = 'bussines';
     protected $fillable = [
@@ -55,4 +57,16 @@ class Business extends Model
     {
         return $this->belongsToMany(Period::class, 'd_bussines_periods', 'bussId', 'prdsId')->withPivot(['dbpState', 'dbpId', 'dbpDebt', 'dbpPaid', 'dbpCost'])->as('dbp')->orderBy('prdsNameShort', 'desc');
     }
+
+
+    public function dBussinesPeriods()
+    {
+        return $this->hasMany(DBusinessPeriod::class, 'bussId', 'bussId');
+        //->orderBy('ppayId', 'asc')
+        //->orderBy('svId', 'asc');
+        //->orderByDesc(Services::select('svNumberOfOrder')->whereColumn('services.svId', 'services_provided.svId')->first());
+        //->orderByRaw('(select "svNumberOfOrder" from services where services."svId"=services_provided."svId") asc');
+    }
+
+    
 }

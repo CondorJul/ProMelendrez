@@ -959,4 +959,70 @@ public function reportAnnualSummaryJson(Request $request)
 
         ], 200);
     }
+
+
+    public function tasksCompletedJSON(Request $request)
+    {
+
+        
+        $businesses=Business::select()
+            ->with('dBussinesPeriods.doneByMonth.dDoneByMonthTasks.task')
+        /*    ->whereHas('services.serviceType 
+            's', function ($query) use ($id) {
+                return $query->where('id', $id);
+            })*/
+            ->get();
+
+        return response()->json([
+            'data'=>$businesses 
+        ]);
+
+        /*
+        $place = Place::with('services.serviceTypes')
+            ->whereIn('id', $ids)
+            ->whereHas('services.serviceTypes', function ($query) use ($id) {
+                return $query->where('id', $id);
+            })
+            ->get();*/
+
+
+
+        /*        $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+
+        $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
+        $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
+        $period = Period::select()->where('prdsId', $request->prdsId)->first();
+
+        $dataGrouped = array();
+
+
+        for ($i = 0; $i < 10; $i++) {
+            $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
+                return intval($element['_lastDigit']) == intval($i);
+            });
+            $aux2 = array_values($aux1);
+            $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => ''], ['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '']]);
+            $temp = array();
+            $temp['name'] = 'RUC ' . $i;
+            $temp['values'] = $temp2;
+            $dataGrouped["digit-" . $i] = $temp;
+        }
+
+
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Listado correctamente',
+            'data' => [
+                'teller' => $teller,
+                'businesses' => $businesses,
+                'groupeds' => $dataGrouped,
+                'period' => $period,
+                'month' => $nameMonths[$request->month - 1]
+            ]
+
+        ], 200);
+
+        */
+    }
 }

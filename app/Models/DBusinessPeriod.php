@@ -27,6 +27,17 @@ class DBusinessPeriod extends Model
     {
         return $this->belongsTo(Period::class, 'prdsId', 'prdsId');
     }
+
+    public function doneByMonth()
+    {
+        return $this->hasMany(DoneByMonth::class, 'dbpId', 'dbpId')
+            ->orderBy('dbmMonth', 'asc')
+        ;
+        //->orderBy('ppayId', 'asc')
+        //->orderBy('svId', 'asc');
+        //->orderByDesc(Services::select('svNumberOfOrder')->whereColumn('services.svId', 'services_provided.svId')->first());
+        //->orderByRaw('(select "svNumberOfOrder" from services where services."svId"=services_provided."svId") asc');
+    }
 }
 
 /*
