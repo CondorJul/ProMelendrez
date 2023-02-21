@@ -190,7 +190,7 @@ SELECT distinct on (d_bussines_periods."bussId")
 from services_provided 
 INNER JOIN d_bussines_periods on services_provided."dbpId"=d_bussines_periods."dbpId"
 INNER JOIN periods ON d_bussines_periods."prdsId"=periods."prdsId"
-where services_provided."svId"=1 and services_provided."spDebt"<>0 
+where /*services_provided."svId"=1 and*/ services_provided."spDebt"<>0 
 ORDER BY d_bussines_periods."bussId", periods."prdsNameShort" ASC, 
 services_provided."svId" ASC, 
 services_provided."ppayId" ASC
