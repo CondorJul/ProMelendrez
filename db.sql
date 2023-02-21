@@ -2046,6 +2046,10 @@ create table done_by_month (
     FOREIGN KEY ("dbpId") REFERENCES d_bussines_periods("dbpId") 
 );
 
+ALTER TABLE done_by_month ALTER COLUMN "dbpId" SET NOT NULL;
+ALTER TABLE done_by_month ALTER COLUMN "dbmMonth" SET NOT NULL;
+
+
 create table d_done_by_month_tasks(
     "ddbmtId" serial PRIMARY key, 
     "dbmId" integer,  
@@ -2077,6 +2081,8 @@ create table d_done_by_month_tasks(
     FOREIGN KEY ("dbmId") REFERENCES done_by_month("dbmId"),
     FOREIGN KEY ("tsksId") REFERENCES tasks("tsksId")
 );
+ALTER TABLE d_done_by_month_tasks ALTER COLUMN "tsksId" SET NOT NULL;
+ALTER TABLE d_done_by_month_tasks ALTER COLUMN "dbmId" SET NOT NULL;
 
 
 

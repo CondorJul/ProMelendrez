@@ -215,7 +215,7 @@ LEFT JOIN (select bussines."bussId" as "_bussId",
 from bussines 
 	INNER JOIN d_bussines_periods on bussines."bussId"=d_bussines_periods."bussId"
 	INNER JOIN services_provided on d_bussines_periods."dbpId"=services_provided."dbpId"
-    where "svId"=1
+   /* where "svId"=1*/
     
     GROUP BY "_bussId" ) pd on lp."_bussId"=pd."_bussId"
 
