@@ -883,6 +883,19 @@ class ReportsController extends Controller
                 'month' => $nameMonths[$request->month - 1],
                 'date' => $f,
                 'substring' => function ($str) {
+                    $a=[
+                        ['oldWord'=>'EMPRESA', 'newWord'=>'EMP'], 
+                        ['oldWord'=>'COMUNAL', 'newWord'=>'COMU'], 
+                        ['oldWord'=>'SERVICIOS', 'newWord'=>'SERV'],
+                        ['oldWord'=>'MÚLTIPLES', 'newWord'=>'MÚLT'],
+                        ['oldWord'=>'MULTIPLES', 'newWord'=>'MULT']
+                    ];
+                    foreach ($a as $key => $value) {
+                        $str=str_replace($value['oldWord'], $value['newWord'],$str);
+                    }
+
+                    //str_replace("world","Peter","Hello world!");
+
                     return \Illuminate\Support\Str::limit($str, 31, $end='');
                     //return substr( $str, 0, 31);
                 }
