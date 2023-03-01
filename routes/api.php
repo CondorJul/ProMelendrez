@@ -32,6 +32,7 @@ use App\Http\Controllers\API\v1\PeriodPaymentController;
 use App\Http\Controllers\API\v1\ReportsController;
 use App\Http\Controllers\API\v1\ServicesController;
 use App\Http\Controllers\API\v1\ServiceProvidedController;
+use App\Http\Controllers\API\v1\StatementController;
 use App\Http\Controllers\API\v1\TaskController;
 use Illuminate\Bus\BusServiceProvider;
 use Illuminate\Routing\RouteRegistrar;
@@ -354,7 +355,7 @@ Route::get('/v1/reports/get-client-by-state', [ReportsController::class, 'getCli
 Route::get('/v1/reports/annual-summary', [ReportsController::class, 'reportAnnualSummary']);
 Route::get('/v1/reports/get-annual-resume-by-month', [ReportsController::class, 'getAnnualResumeByMonth']);
 
-Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
+Route::get('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 
 //Route::post('/v1/reports/my-format-dj-json', [ReportsController::class, 'myFormatDJJson']);
 
@@ -374,6 +375,9 @@ Route::delete('/v1/period-payments/{id}', [PeriodPaymentController::class, 'dest
 /*Annual Resume */
 Route::get('/v1/annual-resume/find-by', [AnnualResumeController::class, 'findBy']); //->middleware(['auth:sanctum']);
 Route::post('/v1/annual-resume/create-update', [AnnualResumeController::class, 'createUpdate'])->middleware(['auth:sanctum']);
+
+Route::get('/v1/statements/statements-by-month', [StatementController::class, 'statementsByMonth']); //->middleware(['auth:sanctum']);
+
 
 
 

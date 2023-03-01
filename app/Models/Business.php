@@ -67,6 +67,9 @@ class Business extends Model
         //->orderByDesc(Services::select('svNumberOfOrder')->whereColumn('services.svId', 'services_provided.svId')->first());
         //->orderByRaw('(select "svNumberOfOrder" from services where services."svId"=services_provided."svId") asc');
     }
+    public function businessStates(){
+        return $this->hasMany(BusinessStates::class, 'bussId', 'bussId'); 
+    }
 
     
 }

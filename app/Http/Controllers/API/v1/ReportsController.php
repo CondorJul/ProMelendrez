@@ -7,6 +7,7 @@ use App\Models\AnnualResume;
 use App\Models\Business;
 use App\Models\DBusinessPeriod;
 use App\Models\Period;
+use App\Models\Task;
 use App\Models\Teller;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
@@ -912,7 +913,9 @@ class ReportsController extends Controller
 
         //consulta base de datos
         $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
-        $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
+        $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')
+        ->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])
+        ->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
         $period = Period::select()->where('prdsId', $request->prdsId)->first();
 
         $dataGrouped = array();
@@ -953,14 +956,21 @@ class ReportsController extends Controller
         
         $businesses=Business::select()
             ->with('dBussinesPeriods.doneByMonth.dDoneByMonthTasks.task')
-        /*    ->whereHas('services.serviceType 
+            ->with('businessStates')
+
+
+       /*    ->whereHas('services.serviceType 
             's', function ($query) use ($id) {
                 return $query->where('id', $id);
             })*/
             ->get();
 
+
+        //$tasks=Task::select()->get();
+
         return response()->json([
-            'data'=>$businesses 
+            'data'=>$businesses,
+            //'tasks'=>$tasks 
         ]);
 
         /*
@@ -1048,4 +1058,51 @@ class ReportsController extends Controller
             return 'Surgio un error, intente más tarde';
         }
     }
+
+
+
+
+
+
+    public function reportTasksBySubPeriod(Request $request)
+    {
+        try {
+            //$b = Business::with('person')->where('bussId', $request->bussId)->first();
+                    
+            $businesses=Business::select()
+                ->with('dBussinesPeriods.doneByMonth.dDoneByMonthTasks.task')
+                ->with('businessStates')
+                ->get();
+
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Total", "Balance Anual");
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $nameMonths[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
+
+            $data = [
+                'businesses' => $businesses,
+                'date' => $f
+            ];
+
+            $path = base_path('resources/views/v1.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+            $path1 = base_path('resources/views/icon.jpg');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'landscape')->loadView('reports2.reports-tasks-by-sub-period', compact('pic', 'pic1'), $data);
+
+            return $pdf->stream();
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
+    }
+
+
 }

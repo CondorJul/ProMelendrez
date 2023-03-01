@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class DBusinessPeriod extends Model
 {
     use HasFactory;
+    public static $snakeAttributes = false;
+
     protected $primaryKey = 'dbpId';
     protected $table = 'd_bussines_periods';
     protected $fillable = [
