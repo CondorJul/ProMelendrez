@@ -888,7 +888,13 @@ class ReportsController extends Controller
                         ['oldWord'=>'COMUNAL', 'newWord'=>'COMU'], 
                         ['oldWord'=>'SERVICIOS', 'newWord'=>'SERV'],
                         ['oldWord'=>'MÚLTIPLES', 'newWord'=>'MÚLT'],
-                        ['oldWord'=>'MULTIPLES', 'newWord'=>'MULT']
+                        ['oldWord'=>'MULTIPLES', 'newWord'=>'MULT'],
+                        ['oldWord'=>'TRANSPORTES', 'newWord'=>'TRANSP'],
+                        ['oldWord'=>'SOCIEDAD ANONIMA CERRADA', 'newWord'=>'SAC'],
+                        ['oldWord'=>'ASOCIACION', 'newWord'=>'ASOC'],
+                        ['oldWord'=>'PRODUCTORES', 'newWord'=>'PRODUCT'],
+                        ['oldWord'=>'AGROPECUARIOS', 'newWord'=>'AGROPE'],
+                        ['oldWord'=>'CORPORACION', 'newWord'=>'CORPOR'],
                     ];
                     foreach ($a as $key => $value) {
                         $str=str_replace($value['oldWord'], $value['newWord'],$str);
