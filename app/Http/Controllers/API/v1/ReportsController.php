@@ -883,7 +883,7 @@ class ReportsController extends Controller
                 'month' => $nameMonths[$request->month - 1],
                 'date' => $f,
                 'substring' => function ($str) {
-                    return substr( $str, 0, 31);
+                    return substr( $str, 0, 30);
                 }
             ];
 
