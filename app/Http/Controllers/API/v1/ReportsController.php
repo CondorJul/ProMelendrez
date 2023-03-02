@@ -850,11 +850,38 @@ class ReportsController extends Controller
         try {
             //seleeciona el mes
             $nameMonths = array("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
+            $period = Period::select()->where('prdsId', $request->prdsId)->first();
+            $year=$period->prdsNameShort;
+            $month=$request->month;
+            $totalMonths=$year*12+$month;
+            $bussState='1';
 
             //consulta base de datos
             $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
-            $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])->orderByRaw(' "_lastDigit" asc, "bussName" asc')->get();
-            $period = Period::select()->where('prdsId', $request->prdsId)->first();
+            $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')
+            //->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])
+            //en el where comparamos dos fechas, la fecha actual tiene que ser mayor a la fecha ingresada
+            ->whereRaw('"tellId"=?  
+                        and
+                        (
+                            ( 
+                                "bussState"=?/*Activo*/  
+                                and (extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate")<=?)
+                            )
+                            OR 
+                            EXISTS 
+                            (
+                                select * from business_states 
+                                    where business_states."bussId" = bussines."bussId" and business_states."bussState"=? 
+                                    and
+                                    (
+                                        extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate"))<=?
+                                        and ?<=(extract(YEAR from "bussStateDateNew")*12+extract(MONTH from "bussStateDateNew")
+                                    )
+                            )
+                        )', [$request->tellId, $bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths])
+            ->orderByRaw(' "_lastDigit" asc, "bussName" asc')
+            ->get();
 
             $fecha = Carbon::parse(date('m/d/y'));
             $mes = $nameMonths[($fecha->format('m')) - 1];
@@ -899,9 +926,7 @@ class ReportsController extends Controller
                     foreach ($a as $key => $value) {
                         $str=str_replace($value['oldWord'], $value['newWord'],$str);
                     }
-
                     //str_replace("world","Peter","Hello world!");
-
                     return \Illuminate\Support\Str::limit($str, 31, $end='');
                     //return substr( $str, 0, 31);
                 }

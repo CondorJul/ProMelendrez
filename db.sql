@@ -2302,3 +2302,63 @@ END;
 $body$
 LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER;
 
+
+/*COlumn añadidos 28/03/2023*/
+
+ALTER TABLE business_states ADD "bussStateDateNew" TIMESTAMP;
+
+ALTER TABLE business_states ADD "bussStateNew" VARCHAR(5);
+
+
+
+CREATE OR REPLACE FUNCTION public.tf_b_u_bussines()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    _bussFileNumber integer;
+    _bussName varchar(300);
+
+BEGIN
+
+  
+    IF  (NEW."bussState"<>OLD."bussState") or (DATE(NEW."bussStateDate") <>DATE(OLD."bussStateDate")) THEN 
+      
+      
+        /*Agarramos el id de updated_by para crear el siguiente registro*/
+       --IF false = (DATE(OLD."bussStateDate") <=DATE(NEW."bussStateDate") && DATE(NEW."bussStateDate")<=DATE(NOW())) THEN
+        
+            --RAISE EXCEPTION '<msg>La nueva fecha tiene que ser mayor a la fecha actual.<msg>';
+        --END IF;
+
+        INSERT INTO business_states ("bussId", "bussState", "bussStateDate", "bussComment", "bussStateNew", "bussStateDateNew",    "created_by" ) 
+        values( OLD."bussId", OLD."bussState", OLD."bussStateDate", OLD."bussComment",  NEW."bussState", NEW."bussStateDate"  ,  NEW."updated_by" );
+    
+    END IF;
+
+
+
+  select
+        "bussFileNumber", "bussName" INTO _bussFileNumber, _bussName
+    FROM
+        bussines
+    WHERE
+        "bussId"<> NEW."bussId" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
+
+    IF _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
+        RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;
+    END IF;
+
+RETURN NEW;
+END;
+$function$
+
+
+
+
+UPDATE business_states
+SET "bussStateDateNew"=s."bussStateDate",
+"bussStateNew"=s."bussState"
+
+FROM (SELECT "bussId",  "bussState", "bussStateDate" from bussines) as s
+where business_states."bussId"=s."bussId"
