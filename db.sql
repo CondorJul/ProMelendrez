@@ -2356,9 +2356,16 @@ $function$
 
 
 
-UPDATE business_states
+/*UPDATE business_states
 SET "bussStateDateNew"=s."bussStateDate",
 "bussStateNew"=s."bussState"
 
 FROM (SELECT "bussId",  "bussState", "bussStateDate" from bussines) as s
 where business_states."bussId"=s."bussId"
+*/
+
+select * from business_states where 
+    (extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate"))<=24269
+    and 24269<=(extract(YEAR from "bussStateDateNew")*12+extract(MONTH from "bussStateDateNew"))
+
+select 

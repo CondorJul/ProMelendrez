@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
+use App\Models\DBusinessPeriod;
+use App\Models\DoneByMonth;
 use App\Models\Period;
 use Illuminate\Http\Request;
 
@@ -16,7 +18,20 @@ class StatementController extends Controller
         $dbmMonth=$request->dbmMonth;
         $period=Period::select()->where('prdsId',$prdsId)->first();
         $year=$period->prdsNameShort;
-        $businesses=Business::select()
+
+        $dBusinessPeriod=DBusinessPeriod::select()
+            ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
+                $query->where('dbmMonth',$dbmMonth);
+            },
+            'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                $query3->orderBy('tsksId','asc');
+            } ,
+            'doneByMonths.dDoneByMonthTasks.task'])
+            ->with(['business'])
+            ->whereHas('doneByMonths')
+            ->get();
+
+        /*$businesses=Business::select()
         ->with(['dBussinesPeriods'=>function($query) use($prdsId){
             $query->where('prdsId',$prdsId);
         },
@@ -28,7 +43,11 @@ class StatementController extends Controller
             $query3->orderBy('tsksId','asc');
         } ,
         'dBussinesPeriods.doneByMonth.dDoneByMonthTasks.task'])
-        ->with('businessStates')
+        ->with('businessStates') 
+        ->get();
+        */
+
+
         //->whereRaw(' "bussState"=?/*1=Activo*/ or ( extract(MONTH from "bussStateDate")=? and extract(YEAR from "bussStateDate")=?)',["1"/*Activo */, $dbmMonth, $year])
         //->whereRaw('(select "bussStateDate" from business_states where "bussStateDate" > 2023-01-01 and "bussState=1 )')
 
@@ -36,8 +55,8 @@ class StatementController extends Controller
         's', function ($query) use ($id) {
             return $query->where('id', $id);
         })*/
-        ->get();
-        $businessesReturn=[];
+        ///->get();
+        /*$businessesReturn=[];
         for($i=0;$i<count($businesses);$i++){
             //evaluamos que tenga period preseleccionado y que tenga registros por mes
             if( count($businesses[$i]->dBussinesPeriods) && count($businesses[$i]->dBussinesPeriods[0]->doneByMonth)){
@@ -47,13 +66,15 @@ class StatementController extends Controller
                 
 
             }
-        }
+        }*/
 
 
 
         return response()->json([
-            'data'=>$businessesReturn,
+            //'data'=>$businessesReturn,
             //'tasks'=>$tasks 
+
+            'data'=>$dBusinessPeriod
         ]);
     }
 
