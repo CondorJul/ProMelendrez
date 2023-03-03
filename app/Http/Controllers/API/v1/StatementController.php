@@ -28,6 +28,7 @@ class StatementController extends Controller
             } ,
             'doneByMonths.dDoneByMonthTasks.task'])
             ->with(['business'])
+            ->where('prdsId',$prdsId)
             ->whereHas('doneByMonths')
             ->get();
 
