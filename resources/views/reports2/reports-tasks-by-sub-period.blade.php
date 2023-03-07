@@ -111,25 +111,53 @@
                     <th>LIB</th>
                 </tr>
                 @php($countBuss=0)
-                @foreach($businesses as $key =>$value)
+                @foreach($dBusinessPeriods as $key =>$value)
                     @php($countBuss++)
+                    @php($business=$value['business'])
+                    @php($doneByMonths=$value['doneByMonths'])
 
                     <tr>
                         <th style="width: 2%; font-weight: lighter; text-align: center;">{{$countBuss}}</th>
-                        <th style="width: 23%; font-weight: lighter; text-align: center;">{{$value['bussName']}}</th>
-                        <th style="width: 7%; font-weight: lighter; text-align: center;">{{$value['bussRUC']}}</th>
-                        <th>{{$value['bussFileKind']}}</th>
-                        <th style="width: 3%; font-weight: lighter; text-align: center;">{{$value['bussFileNumber']}}</th>
-                        <th>{{$value['bussRegime']}}</th>
+                        <th style="width: 23%; font-weight: lighter; text-align: center;">{{$business['bussName']}}</th>
+                        <th style="width: 7%; font-weight: lighter; text-align: center;">{{$business['bussRUC']}}</th>
+                        <th>{{$business['bussFileKind']}}</th>
+                        <th style="width: 3%; font-weight: lighter; text-align: center;">{{$business['bussFileNumber']}}</th>
+                        <th>{{$business['bussRegime']}}</th>
 
-                        <th>{{date('d-m-Y', strtotime($value['bussStateDate']))   }}</th>
-                        <th>{{$value['bussKindBookAcc']}}</th>
-                        <!--@for ($i = 1; $i <= 3; $i++)
-                            @foreach($$value['bussKindBookAcc'] as $keydbm =>$valuedbm)
-                                <th>s</th>
+                        <th>{{date('d-m-Y', strtotime($business['bussStateDate']))   }}</th>
+                        <th>{{$business['bussKindBookAcc']}}</th>
+
+                        @foreach($doneByMonths as $keydbm =>$valuedbm)
+                            @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
+                            @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
+                            
+                                <th>
+                                     @switch($valueddbmt['ddbmtState'])
+                                        @case(5/* Cerrado*/)
+                                                SI
+                                            @break
+
+                                        @case(7/*No tiene */)
+                                            NT
+                                            @break
+
+                                        @default
+                                        -
+                                    @endswitch
+
+                                    @switch($valueddbmt['ddbmtRectified'])
+                                        @case(2/* Cerrado*/)
+                                                -R
+                                            @break
+                                        @default
+                                    @endswitch
+                                
+                                </th>
 
                             @endforeach
-                        @endfor -->
+                        @endforeach        
+                
+                        
 
               
                     </tr>

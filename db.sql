@@ -2364,8 +2364,19 @@ FROM (SELECT "bussId",  "bussState", "bussStateDate" from bussines) as s
 where business_states."bussId"=s."bussId"
 */
 
-select * from business_states where 
+/*select * from business_states where 
     (extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate"))<=24269
     and 24269<=(extract(YEAR from "bussStateDateNew")*12+extract(MONTH from "bussStateDateNew"))
 
-select 
+*/
+
+/*Añadido al 06/03/2023*/
+/*DECLARACIONES*/
+
+insert into permissions(name, guard_name, name_to_see) values ('SI_STATEMENTS_MODULE', 'web', 'Modulo Declaraciones');
+/*insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_WAITING_LINE_GRAPH', 'web', 'Graficas de Linea de Espera');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_ACCOUNTING_GRAPH', 'web', 'Graficas de Contabilidad');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_CLIENTS_GRAPH', 'web', 'Graficas de Clientes');*/
+
+
+

@@ -9,6 +9,7 @@ use App\Models\DBusinessPeriod;
 use App\Models\Period;
 use App\Models\Task;
 use App\Models\Teller;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Exception;
@@ -1114,10 +1115,31 @@ class ReportsController extends Controller
         try {
             //$b = Business::with('person')->where('bussId', $request->bussId)->first();
                     
-            $businesses=Business::select()
-                ->with('dBussinesPeriods.doneByMonth.dDoneByMonthTasks.task')
+            /*$businesses=Business::select()
+                ->with('dBussinesPeriods.doneByMonths.dDoneByMonthTasks.task')
                 ->with('businessStates')
+                ->get();*/
+
+            $prdsId=$request->prdsId;
+            $dbmMonth=$request->dbmMonth;
+            $period=Period::select()->where('prdsId',$prdsId)->first();
+            $year=$period->prdsNameShort;
+    
+            $dBusinessPeriod=DBusinessPeriod::select()
+                ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
+                    $query->where('dbmMonth',$dbmMonth);
+                },
+                'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                    $query3->orderBy('tsksId','asc');
+                } ,
+                'doneByMonths.dDoneByMonthTasks.task'])
+                ->with(['business'])
+                ->where('prdsId',$prdsId)
+                ->whereHas('doneByMonths')
                 ->get();
+    
+            $users=User::select('id', 'perId')->with('person')->get();
+                
 
             setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
             $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Total", "Balance Anual");
@@ -1126,7 +1148,8 @@ class ReportsController extends Controller
             $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
 
             $data = [
-                'businesses' => $businesses,
+                'dBusinessPeriods' => $dBusinessPeriod,
+                'users' => $users,                
                 'date' => $f
             ];
 

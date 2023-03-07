@@ -7,6 +7,7 @@ use App\Models\Business;
 use App\Models\DBusinessPeriod;
 use App\Models\DoneByMonth;
 use App\Models\Period;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class StatementController extends Controller
@@ -31,6 +32,9 @@ class StatementController extends Controller
             ->where('prdsId',$prdsId)
             ->whereHas('doneByMonths')
             ->get();
+
+        $users=User::select('id', 'perId')->with('person')->get();
+
 
         /*$businesses=Business::select()
         ->with(['dBussinesPeriods'=>function($query) use($prdsId){
@@ -72,10 +76,15 @@ class StatementController extends Controller
 
 
         return response()->json([
-            //'data'=>$businessesReturn,
-            //'tasks'=>$tasks 
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => [
+                'dBusinessesPeriod'=>$dBusinessPeriod,
+                'users'=>$users
 
-            'data'=>$dBusinessPeriod
+            ]
+            //'data'=>$businessesReturn,
+            //'tasks'=>$tasks    
         ]);
     }
 

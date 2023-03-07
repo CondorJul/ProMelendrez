@@ -181,6 +181,7 @@ class DoneByMonthController extends Controller
                         $d->ddbmtOptionsByComa=isset($value['ddbmtOptionsByComa'])?($value['ddbmtOptionsByComa']):null;
                         $d->ddbmtShortComment=isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null;
 
+                        $d->ddbmtRectified=2;
                         $d->ddbmtRectifiedBy=$user->id;
                         $d->ddbmtRectifiedAt = DB::raw('now()');
 
