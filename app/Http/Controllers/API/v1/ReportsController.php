@@ -1135,7 +1135,8 @@ class ReportsController extends Controller
                 ->where('prdsId',$prdsId)
                 ->whereHas('doneByMonths')
                 ->get();*/
-                $dBusinessPeriod=DBusinessPeriod::select()
+                $dBusinessPeriod=DBusinessPeriod::selectRaw('d_bussines_periods.*, bussines."bussRUC", bussines."bussName"')
+                ->join('bussines', 'bussines.bussId', '=', 'd_bussines_periods.bussId')
                 ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
                     $query->where('dbmMonth',$dbmMonth);
                 },
@@ -1143,18 +1144,22 @@ class ReportsController extends Controller
                     $query3->orderBy('tsksId','asc');
                 } ,
                 'doneByMonths.dDoneByMonthTasks.task'])
-                ->with(['business'=>function($query){
+                /*->with(['business'=>function($query){
                     $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
-                }])
+                }])*/
+                ->with('business')
                 ->where('prdsId',$prdsId)
+                ->whereRaw('(RIGHT("bussRUC",1)=? or -1=?) ', [$ln, $ln])
                 //->has('doneByMonths')
                 ->whereHas('doneByMonths', function($query) use ($dbmMonth){
                     $query->where('dbmMonth',$dbmMonth);
                 })
-                ->whereHas('business', function($query) use ($ln){
+                /*->whereHas('business', function($query) use ($ln){
                     $query->whereRaw(' (RIGHT("bussRUC",1)=? or -1=?) ',[$ln,$ln]);
-                })
+                })*/
+                ->orderByRaw('RIGHT("bussRUC",1) ASC, "bussName" asc ')
                 ->get();
+    
     
             $users=User::select('id', 'perId')->with('person')->get();
                 
