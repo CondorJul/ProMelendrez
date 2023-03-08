@@ -1106,10 +1106,6 @@ class ReportsController extends Controller
     }
 
 
-
-
-
-
     public function reportTasksBySubPeriod(Request $request)
     {
         try {
@@ -1122,10 +1118,12 @@ class ReportsController extends Controller
 
             $prdsId=$request->prdsId;
             $dbmMonth=$request->dbmMonth;
+            $ln=$request->ln;
+
             $period=Period::select()->where('prdsId',$prdsId)->first();
             $year=$period->prdsNameShort;
     
-            $dBusinessPeriod=DBusinessPeriod::select()
+            /*$dBusinessPeriod=DBusinessPeriod::select()
                 ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
                     $query->where('dbmMonth',$dbmMonth);
                 },
@@ -1136,6 +1134,26 @@ class ReportsController extends Controller
                 ->with(['business'])
                 ->where('prdsId',$prdsId)
                 ->whereHas('doneByMonths')
+                ->get();*/
+                $dBusinessPeriod=DBusinessPeriod::select()
+                ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
+                    $query->where('dbmMonth',$dbmMonth);
+                },
+                'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                    $query3->orderBy('tsksId','asc');
+                } ,
+                'doneByMonths.dDoneByMonthTasks.task'])
+                ->with(['business'=>function($query){
+                    $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
+                }])
+                ->where('prdsId',$prdsId)
+                //->has('doneByMonths')
+                ->whereHas('doneByMonths', function($query) use ($dbmMonth){
+                    $query->where('dbmMonth',$dbmMonth);
+                })
+                ->whereHas('business', function($query) use ($ln){
+                    $query->whereRaw(' (RIGHT("bussRUC",1)=? or -1=?) ',[$ln,$ln]);
+                })
                 ->get();
     
             $users=User::select('id', 'perId')->with('person')->get();

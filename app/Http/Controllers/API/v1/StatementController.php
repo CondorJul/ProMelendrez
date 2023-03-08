@@ -17,6 +17,7 @@ class StatementController extends Controller
     public function statementsByMonth(Request $request){
         $prdsId=$request->prdsId;
         $dbmMonth=$request->dbmMonth;
+        $ln=$request->ln;
         $period=Period::select()->where('prdsId',$prdsId)->first();
         $year=$period->prdsNameShort;
 
@@ -28,9 +29,17 @@ class StatementController extends Controller
                 $query3->orderBy('tsksId','asc');
             } ,
             'doneByMonths.dDoneByMonthTasks.task'])
-            ->with(['business'])
+            ->with(['business'=>function($query){
+                $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
+            }])
             ->where('prdsId',$prdsId)
-            ->whereHas('doneByMonths')
+            //->has('doneByMonths')
+            ->whereHas('doneByMonths', function($query) use ($dbmMonth){
+                $query->where('dbmMonth',$dbmMonth);
+            })
+            ->whereHas('business', function($query) use ($ln){
+                $query->whereRaw(' (RIGHT("bussRUC",1)=? or -1=?) ',[$ln,$ln]);
+            })
             ->get();
 
         $users=User::select('id', 'perId')->with('person')->get();
