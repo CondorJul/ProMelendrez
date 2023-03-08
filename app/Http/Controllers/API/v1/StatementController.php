@@ -33,6 +33,7 @@ class StatementController extends Controller
             /*->with(['business'=>function($query){
                 $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
             }])*/
+            ->with('business')
             ->where('prdsId',$prdsId)
             ->whereRaw('(RIGHT("bussRUC",1)=? or -1=?) ', [$ln, $ln])
             //->has('doneByMonths')
