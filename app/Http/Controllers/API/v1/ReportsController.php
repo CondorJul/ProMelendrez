@@ -1223,10 +1223,12 @@ class ReportsController extends Controller
                     return $a[$bussRegime];
                 },
                 'getBussFileKindName'=>function($bussFileKind){
+                    if(!$bussFileKind) return "";
                     $a=array("1"=>"Archivador", "2"=>"Folder");
                     return $a[$bussFileKind];
                 },
                 'getBussKindBookAccName'=>function($bussKindBookAcc){
+                    if(!$bussKindBookAcc) return "";
                     $a=array("1"=>"Electronico", "2"=>"Computarizado");
                     return $a[$bussKindBookAcc];
                 }
