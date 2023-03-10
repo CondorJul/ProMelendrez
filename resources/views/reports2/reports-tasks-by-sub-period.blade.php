@@ -82,88 +82,96 @@
         <div style="font-size: 10.8px; line-height: 12px; padding-top: 5px;">EL PRESENTE ES PARA INFORMAR RESPECTO A LOS HONORARIOS POR SERVICIOS QUE NOS ADEUDA HASTA LA FECHA. <br> Ante cualquier duda o consulta, sírvase comunicarse con nosotros al celular <span style="color: red; font-weight: bold;">N° 973896051 / 951415451</span> a los señores: <br> José Luis MELENDRES CÓNDOR y/o Rita Cindy MIRANDA RAMOS, o al correo <span style="color: blue; font-weight: bold;">melendres.auditores@hotmail.com</span></div>
     </footer>
     <main>
-        <div style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">
-            <table style="width: 100%;" border="1" cellspacing="0">
-                <tr>
-                    <th colspan="4">RUC 4</th>
-                    <th colspan="4"></th>
-                    <th colspan="3">ENERO</th>
-                    <th colspan="3">FEBRERO</th>
-                    <th colspan="3">MARZO</th>
-                </tr>
-                <tr>
-                    <th>#</th>
-                    <th>RAZÓN SOCIAL / EMPRESA</th>
-                    <th>RUC</th>
-                    <th>ALM.</th>
-                    <th>ARC</th>
-                    <th>REG</th>
-                    <th>FECHA</th>
-                    <th>LIB.</th>
-                    <th>PDT.</th>
-                    <th>PLM.</th>
-                    <th>LIB</th>
-                    <th>PDT.</th>
-                    <th>PLM.</th>
-                    <th>LIB</th>
-                    <th>PDT.</th>
-                    <th>PLM.</th>
-                    <th>LIB</th>
-                </tr>
-                @php($countBuss=0)
-                @foreach($dBusinessPeriods as $key =>$value)
-                    @php($countBuss++)
-                    @php($business=$value['business'])
-                    @php($doneByMonths=$value['doneByMonths'])
+        @php($pageBreak=false)
+        @foreach($groupeds as $keyln=>$valueln)
 
+            @php($dBusinessPeriods=$valueln['values'])
+           
+            <!--La primera ves no puede dar salto de pagina, pero despues del if, la condicion se vuelve positiva para dar salto de pagina-->
+            @if($pageBreak)
+                <!--Permite dar salto de pagina -->
+                <div style="page-break-after:always;"></div>
+            @endif
+
+            @php($pageBreak=true)
+
+
+            <div style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">
+                <table style="width: 100%;" border="1" cellspacing="0">
                     <tr>
-                        <th style="width: 2%; font-weight: lighter; text-align: center;">{{$countBuss}}</th>
-                        <th style="width: 23%; font-weight: lighter; text-align: center;">{{$business['bussName']}}</th>
-                        <th style="width: 7%; font-weight: lighter; text-align: center;">{{$business['bussRUC']}}</th>
-                        <th>{{$business['bussFileKind']}}</th>
-                        <th style="width: 3%; font-weight: lighter; text-align: center;">{{$business['bussFileNumber']}}</th>
-                        <th>{{$business['bussRegime']}}</th>
-
-                        <th>{{date('d-m-Y', strtotime($business['bussStateDate']))   }}</th>
-                        <th>{{$business['bussKindBookAcc']}}</th>
-
-                        @foreach($doneByMonths as $keydbm =>$valuedbm)
-                            @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
-                            @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
-                            
-                                <th>
-                                     @switch($valueddbmt['ddbmtState'])
-                                        @case(5/* Cerrado*/)
-                                                SI
-                                            @break
-
-                                        @case(7/*No tiene */)
-                                            NT
-                                            @break
-
-                                        @default
-                                        -
-                                    @endswitch
-
-                                    @switch($valueddbmt['ddbmtRectified'])
-                                        @case(2/* Cerrado*/)
-                                                -R
-                                            @break
-                                        @default
-                                    @endswitch
-                                
-                                </th>
-
-                            @endforeach
-                        @endforeach        
-                
-                        
-
-              
+                        <th colspan="4">{{$valueln['name']}}</th>
+                        <th colspan="4"></th>
+                        <th colspan="3">{{$valueln['month']}}</th>
                     </tr>
-                @endforeach
-            </table>
-        </div>
+                    <tr>
+                        <th>#</th>
+                        <th>RAZÓN SOCIAL / EMPRESA</th>
+                        <th>RUC</th>
+                        <th>ALM.</th>
+                        <th>ARC</th>
+                        <th>REG</th>
+                        <th>FECHA</th>
+                        <th>LIB.</th>
+                        <th>PDT.</th>
+                        <th>PLM.</th>
+                        <th>LIB</th>
+                        
+                    </tr>
+                    @php($countBuss=0)
+                    @foreach($dBusinessPeriods as $key =>$value)
+                        @php($countBuss++)
+                        @php($business=$value['business'])
+                        @php($doneByMonths=$value['doneByMonths'])
+
+                        <tr>
+                            <th style="width: 2%; font-weight: lighter; text-align: center;">{{$countBuss}}</th>
+                            <th style="width: 23%; font-weight: lighter; text-align: center;">{{$business['bussName']}}</th>
+                            <th style="width: 7%; font-weight: lighter; text-align: center;">{{$business['bussRUC']}}</th>
+                            <th>{{ $getBussFileKindName($business['bussFileKind']) }}</th>
+                            <th style="width: 3%; font-weight: lighter; text-align: center;">{{$business['bussFileNumber']}}</th>
+                            <th>{{ $getBussRegimeName($business['bussRegime'])}}</th>
+
+                            <th>{{date('d-m-Y', strtotime($business['bussStateDate']))   }}</th>
+                            <th>{{$getBussKindBookAccName($business['bussKindBookAcc'])}}</th>
+
+                            @foreach($doneByMonths as $keydbm =>$valuedbm)
+                                @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
+                                @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
+                                
+                                    <th>
+                                        @switch($valueddbmt['ddbmtState'])
+                                            @case(5/* Cerrado*/)
+                                                SI-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+                                                @break
+
+                                            @case(7/*No tiene */)
+                                                NT-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+                                                @break
+
+                                            @default
+                                            -
+                                        @endswitch
+
+                                        @switch($valueddbmt['ddbmtRectified'])
+                                            @case(2/* Cerrado*/)
+                                            R-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+                                                @break
+                                            @default
+                                        @endswitch
+                                    
+                                    </th>
+
+                                @endforeach
+                            @endforeach        
+                    
+                            
+
+                
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+        @endforeach
 
     </main>
 </body>

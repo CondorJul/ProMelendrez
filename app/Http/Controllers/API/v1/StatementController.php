@@ -21,7 +21,7 @@ class StatementController extends Controller
         $period=Period::select()->where('prdsId',$prdsId)->first();
         $year=$period->prdsNameShort;
 
-        $dBusinessPeriod=DBusinessPeriod::selectRaw('d_bussines_periods.*, bussines."bussRUC", bussines."bussName"')
+        $dBusinessPeriod=DBusinessPeriod::selectRaw('d_bussines_periods.*, bussines."bussRUC", bussines."bussName",  RIGHT("bussRUC",1) as "_lastDigit"')
             ->join('bussines', 'bussines.bussId', '=', 'd_bussines_periods.bussId')
             ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
                 $query->where('dbmMonth',$dbmMonth);
