@@ -1215,7 +1215,7 @@ class ReportsController extends Controller
                     $aux1=array_values($aux);
                     $user=(count($aux1) >0)?$aux1[0]:null;
                     $perName=($user!=null)?explode(" ",$user['person']['perName'])[0]:'-----';
-                    return $perName;
+                    return ucwords($perName);
                 },
                 'getBussRegimeName'=>function($bussRegime){
                     if(!$bussRegime) return "";

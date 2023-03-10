@@ -125,20 +125,20 @@
 
                         <tr>
                             <th style="width: 2%; font-weight: lighter; text-align: center;">{{$countBuss}}</th>
-                            <th style="width: 23%; font-weight: lighter; text-align: center;">{{$business['bussName']}}</th>
+                            <th style="width: 28%; font-weight: lighter; text-align: center;">{{$business['bussName']}}</th>
                             <th style="width: 7%; font-weight: lighter; text-align: center;">{{$business['bussRUC']}}</th>
                             <th>{{ $getBussFileKindName($business['bussFileKind']) }}</th>
                             <th style="width: 3%; font-weight: lighter; text-align: center;">{{$business['bussFileNumber']}}</th>
                             <th>{{ $getBussRegimeName($business['bussRegime'])}}</th>
 
-                            <th>{{date('d-m-Y', strtotime($business['bussStateDate']))   }}</th>
-                            <th>{{$getBussKindBookAccName($business['bussKindBookAcc'])}}</th>
+                            <th style="width: 7%; font-weight: lighter; text-align: center;">{{date('d-m-Y', strtotime($business['bussStateDate']))   }}</th>
+                            <th style="width: 7%; font-weight: lighter; text-align: center;">{{$getBussKindBookAccName($business['bussKindBookAcc'])}}</th>
 
                             @foreach($doneByMonths as $keydbm =>$valuedbm)
                                 @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
                                 @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
                                 
-                                    <th>
+                                    <th style="width: 7%; font-weight: lighter; text-align: center;">
                                         @switch($valueddbmt['ddbmtState'])
                                             @case(5/* Cerrado*/)
                                                 SI-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
