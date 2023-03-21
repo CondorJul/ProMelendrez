@@ -256,7 +256,7 @@ class StatementController extends Controller
              for($i=0;$i<count($arrayStatements);$i++){
                 $_bussId=$arrayStatements[$i]->bussId;
 
-                $key=array_search($_bussId, array_column($arrayBusinessess, true), 'bussId');
+                $key=array_search($_bussId, array_column($arrayBusinessess,'bussId'));
                 array_push($arrayO, $key);
                 if($key){
 
