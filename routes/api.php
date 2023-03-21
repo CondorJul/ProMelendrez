@@ -379,6 +379,8 @@ Route::post('/v1/annual-resume/create-update', [AnnualResumeController::class, '
 Route::get('/v1/statements/statements-by-month', [StatementController::class, 'statementsByMonth']); //->middleware(['auth:sanctum']);
 Route::get('/v1/statements/summary', [StatementController::class, 'summary']); //->middleware(['auth:sanctum']);
 
+Route::get('/v1/statements/pendings', [StatementController::class, 'pendings']); //->middleware(['auth:sanctum']);
+
 
 
 
