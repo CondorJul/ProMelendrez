@@ -1219,7 +1219,7 @@ class ReportsController extends Controller
                 },
                 'getBussRegimeName'=>function($bussRegime){
                     if(!$bussRegime) return "";
-                    $a=array("1"=>"Especial", "2"=>"General", "3"=>"MYP Tributario");
+                    $a=array("1"=>"ESPECIAL", "2"=>"GENERAL", "3"=>"MYPE");
                     return $a[$bussRegime];
                 },
                 'getBussFileKindName'=>function($bussFileKind){

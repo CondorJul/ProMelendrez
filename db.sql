@@ -2378,5 +2378,114 @@ insert into permissions(name, guard_name, name_to_see) values ('SI_STATEMENTS_MO
 insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_ACCOUNTING_GRAPH', 'web', 'Graficas de Contabilidad');
 insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_CLIENTS_GRAPH', 'web', 'Graficas de Clientes');*/
 
+/*Añadido al 14/03/2023*/
 
+/*
+bussState;
+bussStateDate;
+bussComment;
+bussObservation
+bussRegime
+bussFileKind
+bussFileNumber
+bussKindBookAcc
+tellerId
+tellerColor
+*/
+
+/*AÑDIDO EL 15/03/2023*/
+ALTER TABLE teller ADD COLUMN "tellColor" varchar(20);
+
+ALTER TABLE done_by_month ADD COLUMN "bussState" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussStateDate" timestamp;
+ALTER TABLE done_by_month ADD COLUMN "bussComment" varchar(500);
+ALTER TABLE done_by_month ADD COLUMN "bussCommentColor" varchar(20);
+
+
+ALTER TABLE done_by_month ADD COLUMN "bussFileKind" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussFileNumber" integer;
+ALTER TABLE done_by_month ADD COLUMN "bussRegime" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussKindBookAcc" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussObservation" text;
+
+ALTER TABLE done_by_month ADD COLUMN "tellId" integer;
+ALTER TABLE done_by_month ADD COLUMN "tellCode" varchar(10);
+ALTER TABLE done_by_month ADD COLUMN "tellName" varchar(50);
+ALTER TABLE done_by_month ADD COLUMN "tellColor" varchar(20);
+
+/**/
+ALTER TABLE done_by_month ADD COLUMN "perId" INTEGER;
+ALTER TABLE done_by_month ADD COLUMN "perKindDoc" varchar(5);
+ALTER TABLE done_by_month ADD COLUMN "perNumberDoc" varchar(20);
+ALTER TABLE done_by_month ADD COLUMN "perName" varchar(300);
+
+
+
+CREATE OR REPLACE FUNCTION public.tf_b_i_done_by_month ()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+   
+BEGIN
+    /*"bussState", "bussStateDate", "bussComment", "bussCommentColor",
+    "bussFileKind",  "bussFileNumber", "bussRegime",  "bussKindBookAcc",  "bussObservation" , 
+    "perId", "perKindDoc" , "perNumberDoc" , "perName",*/
+    
+
+    /*"tellId" , "tellCode", "tellName", "tellColor",*/
+    /*Los campos de bussId, perId, tellId, es solamente historial,  no considerar relevante para la consulta */
+    select 
+            "bussState", "bussStateDate", "bussComment", "bussCommentColor",
+            "bussFileKind",  "bussFileNumber", "bussRegime",  "bussKindBookAcc",  "bussObservation" , 
+            person."perId", "perKindDoc" , "perNumberDoc" , "perName"
+        into 
+            NEW."bussState", NEW."bussStateDate", NEW."bussComment", NEW."bussCommentColor",
+            NEW."bussFileKind",  NEW."bussFileNumber", NEW."bussRegime",  NEW."bussKindBookAcc",  NEW."bussObservation" , 
+            NEW."perId", NEW."perKindDoc" , NEW."perNumberDoc" , NEW."perName"
+    
+    from 
+        d_bussines_periods inner join bussines
+            on d_bussines_periods."bussId"=bussines."bussId"
+        inner join person on bussines."perId"=person."perId" 
+        where d_bussines_periods."dbpId"=new."dbpId";
+
+    Select 
+            teller."tellId" , "tellCode", "tellName", "tellColor"
+        INTO
+            NEW."tellId" , NEW."tellCode", NEW."tellName", NEW."tellColor"
+     from 
+            d_bussines_periods inner join bussines
+                on d_bussines_periods."bussId"=bussines."bussId"
+            inner join teller on bussines."tellId"=teller."tellId" 
+            where d_bussines_periods."dbpId"=new."dbpId";
+
+
+RETURN NEW;
+END;
+$function$
+
+CREATE TRIGGER t_b_i_done_by_month BEFORE
+INSERT
+    ON done_by_month FOR EACH
+    ROW EXECUTE PROCEDURE tf_b_i_done_by_month();
+
+/*
+delete from appointment_temp where "apptmId"=18
+drop TRIGGER t_b_i_done_by_month on done_by_month;
+drop FUNCTION tf_b_i_done_by_month;*/
+
+
+
+/*select * from 
+    d_bussines_periods inner join bussines
+         on d_bussines_periods."bussId"=bussines."bussId"
+    inner join person on bussines."perId"=person."perId" 
+    where d_bussines_periods."prdsId"=1*/
+
+    /*Select * from 
+        d_bussines_periods inner join bussines
+             on d_bussines_periods."bussId"=bussines."bussId"
+        inner join teller on bussines."tellId"=teller."tellId" 
+        where d_bussines_periods."prdsId"=1*/
 

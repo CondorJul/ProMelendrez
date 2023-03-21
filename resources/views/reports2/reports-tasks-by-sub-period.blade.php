@@ -96,7 +96,7 @@
             @php($pageBreak=true)
 
 
-            <div style="font-size: 11px; font-family: Arial, Helvetica, sans-serif;">
+            <div style="font-size: 10px; font-family: Arial, Helvetica, sans-serif;">
                 <table style="width: 100%;" border="1" cellspacing="0">
                     <tr>
                         <th colspan="4">{{$valueln['name']}}</th>
@@ -105,16 +105,16 @@
                     </tr>
                     <tr>
                         <th>#</th>
-                        <th>RAZÓN SOCIAL / EMPRESA</th>
+                        <th>NOMBRE / RAZÓN SOCIAL</th>
                         <th>RUC</th>
-                        <th>ALM.</th>
+                        <th>TIPO</th>
                         <th>ARC</th>
-                        <th>REG</th>
+                        <th>REGIMEN</th>
                         <th>FECHA</th>
-                        <th>LIB.</th>
-                        <th>PDT.</th>
-                        <th>PLM.</th>
-                        <th>LIB</th>
+                        <th>TIPO DE <b> LIBRO</th>
+                        <th>PDT-621</th>
+                        <th>PLME-601</th>
+                        <th>LIBRO</th>
                         
                     </tr>
                     @php($countBuss=0)
@@ -125,48 +125,74 @@
 
                         <tr>
                             <th style="width: 2%; font-weight: lighter; text-align: center;">{{$countBuss}}</th>
-                            <th style="width: 28%; font-weight: lighter; text-align: center;">{{$business['bussName']}}</th>
+                            <th style="width: 28%; font-weight: lighter; text-align: left;">{{$business['bussName']}}</th>
                             <th style="width: 7%; font-weight: lighter; text-align: center;">{{$business['bussRUC']}}</th>
-                            <th>{{ $getBussFileKindName($business['bussFileKind']) }}</th>
-                            <th style="width: 3%; font-weight: lighter; text-align: center;">{{$business['bussFileNumber']}}</th>
-                            <th>{{ $getBussRegimeName($business['bussRegime'])}}</th>
-
-                            <th style="width: 7%; font-weight: lighter; text-align: center;">{{date('d-m-Y', strtotime($business['bussStateDate']))   }}</th>
-                            <th style="width: 7%; font-weight: lighter; text-align: center;">{{$getBussKindBookAccName($business['bussKindBookAcc'])}}</th>
-
+                            
+                            
                             @foreach($doneByMonths as $keydbm =>$valuedbm)
+                                <th>{{ $getBussFileKindName($valuedbm['bussFileKind']) }}</th>
+                                <th style="width: 3%; font-weight: lighter; text-align: center;">{{$valuedbm['bussFileNumber']}}</th>
+                                <th>{{ $getBussRegimeName($valuedbm['bussRegime'])}}</th>
+
+                                <th style="width: 7%; font-weight: lighter; text-align: center;">
+                                    @switch($valuedbm['bussState'])
+                                        @case(1/*Activo*/)
+                                            @break
+                                        @case(2/*Suspendido*/)
+                                            SUSP: {{date('d-m-Y', strtotime($valuedbm['bussStateDate']))}}
+                                            @break
+                                        @case(1/*Retirado*/)
+                                        
+                                            RET: {{date('d-m-Y', strtotime($valuedbm['bussStateDate']))}}
+
+                                            @break
+                                        @default
+                                    @endswitch
+
+                                </th>
+                                <th style="width: 7%; font-weight: lighter; text-align: center;">{{$getBussKindBookAccName($valuedbm['bussKindBookAcc'])}}</th>
+                                <!--Aqui hacermos foreach
+                                    tambien si tiene rectificacion, solo se muestra la informacion de esta , 
+                                    ahora si no tiene se muestra la información normal
+
+
+                                    -->
                                 @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
                                 @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
                                 
                                     <th style="width: 7%; font-weight: lighter; text-align: center;">
-                                        @switch($valueddbmt['ddbmtState'])
-                                            @case(5/* Cerrado*/)
-                                                SI-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
-                                                @break
+                                        @if($valueddbmt['ddbmtRectified']!=null)
+                                            @switch($valueddbmt['ddbmtRectified'])
+                                                @case(2/* Cerrado*/)
+                                                    {{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+                                                    
+                                                    @if($valueddbmt['ddbmtAmount']!=null/*Si es null entonces deducimos que es la primera opcion*/)
+                                                            {{ ($valueddbmt['ddbmtAmount']>0)?'-M':'-O'}}
+                                                        @endif
+                                                    @break
+                                                @default
+                                            @endswitch
+                                        @else
+                                            @switch($valueddbmt['ddbmtState'] )
+                                                @case(5/* Cerrado*/)
+                                                    {{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+                                                    
+                                                        @if($valueddbmt['ddbmtAmount']!=null/*Si es null entonces deducimos que es la primera opcion*/)
+                                                            {{ ($valueddbmt['ddbmtAmount']>0)?'-M':'-O'}}
+                                                        @endif
+                                                    @break
 
-                                            @case(7/*No tiene */)
-                                                NT-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
-                                                @break
-
-                                            @default
-                                            -
-                                        @endswitch
-
-                                        @switch($valueddbmt['ddbmtRectified'])
-                                            @case(2/* Cerrado*/)
-                                            R-{{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
-                                                @break
-                                            @default
-                                        @endswitch
-                                    
+                                                @case(7/*No tiene */)
+                                                    NT
+                                                    @break
+                                                @default
+                                                -
+                                            @endswitch
+                                        @endif
                                     </th>
 
                                 @endforeach
                             @endforeach        
-                    
-                            
-
-                
                         </tr>
                     @endforeach
                 </table>

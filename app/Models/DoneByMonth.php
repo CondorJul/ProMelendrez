@@ -19,6 +19,34 @@ class DoneByMonth extends Model
         "dbmMonth",
     
         "dbmState",
+
+
+        "bussState" ,
+        "bussStateDate",
+        "bussComment",
+        "bussCommentColor",
+        
+        
+        "bussFileKind" ,
+        "bussFileNumber" ,
+        "bussRegime" ,
+        "bussKindBookAcc" ,
+        "bussObservation" ,
+        
+        "tellId" ,
+        "tellCode" ,
+        "tellName" ,
+        "tellColor" ,
+        
+        /**/
+        "perId",
+        "perKindDoc" ,
+        "perNumberDoc" ,
+        "perName",
+
+
+
+
         "created_by",
         "updated_by",
         "updated_at",
