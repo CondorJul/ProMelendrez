@@ -253,39 +253,30 @@ class StatementController extends Controller
 
              $arrayP=[];
              $arrayO=[];
+             $arrayP1=[];
+             $arrayO1=[];
              for($i=0;$i<count($arrayStatements);$i++){
                 $_bussId=$arrayStatements[$i]->bussId;
 
                 $key=array_search($_bussId, array_column($arrayBusinessess,'bussId'));
-                array_push($arrayO, $key);
+                array_push($arrayP1, $key);
                 if($key){
-
-                    array_push($arrayP, $arrayStatements[$i]);
-                    unset($arrayStatements[$i]);
-                    
-                    unset($arrayBusinessess[$key]);
-                    
+                    array_push($arrayP, $arrayStatements[$i]);                    
+                    unset($arrayBusinessess[$key]); 
                 }
-
-
-
-
-
-                /*$_bussId=$arrayStatements[$i]->bussId;
-
-                $b = array_filter($arrayBusinessess, function ($row) use($_bussId) {
-                    return $row->bussId==$_bussId;
-                });
-
-                $b=array_values($b);
-                if($b){
-                    array_values($arrayP[],  )
-                }else{
-
-                }
-                */
-
              }
+
+             for($i=0;$i<count($arrayP);$i++){
+                $_bussId=$arrayP[$i]->bussId;
+                
+                $key=array_search($_bussId, array_column($arrayStatements,'bussId'));
+                array_push($arrayO1, $key);
+                if($key){
+                    array_push($arrayO, $arrayP[$i]);                    
+                    unset($arrayStatements[$key]); 
+                }
+             }
+
 
 
 
@@ -342,7 +333,9 @@ class StatementController extends Controller
               'businessess'=>$arrayBusinessess,
               'statements'=>$arrayStatements,
               'arrayP'=>$arrayP,
-              'arrayO'=>$arrayO
+              'arrayO'=>$arrayO,
+              'arrayP1'=>$arrayP1,
+              'arrayO1'=>$arrayO1
             ]
         ]);
     }
