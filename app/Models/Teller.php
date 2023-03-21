@@ -14,6 +14,7 @@ class Teller extends Model
     protected $fillable = [
         'tellCode',
         'tellName',
+        'tellColor',
         'tellMaxInWait',
         'tellState',
         'hqId',

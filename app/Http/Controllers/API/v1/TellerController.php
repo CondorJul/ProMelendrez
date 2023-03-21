@@ -99,6 +99,8 @@ class TellerController extends Controller
 
         $teller->tellCode = $request->tellCode;
         $teller->tellName = $request->tellName;
+        $teller->tellColor = $request->tellColor;
+        
 
         $teller->save();
         return response()->json([

@@ -9,6 +9,8 @@ use App\Models\DoneByMonth;
 use App\Models\Period;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class StatementController extends Controller
 {
@@ -89,6 +91,7 @@ class StatementController extends Controller
 
 
         return response()->json([
+            
             'res' => true,
             'msg' => 'Actualizado correctamente',
             'data' => [
@@ -98,6 +101,107 @@ class StatementController extends Controller
             ]
             //'data'=>$businessesReturn,
             //'tasks'=>$tasks    
+        ]);
+    }
+
+
+
+    public function summary(Request $request){
+
+        $period = Period::select()->where('prdsId', $request->prdsId)->first();
+        $year=$period->prdsNameShort;
+        $month=$request->dbmMonth;
+        $totalMonths=$year*12+$month;
+        $bussState='1';
+
+
+        $params=[];
+        $arrayBusinessess = DB::select('
+            SELECT count(*) AS total, RIGHT("bussRUC", 1) AS "_lastDigit"  FROM bussines  
+            where 1=1 AND 
+                (
+                    ( 
+                        "bussState"=?/*Activo*/  
+                        and (extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate")<=?)
+                    )
+                    OR 
+                    EXISTS 
+                    (
+                        select * from business_states 
+                            where business_states."bussId" = bussines."bussId" and business_states."bussState"=? 
+                            and
+                            (
+                                extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate"))<=?
+                                and ?<=(extract(YEAR from "bussStateDateNew")*12+extract(MONTH from "bussStateDateNew")
+                            )
+                    )
+                )
+                
+                GROUP BY RIGHT("bussRUC", 1); 
+                ', 
+                [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths]
+            );
+
+
+            $arrayStatements = DB::select('
+                SELECT count(*) AS total, RIGHT(b."bussRUC", 1) AS "_lastDigit" FROM bussines b 
+                INNER JOIN d_bussines_periods dbp on b."bussId"=dbp."bussId"
+                INNER JOIN done_by_month dbm on dbp."dbpId"=dbm."dbpId" where dbp."prdsId"=? and dbm."dbmMonth"=? GROUP BY RIGHT(b."bussRUC", 1);
+                ', 
+                [$request->prdsId,  $month]
+             );
+             $arrayP=[];
+             for($i=0;$i<10;$i++){
+                $t=array();
+                $t["digit"]=$i;
+
+                $b = array_filter($arrayBusinessess, function ($row) use($i) {
+                    return intval($row->_lastDigit)==intval($i);
+                });
+                $b=array_values($b);
+                $t["business"]=($b)?$b[0]->total:0;
+                
+                $s = array_filter($arrayStatements, function ($row) use($i) {
+                    return intval($row->_lastDigit)==intval($i);
+                });
+                $s=array_values($s);
+                $t["statements"]=($s)?$s[0]->total:0;
+
+                if($t["statements"]==0){
+                    $t["message"]='Sin declaraciones';
+                    $t["state"]='success';
+                    $t["badge"]='badge badge-light';
+
+                }elseif($t["statements"]<$t["business"]){
+                    $t["message"]='Incompleto';
+                    $t["state"]='warner';
+                    $t["badge"]='badge badge-warning';
+
+                    
+                }elseif($t["business"]==$t["statements"]){
+                    $t["message"]='Completo';
+                    $t["state"]='success';
+                    $t["badge"]='badge badge-success';
+
+                }elseif($t["statements"]>$t["business"]){
+                    $t["message"]='Atención';
+                    $t["state"]='success';
+                    $t["badge"]='badge badge-danger';
+
+                    
+                }
+
+                array_push($arrayP, $t);
+             }
+
+        return response()->json([
+            'res' => true,
+            'msg' => 'Actualizado correctamente',
+            'data' => [
+              'businessess'=>$arrayBusinessess,
+              'statements'=>$arrayStatements,
+              'arrayP'=>$arrayP
+            ]
         ]);
     }
 
