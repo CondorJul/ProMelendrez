@@ -26,7 +26,9 @@ class UpdTellerRequest extends FormRequest
         return [
             'tellId'=>'required',
             'tellCode'=>'required',
-            'tellName'=>'required'
+            'tellName'=>'required',
+            'tellColor'=>'required'
+            
         ];
     }
 }

@@ -2302,3 +2302,190 @@ END;
 $body$
 LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER;
 
+
+/*COlumn añadidos 28/03/2023*/
+
+ALTER TABLE business_states ADD "bussStateDateNew" TIMESTAMP;
+
+ALTER TABLE business_states ADD "bussStateNew" VARCHAR(5);
+
+
+
+CREATE OR REPLACE FUNCTION public.tf_b_u_bussines()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    _bussFileNumber integer;
+    _bussName varchar(300);
+
+BEGIN
+
+  
+    IF  (NEW."bussState"<>OLD."bussState") or (DATE(NEW."bussStateDate") <>DATE(OLD."bussStateDate")) THEN 
+      
+      
+        /*Agarramos el id de updated_by para crear el siguiente registro*/
+       --IF false = (DATE(OLD."bussStateDate") <=DATE(NEW."bussStateDate") && DATE(NEW."bussStateDate")<=DATE(NOW())) THEN
+        
+            --RAISE EXCEPTION '<msg>La nueva fecha tiene que ser mayor a la fecha actual.<msg>';
+        --END IF;
+
+        INSERT INTO business_states ("bussId", "bussState", "bussStateDate", "bussComment", "bussStateNew", "bussStateDateNew",    "created_by" ) 
+        values( OLD."bussId", OLD."bussState", OLD."bussStateDate", OLD."bussComment",  NEW."bussState", NEW."bussStateDate"  ,  NEW."updated_by" );
+    
+    END IF;
+
+
+
+  select
+        "bussFileNumber", "bussName" INTO _bussFileNumber, _bussName
+    FROM
+        bussines
+    WHERE
+        "bussId"<> NEW."bussId" AND "bussFileNumber" = NEW."bussFileNumber" AND  "bussState" IN ('1'/*Activo */, '2'/*Suspendido*/) ;
+
+    IF _bussFileNumber is not null AND NEW."bussState"<>'3' THEN
+        RAISE EXCEPTION '<msg>Lo sentimos, este número de archivador esta en uso por un otro cliente (%).<msg>',_bussName;
+    END IF;
+
+RETURN NEW;
+END;
+$function$
+
+
+
+
+/*UPDATE business_states
+SET "bussStateDateNew"=s."bussStateDate",
+"bussStateNew"=s."bussState"
+
+FROM (SELECT "bussId",  "bussState", "bussStateDate" from bussines) as s
+where business_states."bussId"=s."bussId"
+*/
+
+/*select * from business_states where 
+    (extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate"))<=24269
+    and 24269<=(extract(YEAR from "bussStateDateNew")*12+extract(MONTH from "bussStateDateNew"))
+
+*/
+
+/*Añadido al 06/03/2023*/
+/*DECLARACIONES*/
+
+insert into permissions(name, guard_name, name_to_see) values ('SI_STATEMENTS_MODULE', 'web', 'Modulo Declaraciones');
+/*insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_WAITING_LINE_GRAPH', 'web', 'Graficas de Linea de Espera');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_ACCOUNTING_GRAPH', 'web', 'Graficas de Contabilidad');
+insert into permissions(name, guard_name, name_to_see) values ('SI_REPORT_CLIENTS_GRAPH', 'web', 'Graficas de Clientes');*/
+
+/*Añadido al 14/03/2023*/
+
+/*
+bussState;
+bussStateDate;
+bussComment;
+bussObservation
+bussRegime
+bussFileKind
+bussFileNumber
+bussKindBookAcc
+tellerId
+tellerColor
+*/
+
+/*AÑDIDO EL 15/03/2023*/
+ALTER TABLE teller ADD COLUMN "tellColor" varchar(20);
+
+ALTER TABLE done_by_month ADD COLUMN "bussState" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussStateDate" timestamp;
+ALTER TABLE done_by_month ADD COLUMN "bussComment" varchar(500);
+ALTER TABLE done_by_month ADD COLUMN "bussCommentColor" varchar(20);
+
+
+ALTER TABLE done_by_month ADD COLUMN "bussFileKind" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussFileNumber" integer;
+ALTER TABLE done_by_month ADD COLUMN "bussRegime" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussKindBookAcc" VARCHAR(5);
+ALTER TABLE done_by_month ADD COLUMN "bussObservation" text;
+
+ALTER TABLE done_by_month ADD COLUMN "tellId" integer;
+ALTER TABLE done_by_month ADD COLUMN "tellCode" varchar(10);
+ALTER TABLE done_by_month ADD COLUMN "tellName" varchar(50);
+ALTER TABLE done_by_month ADD COLUMN "tellColor" varchar(20);
+
+/**/
+ALTER TABLE done_by_month ADD COLUMN "perId" INTEGER;
+ALTER TABLE done_by_month ADD COLUMN "perKindDoc" varchar(5);
+ALTER TABLE done_by_month ADD COLUMN "perNumberDoc" varchar(20);
+ALTER TABLE done_by_month ADD COLUMN "perName" varchar(300);
+
+
+
+CREATE OR REPLACE FUNCTION public.tf_b_i_done_by_month ()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+   
+BEGIN
+    /*"bussState", "bussStateDate", "bussComment", "bussCommentColor",
+    "bussFileKind",  "bussFileNumber", "bussRegime",  "bussKindBookAcc",  "bussObservation" , 
+    "perId", "perKindDoc" , "perNumberDoc" , "perName",*/
+    
+
+    /*"tellId" , "tellCode", "tellName", "tellColor",*/
+    /*Los campos de bussId, perId, tellId, es solamente historial,  no considerar relevante para la consulta */
+    select 
+            "bussState", "bussStateDate", "bussComment", "bussCommentColor",
+            "bussFileKind",  "bussFileNumber", "bussRegime",  "bussKindBookAcc",  "bussObservation" , 
+            person."perId", "perKindDoc" , "perNumberDoc" , "perName"
+        into 
+            NEW."bussState", NEW."bussStateDate", NEW."bussComment", NEW."bussCommentColor",
+            NEW."bussFileKind",  NEW."bussFileNumber", NEW."bussRegime",  NEW."bussKindBookAcc",  NEW."bussObservation" , 
+            NEW."perId", NEW."perKindDoc" , NEW."perNumberDoc" , NEW."perName"
+    
+    from 
+        d_bussines_periods inner join bussines
+            on d_bussines_periods."bussId"=bussines."bussId"
+        inner join person on bussines."perId"=person."perId" 
+        where d_bussines_periods."dbpId"=new."dbpId";
+
+    Select 
+            teller."tellId" , "tellCode", "tellName", "tellColor"
+        INTO
+            NEW."tellId" , NEW."tellCode", NEW."tellName", NEW."tellColor"
+     from 
+            d_bussines_periods inner join bussines
+                on d_bussines_periods."bussId"=bussines."bussId"
+            inner join teller on bussines."tellId"=teller."tellId" 
+            where d_bussines_periods."dbpId"=new."dbpId";
+
+
+RETURN NEW;
+END;
+$function$
+
+CREATE TRIGGER t_b_i_done_by_month BEFORE
+INSERT
+    ON done_by_month FOR EACH
+    ROW EXECUTE PROCEDURE tf_b_i_done_by_month();
+
+/*
+delete from appointment_temp where "apptmId"=18
+drop TRIGGER t_b_i_done_by_month on done_by_month;
+drop FUNCTION tf_b_i_done_by_month;*/
+
+
+
+/*select * from 
+    d_bussines_periods inner join bussines
+         on d_bussines_periods."bussId"=bussines."bussId"
+    inner join person on bussines."perId"=person."perId" 
+    where d_bussines_periods."prdsId"=1*/
+
+    /*Select * from 
+        d_bussines_periods inner join bussines
+             on d_bussines_periods."bussId"=bussines."bussId"
+        inner join teller on bussines."tellId"=teller."tellId" 
+        where d_bussines_periods."prdsId"=1*/
+

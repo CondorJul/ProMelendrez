@@ -389,7 +389,7 @@ class BusinessController extends Controller
         ->with('person')
   
         //->with('person')
-        ->whereRaw(' 1=1 '.$queryWhere.' ORDER BY RIGHT("bussRUC",1) ASC',[$params])
+        ->whereRaw(' 1=1 '.$queryWhere.' ORDER BY RIGHT("bussRUC",1) ASC, "bussName" asc',[$params])
         /*->whereHas('person', function($q) use($h) {
             $q->whereRaw(' lower("perName" ) like lower(?) ',[$h]);
         })*/

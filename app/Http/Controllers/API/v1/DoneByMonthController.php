@@ -181,6 +181,7 @@ class DoneByMonthController extends Controller
                         $d->ddbmtOptionsByComa=isset($value['ddbmtOptionsByComa'])?($value['ddbmtOptionsByComa']):null;
                         $d->ddbmtShortComment=isset($value['ddbmtShortComment'])?$value['ddbmtShortComment']:null;
 
+                        $d->ddbmtRectified=2;
                         $d->ddbmtRectifiedBy=$user->id;
                         $d->ddbmtRectifiedAt = DB::raw('now()');
 
@@ -238,6 +239,8 @@ class DoneByMonthController extends Controller
     public function  prepareArrayToCreate($value, $dbm, $user){
         if($value['ddbmtState']==6){
             $p=[
+                'ddbmtDoneBy'=>$user->id, 
+                'ddbmtDoneAt'=> DB::raw('now()'),
                 'dbmId'=>$dbm->dbmId, /*Foreing key */
                 'tsksId'=>$value['tsksId'], /*Foreign key */
 

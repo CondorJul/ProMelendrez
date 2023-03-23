@@ -25,7 +25,9 @@ class AddTellerRequest extends FormRequest
     {
         return [
             'tellCode'=>'required|unique:teller,tellCode',
-            'tellName'=>'required'
+            'tellName'=>'required',
+            'tellColor'=>'required'
+            
         ];
     }
 }

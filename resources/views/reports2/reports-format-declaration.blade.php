@@ -109,7 +109,7 @@
     <main>
         <div style="font-size: 12px; font-family: 'Arial Narrow'">
 
-            <h2 style="text-align: center; font-size: 25px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;"> {{$month}} - {{ $period['prdsNameShort'] }}</h2>
+            <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;"> {{$month}} - {{ $period['prdsNameShort'] }}</h2>
 
 
             <div class="conteiner" style="font-size: 9px; font-family: 'Arial Narrow'; clear:both; position:relative;">
