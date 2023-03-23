@@ -714,12 +714,60 @@ class ReportsController extends Controller
             $sales2 = array_merge($sales2->toArray(), ['annualResumeDetails' => $aux1]);
 
 
+            $lineaMonths = array();
+            $lineaMonths = array_slice(array_values($nameMonths),0,12, true);
+
+            $arPrevious = AnnualResume::select()->with('period')->where([
+                'prdsId' => $request->prdsIdPrevious,
+                'bussId' => $request->bussId
+            ])->first();
+
+            $arCurrent = AnnualResume::select()->with('period')->where([
+                'prdsId' => $request->prdsIdCurrent,
+                'bussId' => $request->bussId
+            ])->first();
+
+            $arrayPrevious = DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc', [$arPrevious->arId]);
+            $arrayCurrent = DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc', [$arCurrent->arId]);
+
+            $auxPrev = array_map(function ($element) {
+                return doubleval($element->ardTotal);
+            }, $arrayPrevious);
+            $result1 = array_slice($auxPrev,0,12, true);
+
+            $auxCur = array_map(function ($element) {
+                return doubleval($element->ardTotal);
+            }, $arrayCurrent);
+            $result2 = array_slice($auxCur,0,12, true);
+
+            $result3 = array();
+            $result3 = $lineaMonths;
+
+            $datos = array(
+                'type'=>'line',
+                'data'=>array(
+                    'labels'=>$lineaMonths,
+                    'datasets'=>[array(
+                        'label' => $arPrevious->period->prdsNameShort,
+                        'data' => $result1,
+                        'fill' => false,
+                        'borderColor' => 'red'
+                    ),
+                    array(
+                        'label' => $arCurrent->period->prdsNameShort,
+                        'data' => $result2,
+                        'fill' => false,
+                        'borderColor' => 'green'
+                    )]
+                )
+            );
 
             $data = [
                 'business' => $b,
                 'date' => $f,
                 'salesPrev' => $sales1,
                 'salesCur' => $sales2,
+                'data' => json_encode($datos),
                 'evaluateIsset' => function ($num) {
                     return isset($num) ? $num : '-';
                 }
@@ -827,11 +875,66 @@ class ReportsController extends Controller
 
             $sales2 = array_merge($sales2->toArray(), ['annualResumeDetails' => $aux1]);
 
+
+
+
+
+            $lineaMonths = array();
+            $lineaMonths = array_slice(array_values($nameMonths),0,12, true);
+
+            $arPrevious = AnnualResume::select()->with('period')->where([
+                'prdsId' => $request->prdsIdPrevious,
+                'bussId' => $request->bussId
+            ])->first();
+
+            $arCurrent = AnnualResume::select()->with('period')->where([
+                'prdsId' => $request->prdsIdCurrent,
+                'bussId' => $request->bussId
+            ])->first();
+
+            $arrayPrevious = DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc', [$arPrevious->arId]);
+            $arrayCurrent = DB::select('SELECT "ardMonth", "ardTotal" FROM annual_resume_details where "arId"=? order by "ardMonth" asc', [$arCurrent->arId]);
+
+
+            $auxPrev = array_map(function ($element) {
+                return doubleval($element->ardTotal);
+            }, $arrayPrevious);
+            $result1 = array_slice($auxPrev,0,12, true);
+
+            $auxCur = array_map(function ($element) {
+                return doubleval($element->ardTotal);
+            }, $arrayCurrent);
+            $result2 = array_slice($auxCur,0,12, true);
+
+            $result3 = array();
+            $result3 = $lineaMonths;
+
+            $datos = array(
+                'type'=>'line',
+                'data'=>array(
+                    'labels'=>$result3,
+                    'datasets'=>[array(
+                        'label' => 'Dogs',
+                        'data' => $result1,
+                        'fill' => false,
+                        'borderColor' => 'blue'
+                    ),
+                    array(
+                        'label' => 'Dogs',
+                        'data' => $result2,
+                        'fill' => false,
+                        'borderColor' => 'blue'
+                    )]
+                )
+            );
+
+
             $data = [
                 'business' => $b,
                 'date' => $f,
                 'salesPrev' => $sales1,
                 'salesCur' => $sales2,
+                'data' => $datos,
                 'empty2' => function ($num) {
                     return isset($num) ? $num : '-';
                 }
@@ -950,17 +1053,17 @@ class ReportsController extends Controller
     public function tasksCompletedJSON(Request $request)
     {
 
-        
+
         $businesses=Business::select()
             ->with('dBussinesPeriods.doneByMonth.dDoneByMonthTasks.task')
-        /*    ->whereHas('services.serviceType 
+        /*    ->whereHas('services.serviceType
             's', function ($query) use ($id) {
                 return $query->where('id', $id);
             })*/
             ->get();
 
         return response()->json([
-            'data'=>$businesses 
+            'data'=>$businesses
         ]);
 
         /*

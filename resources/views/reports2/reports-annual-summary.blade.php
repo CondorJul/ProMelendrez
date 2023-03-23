@@ -3,7 +3,7 @@
 <head>
     <style type="text/css">
         @page {
-            margin: 80px 74px 74px 100px;
+            margin: 80px 70px 74px 70px;
         }
 
         header {
@@ -18,7 +18,7 @@
         footer {
             border-top: 2px solid #CC0101;
             position: fixed;
-            bottom: -60px;
+            bottom: -40px;
             left: 0px;
             right: 0px;
 
@@ -42,6 +42,7 @@
         .a {
             /*border: 2px solid black;*/
             width: 49%;
+            margin-left: 3px;
         }
 
         .b {
@@ -67,6 +68,7 @@
             height: 10px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -79,7 +81,7 @@
         </div>
     </header>
     <footer>
-        <div style="font-size: 10.8px; line-height: 12px; padding-top: 5px;">EL PRESENTE ES PARA INFORMAR RESPECTO A LOS HONORARIOS POR SERVICIOS QUE NOS ADEUDA HASTA LA FECHA. <br> Ante cualquier duda o consulta, sírvase comunicarse con nosotros al celular <span style="color: red; font-weight: bold;">N° 973896051 / 951415451</span> a los señores: <br> José Luis MELENDRES CÓNDOR y/o Rita Cindy MIRANDA RAMOS, o al correo <span style="color: blue; font-weight: bold;">melendres.auditores@hotmail.com</span></div>
+        <div style="font-size: 10.8px; line-height: 12px; padding-top: 5px;">Ante cualquier duda o consulta, sírvase comunicarse con nosotros al celular <span style="color: red; font-weight: bold;">N° 973896051 / 951415451</span> a los señores: <br> José Luis MELENDRES CÓNDOR y/o Rita Cindy MIRANDA RAMOS, o al correo <span style="color: blue; font-weight: bold;">melendres.auditores@hotmail.com</span></div>
     </footer>
     <main>
         <div style="font-size: 12px; font-family: Arial, Helvetica, sans-serif;">
@@ -91,7 +93,6 @@
         </div>
         <br><br><br><br>
         <div class="contenedor" style="font-size: 12px; font-family: Arial, Helvetica, sans-serif;">
-
 
             @php
             $p = [$salesPrev,$salesCur]
@@ -162,7 +163,7 @@
                             <th></th>
                             <th></th>
                             <th style="width: 1%; border-right-style: hidden;">&nbspS/</th>
-                            <th>{{ $val['ardFee'] }}</th>
+                            <th style="text-align: center">{{ $val['ardFee'] }}</th>
                         </tr>
                         @endif
                         @endforeach
@@ -170,49 +171,17 @@
                             <th colspan="10" class="espacio2" style="border-left-style: hidden; border-right-style: hidden;"></th>
                         </tr>
                         <tr>
-                            <th colspan="10" style="text-align: left;">Nota:</th>
+                            <th colspan="10" style="text-align: left;">Nota: {{ $e['arDescription'] }}</th>
                         </tr>
                 </table>
             </div>
             @endforeach
-
-
-
-
-
-            <!--<div class="b">
-                <table style="width: 100%;" border="1" cellspacing="0">
-                    <tr>
-                        <th colspan="6" style="font-size: 20px;">EJERCICIO 2020</th>
-                    </tr>
-                    <tr>
-                        <th rowspan="2">MESES</th>
-                        <th colspan="3">VENTAS</th>
-                        <th rowspan="2">PLAME</th>
-                        <th rowspan="2">HONORARIOS</th>
-                    </tr>
-                    <tr>
-                        <th>BASE IMPONIBLE</th>
-                        <th>I.G.V</th>
-                        <th>TOTAL</th>
-                    </tr>
-                    @foreach($salesPrev['annualResumeDetails'] as $key => $value)
-                    <tr>
-                        <th style="font-weight: lighter;">-</th>
-                        <th style="width: 15%; font-weight: lighter;">-</th>
-                        <th style="width: 15%; font-weight: lighter;">-</th>
-                        <th style="width: 15%; font-weight: lighter;">-</th>
-                        <th style="width: 10%; font-weight: lighter;">-</th>
-                        <th style="width: 15%; font-weight: lighter;">-</th>
-                    </tr>
-                    @endforeach
-                </table>
-            </div>-->
         </div>
-        <!--
+
         <div>
-            <img style="margin-top: 30px;" src="https://quickchart.io/chart?c={type:'line',data:{labels:['January','February','March','April','May'],datasets:[{label:'Dogs',data:[50,60,70,180,190],fill:false,borderColor:'blue'},{label:'Cats',data:[100,200,300,400,500],fill:false,borderColor:'green'}]}}" width="100%">
-        </div>-->
+            <img src='<?php echo 'https://quickchart.io/chart?c='.$data ?>' width="100%">
+        </div>
+
     </main>
 </body>
 
