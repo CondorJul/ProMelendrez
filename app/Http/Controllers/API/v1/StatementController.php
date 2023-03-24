@@ -137,6 +137,8 @@ class StatementController extends Controller
                     )
                 )
                 
+           
+
                 GROUP BY RIGHT("bussRUC", 1); 
                 ', 
                 [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths]
@@ -212,6 +214,7 @@ class StatementController extends Controller
         $year=$period->prdsNameShort;
         $month=$request->dbmMonth;
         $totalMonths=$year*12+$month;
+        $request->ln;
         $bussState='1';
 
         /*Extraido de Base de datos */
@@ -236,19 +239,33 @@ class StatementController extends Controller
                             )
                     )
                 )
+                and 
+                (  RIGHT("bussRUC", 1)=? or -1=?) 
+
                 
+                order by "_lastDigit" asc, "bussName" asc
                 ; 
                 ', 
-                [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths]
+                [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths, $request->ln, $request->ln]
             );
 
             /*Declarados en el mes  */
             $arrayStatements = DB::select('
                 SELECT b.*, RIGHT(b."bussRUC", 1) AS "_lastDigit" FROM bussines b 
                 INNER JOIN d_bussines_periods dbp on b."bussId"=dbp."bussId"
-                INNER JOIN done_by_month dbm on dbp."dbpId"=dbm."dbpId" where dbp."prdsId"=? and dbm."dbmMonth"=?;
+                INNER JOIN done_by_month dbm on dbp."dbpId"=dbm."dbpId" where dbp."prdsId"=? and dbm."dbmMonth"=?
+                
+                and 
+                (  RIGHT(b."bussRUC", 1)=? or -1=?) 
+
+                
+                order by "_lastDigit" asc, "bussName" asc
+
+                ;
                 ', 
-                [$request->prdsId,  $month]
+                [$request->prdsId,  $month, 
+                
+                $request->ln, $request->ln]
              );
 
 
