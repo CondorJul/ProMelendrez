@@ -267,7 +267,7 @@ class StatementController extends Controller
              for($i=0;$i<count($cloneOfArrayStatements);$i++){
                 $_bussId=$cloneOfArrayStatements[$i]->bussId;
                 $key=array_search($_bussId, array_column($cloneOfArrayBusinessess,'bussId'));
-                if($key){
+                if($key!=null){
                     array_push($arrayProcessedCorrectly, $cloneOfArrayStatements[$i]);                    
                     unset($cloneOfArrayBusinessess[$key]); 
                 }
@@ -282,7 +282,7 @@ class StatementController extends Controller
                 $_bussId=$arrayProcessedCorrectly[$i]->bussId;
                 
                 $key=array_search($_bussId, array_column($cloneOfArrayStatements,'bussId'));
-                if($key){
+                if($key!=null){
                     //array_push($arrayO, $arrayProcessedCorrectly[$i]);                    
                     unset($cloneOfArrayStatements[$key]); 
                 }
