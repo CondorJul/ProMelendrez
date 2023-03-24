@@ -263,11 +263,14 @@ class StatementController extends Controller
           
 
 
-
+             $countB=[];
+             $countS=[];
              for($i=0;$i<count($cloneOfArrayStatements);$i++){
                 $_bussId=$cloneOfArrayStatements[$i]->bussId;
                 $key=array_search($_bussId, array_column($cloneOfArrayBusinessess,'bussId'));
                 if($key!=null){
+                    array_push($countB,$key);
+                    
                     array_push($arrayProcessedCorrectly, $cloneOfArrayStatements[$i]);                    
                     unset($cloneOfArrayBusinessess[$key]); 
                 }
@@ -283,7 +286,8 @@ class StatementController extends Controller
                 
                 $key=array_search($_bussId, array_column($cloneOfArrayStatements,'bussId'));
                 if($key!=null){
-                    //array_push($arrayO, $arrayProcessedCorrectly[$i]);                    
+                    //array_push($arrayO, $arrayProcessedCorrectly[$i]);      
+                    array_push($countS,$key);              
                     unset($cloneOfArrayStatements[$key]); 
                 }
              }
@@ -359,6 +363,10 @@ class StatementController extends Controller
                 /*Información de pendientes y de observados  */
                 'pendings'=>array_values($cloneOfArrayBusinessess),
                 'observeds'=>array_values($cloneOfArrayStatements),
+
+
+                'countB'=>$countB,
+                'countS'=>$countS,
               
             ]
         ]);
