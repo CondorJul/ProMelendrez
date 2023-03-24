@@ -272,7 +272,7 @@ class StatementController extends Controller
                     array_push($countB,$key);
                     
                     array_push($arrayProcessedCorrectly, $cloneOfArrayStatements[$i]);                    
-                    unset($cloneOfArrayBusinessess[$key]); 
+                    //unset($cloneOfArrayBusinessess[$key]); 
                 }
              }
              /*Lo que sobra de cloneOfArrayBusinessess, se considera pendiente de atencion
@@ -288,7 +288,7 @@ class StatementController extends Controller
                 if($key!=null){
                     //array_push($arrayO, $arrayProcessedCorrectly[$i]);      
                     array_push($countS,$key);              
-                    unset($cloneOfArrayStatements[$key]); 
+                    //unset($cloneOfArrayStatements[$key]); 
                 }
              }
 
