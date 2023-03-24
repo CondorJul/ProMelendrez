@@ -260,19 +260,25 @@ class StatementController extends Controller
              $cloneOfArrayBusinessess=array_merge(array(), $arrayBusinessess);
 
              $arrayProcessedCorrectly=[];
+             $arrayObserveds=[];
+             $arrayPendings=[];
+
           
 
 
              $countB=[];
              $countS=[];
+
              for($i=0;$i<count($cloneOfArrayStatements);$i++){
                 $_bussId=$cloneOfArrayStatements[$i]->bussId;
                 $key=array_search($_bussId, array_column($cloneOfArrayBusinessess,'bussId'));
                 if($key!==false){
-                    array_push($countB,$key);
+                    array_push($countB,$cloneOfArrayBusinessess[$key]);
                     
                     array_push($arrayProcessedCorrectly, $cloneOfArrayStatements[$i]);                    
-                    unset($cloneOfArrayBusinessess[$key]); 
+                    //unset($cloneOfArrayBusinessess[$key]); 
+                }else{
+                    array_push($arrayObserveds, $cloneOfArrayStatements[$i] );
                 }
              }
              /*Lo que sobra de cloneOfArrayBusinessess, se considera pendiente de atencion
@@ -281,16 +287,31 @@ class StatementController extends Controller
 
 
 
-             for($i=0;$i<count($arrayProcessedCorrectly);$i++){
+             for($i=0;$i<count($cloneOfArrayBusinessess);$i++){
+                $_bussId=$cloneOfArrayBusinessess[$i]->bussId;
+                
+                $key=array_search($_bussId, array_column($arrayProcessedCorrectly,'bussId'));
+                if($key!==false){
+                    //array_push($arrayO, $arrayProcessedCorrectly[$i]);      
+                    array_push($countS,$key);              
+                    //unset($cloneOfArrayStatements[$key]); 
+                }else{
+                    array_push($arrayPendings, $cloneOfArrayBusinessess[$i]);
+                }
+             }
+
+
+
+             /*for($i=0;$i<count($arrayProcessedCorrectly);$i++){
                 $_bussId=$arrayProcessedCorrectly[$i]->bussId;
                 
                 $key=array_search($_bussId, array_column($cloneOfArrayStatements,'bussId'));
                 if($key!==false){
                     //array_push($arrayO, $arrayProcessedCorrectly[$i]);      
                     array_push($countS,$key);              
-                    unset($cloneOfArrayStatements[$key]); 
+                    //unset($cloneOfArrayStatements[$key]); 
                 }
-             }
+             }*/
 
             /*Lo que sobra de cloneOfArrayStatements, se considera se considera observado, por 
 
@@ -361,8 +382,8 @@ class StatementController extends Controller
                 'processeds'=>$arrayProcessedCorrectly,
 
                 /*Información de pendientes y de observados  */
-                'pendings'=>array_values($cloneOfArrayBusinessess),
-                'observeds'=>array_values($cloneOfArrayStatements),
+                'pendings'=>array_values($arrayPendings),
+                'observeds'=>array_values($arrayObserveds),
 
 
                 'countB'=>$countB,
