@@ -206,7 +206,7 @@ class StatementController extends Controller
     }
 
 
-    public function pendings(Request $request){
+    public function pendingsAndObserveds(Request $request){
 
         $period = Period::select()->where('prdsId', $request->prdsId)->first();
         $year=$period->prdsNameShort;
@@ -214,8 +214,8 @@ class StatementController extends Controller
         $totalMonths=$year*12+$month;
         $bussState='1';
 
-
-        $params=[];
+        /*Extraido de Base de datos */
+        /*Todos los clientes que deben declarara en dicho mes */
         $arrayBusinessess = DB::select('
             SELECT *, RIGHT("bussRUC", 1) AS "_lastDigit"  FROM bussines  
             where 1=1 AND 
@@ -242,7 +242,7 @@ class StatementController extends Controller
                 [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths]
             );
 
-
+            /*Declarados en el mes  */
             $arrayStatements = DB::select('
                 SELECT b.*, RIGHT(b."bussRUC", 1) AS "_lastDigit" FROM bussines b 
                 INNER JOIN d_bussines_periods dbp on b."bussId"=dbp."bussId"
@@ -251,31 +251,74 @@ class StatementController extends Controller
                 [$request->prdsId,  $month]
              );
 
-             $arrayP=[];
-             $arrayO=[];
-             $arrayP1=[];
-             $arrayO1=[];
-             for($i=0;$i<count($arrayStatements);$i++){
-                $_bussId=$arrayStatements[$i]->bussId;
 
-                $key=array_search($_bussId, array_column($arrayBusinessess,'bussId'));
-                array_push($arrayP1, $key);
-                if($key){
-                    array_push($arrayP, $arrayStatements[$i]);                    
-                    unset($arrayBusinessess[$key]); 
+            /*Cruzamos la data para saber quiens han declarado correctamente,
+             y quienes puedan ser un error al momento de registrar */
+
+             /*Aqui clonamos y mantemeos los originales*/
+             $cloneOfArrayStatements=array_merge(array(), $arrayStatements);
+             $cloneOfArrayBusinessess=array_merge(array(), $arrayBusinessess);
+
+             $arrayProcessedCorrectly=[];
+             $arrayObserveds=[];
+             $arrayPendings=[];
+
+          
+
+
+             $countB=[];
+             $countS=[];
+
+             for($i=0;$i<count($cloneOfArrayStatements);$i++){
+                $_bussId=$cloneOfArrayStatements[$i]->bussId;
+                $key=array_search($_bussId, array_column($cloneOfArrayBusinessess,'bussId'));
+                if($key!==false){
+                    array_push($countB,$cloneOfArrayBusinessess[$key]);
+                    
+                    array_push($arrayProcessedCorrectly, $cloneOfArrayStatements[$i]);                    
+                    //unset($cloneOfArrayBusinessess[$key]); 
+                }else{
+                    array_push($arrayObserveds, $cloneOfArrayStatements[$i] );
                 }
              }
+             /*Lo que sobra de cloneOfArrayBusinessess, se considera pendiente de atencion
 
-             for($i=0;$i<count($arrayP);$i++){
-                $_bussId=$arrayP[$i]->bussId;
+             */
+
+
+
+             for($i=0;$i<count($cloneOfArrayBusinessess);$i++){
+                $_bussId=$cloneOfArrayBusinessess[$i]->bussId;
                 
-                $key=array_search($_bussId, array_column($arrayStatements,'bussId'));
-                array_push($arrayO1, $key);
-                if($key){
-                    array_push($arrayO, $arrayP[$i]);                    
-                    unset($arrayStatements[$key]); 
+                $key=array_search($_bussId, array_column($arrayProcessedCorrectly,'bussId'));
+                if($key!==false){
+                    //array_push($arrayO, $arrayProcessedCorrectly[$i]);      
+                    array_push($countS,$key);              
+                    //unset($cloneOfArrayStatements[$key]); 
+                }else{
+                    array_push($arrayPendings, $cloneOfArrayBusinessess[$i]);
                 }
              }
+
+
+
+             /*for($i=0;$i<count($arrayProcessedCorrectly);$i++){
+                $_bussId=$arrayProcessedCorrectly[$i]->bussId;
+                
+                $key=array_search($_bussId, array_column($cloneOfArrayStatements,'bussId'));
+                if($key!==false){
+                    //array_push($arrayO, $arrayProcessedCorrectly[$i]);      
+                    array_push($countS,$key);              
+                    //unset($cloneOfArrayStatements[$key]); 
+                }
+             }*/
+
+            /*Lo que sobra de cloneOfArrayStatements, se considera se considera observado, por 
+
+                por que se declaro fera de la fecha 
+
+             */
+
 
 
 
@@ -330,12 +373,22 @@ class StatementController extends Controller
             'res' => true,
             'msg' => 'Actualizado correctamente',
             'data' => [
-              'businessess'=>$arrayBusinessess,
-              'statements'=>$arrayStatements,
-              'arrayP'=>$arrayP,
-              'arrayO'=>$arrayO,
-              'arrayP1'=>$arrayP1,
-              'arrayO1'=>$arrayO1
+                /*Información en crudo */
+                'businessess'=>$arrayBusinessess,/* */
+                'statements'=>$arrayStatements,
+
+                /*Procesado correctamente */
+
+                'processeds'=>$arrayProcessedCorrectly,
+
+                /*Información de pendientes y de observados  */
+                'pendings'=>array_values($arrayPendings),
+                'observeds'=>array_values($arrayObserveds),
+
+
+                'countB'=>$countB,
+                'countS'=>$countS,
+              
             ]
         ]);
     }

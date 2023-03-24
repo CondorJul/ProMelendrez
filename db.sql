@@ -2489,3 +2489,77 @@ drop FUNCTION tf_b_i_done_by_month;*/
         inner join teller on bussines."tellId"=teller."tellId" 
         where d_bussines_periods."prdsId"=1*/
 
+
+
+select 
+            b."bussState", b."bussStateDate", b."bussComment", b."bussCommentColor",
+            b."bussFileKind",  b."bussFileNumber", b."bussRegime",  b."bussKindBookAcc",  b."bussObservation" , 
+            p."perId", p."perKindDoc" , p."perNumberDoc" , p."perName"
+
+    
+    from 
+    	done_by_month m INNER JOIN
+    
+        d_bussines_periods d  on m."dbpId"=d."dbpId"
+        
+        inner join bussines b
+            on d."bussId"=b."bussId"
+        inner join person p on b."perId"=p."perId" 
+        where d."prdsId"=14 and m."dbmMonth"=1 
+
+update
+    done_by_month 
+    set 
+        "bussState" = be."bussState",  "bussStateDate" = be."bussStateDate", "bussComment" = be."bussComment",
+        "bussCommentColor"=be."bussCommentColor", "bussFileKind"=be."bussFileKind", 
+        "bussFileNumber"= be."bussFileNumber", "bussRegime"= be."bussRegime", 
+        "bussKindBookAcc"= be."bussKindBookAcc",  "bussObservation"=be."bussObservation" , 
+            "perId"=be."perId", "perKindDoc"= be."perKindDoc" , "perNumberDoc"=be."perNumberDoc" , "perName"= be."perName"
+
+
+FROM (
+
+    select 
+            b."bussState", b."bussStateDate", b."bussComment", b."bussCommentColor",
+            b."bussFileKind",  b."bussFileNumber", b."bussRegime",  b."bussKindBookAcc",  b."bussObservation" , 
+            p."perId", p."perKindDoc" , p."perNumberDoc" , p."perName", 
+
+            m."dbmId", m."dbpId", m."dbmMonth"
+
+    
+    from 
+    	done_by_month m INNER JOIN
+    
+        d_bussines_periods d  on m."dbpId"=d."dbpId"
+        
+        inner join bussines b
+            on d."bussId"=b."bussId"
+        inner join person p on b."perId"=p."perId" 
+
+) AS be where done_by_month."dbmId"=be."dbmId" 
+and done_by_month."dbmMonth"=be."dbmMonth" 
+and done_by_month."dbmId"=be."dbmId" and 
+
+done_by_month."perId" is  null 
+and done_by_month."bussState" is  null 
+and done_by_month."bussFileNumber" is  null
+and done_by_month."dbmMonth"=1;
+
+
+
+
+
+
+
+
+
+
+
+
+        UPDATE dummy
+SET customer=subquery.customer,
+    address=subquery.address,
+    partn=subquery.partn
+FROM (SELECT address_id, customer, address, partn
+      FROM  /* big hairy SQL */ ...) AS subquery
+WHERE dummy.address_id=subquery.address_id;
