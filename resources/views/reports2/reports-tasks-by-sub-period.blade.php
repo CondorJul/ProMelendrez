@@ -83,7 +83,7 @@
         ">{{ $date }}</h2>
     </footer>
     <main>
-    <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">DECLARACIÓN</h2>
+
         @php($pageBreak=false)
         @foreach($groupeds as $keyln=>$valueln)
 
@@ -94,7 +94,7 @@
                 <!--Permite dar salto de pagina -->
                 <div style="page-break-after:always;"></div>
             @endif
-
+            <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">REGISTRO DE DECLARACIÓN MENSUAL GENERAL</h2>
             @php($pageBreak=true)
 
 
@@ -103,7 +103,7 @@
                     <tr>
                         <th colspan="4" style="font-size: 25px; height:30px; font-weight:bold; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$valueln['name']}}</th>
                         <th colspan="4" style="border-top-style: hidden;"></th>
-                        <th colspan="3" style="font-size: 20px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month']}}</th>
+                        <th colspan="4" style="font-size: 20px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month']}}</th>
                     </tr>
                     <tr>
                         <th>#</th>
@@ -117,7 +117,7 @@
                         <th>PDT-621</th>
                         <th>PLAME-601</th>
                         <th>LIBROS</th>
-
+                        <th>VENT</th>
                     </tr>
                     @php($countBuss=0)
                     @foreach($dBusinessPeriods as $key =>$value)
@@ -194,6 +194,7 @@
                                     </th>
 
                                 @endforeach
+                                <th style="width: 4.3%; font-weight: lighter; text-align: center;"></th>
                             @endforeach
                         </tr>
                     @endforeach
