@@ -160,7 +160,7 @@
 
 
                                     -->
-                                <th style="width: 4.3%; font-weight: lighter; text-align: center; " style="background-color: {{ $valuedbm['tellColor'] }}" >{{$valuedbm['tellCode']}}</th>
+                                <th style="width: 2.5%; font-weight: lighter; text-align: center; background-color: {{ $valuedbm['tellColor'] }}" >{{$valuedbm['tellCode']}}</th>
                                 @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
                                 @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
 
