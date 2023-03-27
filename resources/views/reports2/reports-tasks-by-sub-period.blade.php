@@ -125,8 +125,10 @@
                         @php($countBuss++)
                         @php($business=$value['business'])
                         @php($doneByMonths=$value['doneByMonths'])
+                        <!--Se obtiene el color que esta en la primera posicion, practica no recomendable-->
+                        @php($tellColor=$doneByMonths[0]['tellColor'])
 
-                        <tr>
+                        <tr style="background-color:  {{$tellColor}};" >
                             <th style="width: 2%; height:16px; font-weight: lighter; text-align: center;">{{$countBuss}}</th>
                             <th style="width: 28%; font-weight: lighter; text-align: left; padding-left: 7px;">{{$business['bussName']}}</th>
                             <th style="width: 6%; font-weight: lighter; text-align: center;">{{$business['bussRUC']}}</th>
