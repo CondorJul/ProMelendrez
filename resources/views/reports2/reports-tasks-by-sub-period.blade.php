@@ -102,8 +102,8 @@
                 <table style="width: 100%;" border="1" cellspacing="0">
                     <tr>
                         <th colspan="4" style="font-size: 25px; height:30px; font-weight:bold; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$valueln['name']}}</th>
-                        <th colspan="4" style="border-top-style: hidden;"></th>
-                        <th colspan="4" style="font-size: 20px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month']}}</th>
+                        <th colspan="5" style="border-top-style: hidden;"></th>
+                        <th colspan="3" style="font-size: 20px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month']}}</th>
                     </tr>
                     <tr>
                         <th>#</th>
@@ -114,10 +114,11 @@
                         <th>RÉGIMEN</th>
                         <th>FECHA</th>
                         <th>TIPO DE <b> LIBRO</th>
+                        <th>VENT</th>
                         <th>PDT-621</th>
                         <th>PLAME-601</th>
                         <th>LIBROS</th>
-                        <th>VENT</th>
+                        
                     </tr>
                     @php($countBuss=0)
                     @foreach($dBusinessPeriods as $key =>$value)
@@ -159,6 +160,7 @@
 
 
                                     -->
+                                <th style="width: 4.3%; font-weight: lighter; text-align: center; " style="background-color: {{ $valuedbm['tellColor'] }}" >{{$valuedbm['tellCode']}}</th>
                                 @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
                                 @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
 
@@ -194,7 +196,6 @@
                                     </th>
 
                                 @endforeach
-                                <th style="width: 4.3%; font-weight: lighter; text-align: center;"></th>
                             @endforeach
                         </tr>
                     @endforeach
