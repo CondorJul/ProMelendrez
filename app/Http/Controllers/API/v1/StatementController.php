@@ -7,6 +7,7 @@ use App\Models\Business;
 use App\Models\DBusinessPeriod;
 use App\Models\DoneByMonth;
 use App\Models\Period;
+use App\Models\Teller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -210,6 +211,7 @@ class StatementController extends Controller
 
     public function pendingsAndObserveds(Request $request){
 
+        $tellers=Teller::all();
         $period = Period::select()->where('prdsId', $request->prdsId)->first();
         $year=$period->prdsNameShort;
         $month=$request->dbmMonth;
@@ -220,8 +222,13 @@ class StatementController extends Controller
         /*Extraido de Base de datos */
         /*Todos los clientes que deben declarara en dicho mes */
         $arrayBusinessess = DB::select('
-            SELECT *, RIGHT("bussRUC", 1) AS "_lastDigit"  FROM bussines  
-            where 1=1 AND 
+            SELECT 
+                *, 
+                RIGHT("bussRUC", 1) AS "_lastDigit" 
+            FROM bussines  
+            where
+             1=1 
+            AND 
                 (
                     ( 
                         "bussState"=?/*Activo*/  
@@ -241,23 +248,40 @@ class StatementController extends Controller
                 )
                 and 
                 (  RIGHT("bussRUC", 1)=? or -1=?) 
+                
+                and 
 
+                ("tellId"=? or -1=?)
                 
                 order by "_lastDigit" asc, "bussName" asc
                 ; 
                 ', 
-                [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths, $request->ln, $request->ln]
+                [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths, 
+                $request->ln, $request->ln,
+                 $request->tellId, $request->tellId]
             );
 
             /*Declarados en el mes  */
             $arrayStatements = DB::select('
-                SELECT b.*, RIGHT(b."bussRUC", 1) AS "_lastDigit" FROM bussines b 
+                SELECT 
+                    b."bussId",b."bussKind", b."bussName", b."bussRUC", 
+                    dbm."bussState", dbm."bussStateDate", dbm."bussComment", 
+                    dbm."bussCommentColor", dbm."bussFileKind", dbm."bussFileNumber",
+                    dbm."bussRegime", dbm."bussKindBookAcc", dbm."bussObservation", dbm."tellId", 
+
+                    RIGHT(b."bussRUC", 1) AS "_lastDigit" 
+                FROM bussines b 
                 INNER JOIN d_bussines_periods dbp on b."bussId"=dbp."bussId"
-                INNER JOIN done_by_month dbm on dbp."dbpId"=dbm."dbpId" where dbp."prdsId"=? and dbm."dbmMonth"=?
+                INNER JOIN done_by_month dbm on dbp."dbpId"=dbm."dbpId" 
+                where
+                
+                dbp."prdsId"=? and dbm."dbmMonth"=?
                 
                 and 
                 (  RIGHT(b."bussRUC", 1)=? or -1=?) 
+                and 
 
+                (dbm."tellId"=? or -1=?)
                 
                 order by "_lastDigit" asc, "bussName" asc
 
@@ -265,7 +289,9 @@ class StatementController extends Controller
                 ', 
                 [$request->prdsId,  $month, 
                 
-                $request->ln, $request->ln]
+                $request->ln, $request->ln,
+                $request->tellId, $request->tellId
+                ]
              );
 
 
@@ -401,6 +427,8 @@ class StatementController extends Controller
                 /*Información de pendientes y de observados  */
                 'pendings'=>array_values($arrayPendings),
                 'observeds'=>array_values($arrayObserveds),
+
+                'tellers'=>$tellers,
 
 
                 'countB'=>$countB,
