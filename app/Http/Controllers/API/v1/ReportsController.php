@@ -944,6 +944,178 @@ class ReportsController extends Controller
         }
     }
 
+
+
+
+    public function reportFormatDeclarationByLastDigit(Request $request)
+    {
+        try {
+            //seleeciona el mes
+            $nameMonths = array("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
+            $period = Period::select()->where('prdsId', $request->prdsId)->first();
+            $year=$period->prdsNameShort;
+            $month=$request->month;
+            $ln=$request->ln;
+
+            $totalMonths=$year*12+$month;
+            $bussState='1';
+
+            //consulta base de datos
+            $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
+
+
+
+            $params = [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths];
+
+            $paramsSql='';
+            if($request->tellId>0){
+                $paramsSql=' and
+                "tellId"=? ';
+                $params[] = $request->tellId;
+
+            }
+            if($request->ln>=0){
+                $paramsSql.=' and 
+                (RIGHT("bussRUC",1)=? or -1=?) ';
+                $params[]=$request->ln;
+                $params[]=$request->ln;
+
+            }
+            $businesses = Business::selectRaw('*, RIGHT("bussRUC",1) as "_lastDigit" ')->with('teller')
+            //->whereRaw('"tellId"=?  and "bussState"=?', [$request->tellId, $request->bussState])
+            //en el where comparamos dos fechas, la fecha actual tiene que ser mayor a la fecha ingresada
+            ->whereRaw('
+                        
+                        (
+                            (
+                                "bussState"=?/*Activo*/
+                                and (extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate")<=?)
+                            )
+                            OR
+                            EXISTS
+                            (
+                                select * from business_states
+                                    where business_states."bussId" = bussines."bussId" and business_states."bussState"=?
+                                    and
+                                    (
+                                        extract(YEAR from "bussStateDate")*12+extract(MONTH from "bussStateDate"))<=?
+                                        and ?<=(extract(YEAR from "bussStateDateNew")*12+extract(MONTH from "bussStateDateNew")
+                                    )
+                            )
+                        ) 
+                        
+                        '.$paramsSql, $params)
+                    ->orderByRaw(' "_lastDigit" asc, "bussName" asc')
+                    ->get();
+            
+            //echo json_encode($businesses);
+
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $nameMonths[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
+
+            $dataGrouped = array();
+
+
+
+
+            if($ln>=0 && $ln<=9/*Entonces solo regres de un digito */){
+                //*NO hay necesidad de agrupar por ultimo digito por que solo es uno */
+                $aux1 = $businesses->toArray();
+                //$aux2 = array_values($aux1);
+                $aux2 = array_values($aux1);
+                $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '', 'bussRUC' => ''], ['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '', 'bussRUC' => '']]);
+                $temp = array();
+                $temp['name'] = 'RUC ' . $ln;
+                $temp['values'] = $aux1;
+                /*aqui guardamos el nombre de mes para luego plasmarlo en el formato de forma mas facil */
+                $temp['month']= strtoupper($nameMonths[$month - 1]);
+
+                $dataGrouped["digit-" . $ln] = $temp;
+            }
+            if($ln==-1){
+                //agrupa por ultimo digito
+                for ($i = 0; $i < 10; $i++) {
+                    $aux1 = array_filter($businesses->toArray(), function ($element) use ($i) {
+                        return intval($element['_lastDigit']) == intval($i);
+                    });
+                    $aux2 = array_values($aux1);
+                    $temp2 = array_merge($aux2, [['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '', 'bussRUC' => ''], ['bussName' => '', 'bussFileNumber' => '', 'bussRegime' => '', 'bussRUC' => '']]);
+                    $temp = array();
+                    $temp['name'] = 'RUC ' . $i;
+                    $temp['values'] = $temp2;
+                    $temp['month']= strtoupper($nameMonths[$month - 1]);
+    
+                    $dataGrouped["digit-" . $i] = $temp;
+                }
+            }
+
+            
+
+            $data = [
+                'teller' => $teller,
+                'businesses' => $businesses,
+                'groupeds' => $dataGrouped,
+                'period' => $period,
+                'month' => $nameMonths[$request->month - 1],
+                'date' => $f,
+                'substring' => function ($str) {
+                    $a=[
+                        ['oldWord'=>'EMPRESA', 'newWord'=>'EMP'],
+                        ['oldWord'=>'COMUNAL', 'newWord'=>'COMU'],
+                        ['oldWord'=>'SERVICIOS', 'newWord'=>'SERV'],
+                        ['oldWord'=>'MÚLTIPLES', 'newWord'=>'MÚLT'],
+                        ['oldWord'=>'MULTIPLES', 'newWord'=>'MULT'],
+                        ['oldWord'=>'TRANSPORTES', 'newWord'=>'TRANSP'],
+                        ['oldWord'=>'SOCIEDAD ANONIMA CERRADA', 'newWord'=>'SAC'],
+                        ['oldWord'=>'ASOCIACION', 'newWord'=>'ASOC'],
+                        ['oldWord'=>'PRODUCTORES', 'newWord'=>'PRODUCT'],
+                        ['oldWord'=>'AGROPECUARIOS', 'newWord'=>'AGROPE'],
+                        ['oldWord'=>'CORPORACION', 'newWord'=>'CORPOR'],
+                    ];
+                    foreach ($a as $key => $value) {
+                        $str=str_replace($value['oldWord'], $value['newWord'],$str);
+                    }
+                    //str_replace("world","Peter","Hello world!");
+                   // return \Illuminate\Support\Str::limit($str, 31, $end='');
+                    return substr( $str, 0, 31);
+                }, 
+                'getBussRegimeName'=>function($bussRegime){
+                    if(!$bussRegime) return "";
+                    $a=array("1"=>"ESPECIAL", "2"=>"GENERAL", "3"=>"MYPE");
+                    return $a[$bussRegime];
+                },
+                'getBussFileKindName'=>function($bussFileKind){
+                    if(!$bussFileKind) return "";
+                    $a=array("1"=>"Archivador", "2"=>"Folder");
+                    return $a[$bussFileKind];
+                },
+                'getBussKindBookAccName'=>function($bussKindBookAcc){
+                    if(!$bussKindBookAcc) return "";
+                    $a=array("1"=>"Electronico", "2"=>"Computarizado");
+                    return $a[$bussKindBookAcc];
+                }
+            ];
+
+            $path = base_path('resources/views/v1.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+            $path1 = base_path('resources/views/icon.jpg');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'landscape')->loadView('reports2.reports-format-declaration-by-last-digit', compact('pic', 'pic1'), $data);
+
+            return $pdf->stream();
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
+    }
+
     public function reportFormatDeclaration(Request $request)
     {
         try {
@@ -1354,5 +1526,222 @@ class ReportsController extends Controller
         }
     }
 
+    
+
+    public function reportTasksBySubPeriodWithBeforeMonth(Request $request)
+    {
+        try {
+           //Seleccionamos y stablecemos los datos generales
+            setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+            $nameMonths = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Total", "Balance Anual");
+            $fecha = Carbon::parse(date('m/d/y'));
+            $mes = $nameMonths[($fecha->format('m')) - 1];
+            $f = $fecha->format('d') . ' de ' . $mes . ' de ' . $fecha->format('Y');
+            //$b = Business::with('person')->where('bussId', $request->bussId)->first();
+
+            /*$businesses=Business::select()
+                ->with('dBussinesPeriods.doneByMonths.dDoneByMonthTasks.task')
+                ->with('businessStates')
+                ->get();*/
+
+            $prdsId=$request->prdsId;
+            $dbmMonth=$request->dbmMonth;
+            $ln=$request->ln;
+
+            $period=Period::select()->where('prdsId',$prdsId)->first();
+            $year=$period->prdsNameShort;
+            
+            /** */
+            $dbmMonthBefore = 12;
+            $prdsIdBefore=$request->prdsId;
+            $yearBefore = $year;
+            if($dbmMonth>=2){
+                $dbmMonthBefore = $dbmMonth-1;
+            }else{
+                $p= Period::select()->where('prdsNameShort',$year-1)->first();
+                $prdsIdBefore = $p->prdsId;
+                $yearBefore =  $p->prdsNameShort;
+            }
+
+            
+
+
+
+
+            /*$dBusinessPeriod=DBusinessPeriod::select()
+                ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
+                    $query->where('dbmMonth',$dbmMonth);
+                },
+                'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                    $query3->orderBy('tsksId','asc');
+                } ,
+                'doneByMonths.dDoneByMonthTasks.task'])
+                ->with(['business'])
+                ->where('prdsId',$prdsId)
+                ->whereHas('doneByMonths')
+                ->get();*/
+                $dBusinessPeriod=DBusinessPeriod::selectRaw('d_bussines_periods.*, bussines."bussRUC", bussines."bussName", RIGHT("bussRUC",1) as "_lastDigit"')
+                ->join('bussines', 'bussines.bussId', '=', 'd_bussines_periods.bussId')
+                ->with([ 'doneByMonths'=>function($query) use($dbmMonth){
+                    $query->where('dbmMonth',$dbmMonth);
+                },
+                'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                    $query3->orderBy('tsksId','asc');
+                } ,
+                'doneByMonths.dDoneByMonthTasks.task'])
+                /*->with(['business'=>function($query){
+                    $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
+                }])*/
+                ->with('business')
+                ->where('prdsId',$prdsId)  
+                ->whereRaw('(RIGHT("bussRUC",1)=? or -1=?) ', [$ln, $ln])
+                //->has('doneByMonths')
+                ->whereHas('doneByMonths', function($query) use ($dbmMonth){
+                    $query->where('dbmMonth',$dbmMonth);
+                })
+                /*->whereHas('business', function($query) use ($ln){
+                    $query->whereRaw(' (RIGHT("bussRUC",1)=? or -1=?) ',[$ln,$ln]);
+                })*/
+                ->orderByRaw('RIGHT("bussRUC",1) ASC, "bussName" asc ')
+                ->get();
+
+
+                $dBusinessPeriodBefore=DBusinessPeriod::selectRaw('d_bussines_periods.*, bussines."bussRUC", bussines."bussName", RIGHT("bussRUC",1) as "_lastDigit"')
+                ->join('bussines', 'bussines.bussId', '=', 'd_bussines_periods.bussId')
+                ->with([ 'doneByMonths'=>function($query) use($dbmMonthBefore){
+                    $query->where('dbmMonth',$dbmMonthBefore);
+                },
+                'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                    $query3->orderBy('tsksId','asc');
+                } ,
+                'doneByMonths.dDoneByMonthTasks.task'])
+                /*->with(['business'=>function($query){
+                    $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
+                }])*/
+                ->with('business')
+                ->where('prdsId',$prdsIdBefore)  
+                ->whereRaw('(RIGHT("bussRUC",1)=? or -1=?) ', [$ln, $ln])
+                //->has('doneByMonths')
+                ->whereHas('doneByMonths', function($query) use ($dbmMonthBefore){
+                    $query->where('dbmMonth',$dbmMonthBefore);
+                })
+                /*->whereHas('business', function($query) use ($ln){
+                    $query->whereRaw(' (RIGHT("bussRUC",1)=? or -1=?) ',[$ln,$ln]);
+                })*/
+                ->orderByRaw('RIGHT("bussRUC",1) ASC, "bussName" asc ')
+                ->get();
+                $dBusinessPeriodBeforeArray = $dBusinessPeriodBefore->toArray();
+ 
+                $dBusinessPeriodBeforeArrayC= array_reduce($dBusinessPeriodBeforeArray, function($array, $obj) {
+                      $array['bussRUC_'.$obj['bussRUC']]=$obj; 
+                      return $array;
+                },[]);
+
+                $dBusinessPeriod = $dBusinessPeriod->map(function ($item) use ($dBusinessPeriodBeforeArrayC) {
+                    $item['doneByMonthsBefore'] = $dBusinessPeriodBeforeArrayC['bussRUC_'.$item['bussRUC']]['doneByMonths']??[];
+                    return $item;
+                });
+                
+        
+
+
+
+
+                $dataGrouped = array();
+                if($ln>=0 && $ln<=9/*Entonces solo regres de un digito */){
+                    //*NO hay necesidad de agrupar por ultimo digito por que solo es uno */
+                    $aux1 = $dBusinessPeriod;
+                    //$aux2 = array_values($aux1);
+                    $temp = array();
+                    $temp['name'] = 'RUC ' . $ln;
+                    $temp['values'] = $aux1;
+                    /*aqui guardamos el nombre de mes para luego plasmarlo en el formato de forma mas facil */
+                    $temp['month']= strtoupper($nameMonths[$dbmMonth - 1]);
+                    $temp['month_before'] =  strtoupper($nameMonths[$dbmMonthBefore - 1]);
+                    $temp['year'] = $year ;
+                    $temp['year_before'] =  $yearBefore;
+
+                    
+
+                    $dataGrouped["digit-" . $ln] = $temp;
+                }
+                if($ln==-1){
+                    //agrupa por ultimo digito
+                    for ($i = 0; $i < 10; $i++) {
+                        $aux1 = array_filter($dBusinessPeriod->toArray(), function ($element) use ($i) {
+                            return intval($element['_lastDigit']) == intval($i);
+                        });
+                        $aux2 = array_values($aux1);
+                        $temp = array();
+                        $temp['name'] = 'RUC ' . $i;
+                        $temp['values'] = $aux1;
+                        /*aqui guardamos el nombre de mes para luego plasmarlo en el formato de forma mas facil */
+                        $temp['month']= strtoupper($nameMonths[$dbmMonth - 1]);
+                        $temp['month_before'] =  strtoupper($nameMonths[$dbmMonthBefore - 1]);
+                        $temp['year'] = $year ;
+
+                        $temp['year_before'] =  $yearBefore;
+
+                        $dataGrouped["digit-" . $i] = $temp;
+                    }
+                }
+
+
+            $users=User::select('id', 'perId')
+                ->with('person')
+                ->get();
+
+            $data = [
+                '_dBusinessPeriods' => $dBusinessPeriod,
+                'groupeds' => $dataGrouped,
+                'users' => $users,
+                'date' => $f,
+                'getUserName'=>function($users, $id){
+                    $aux = array_filter($users->toArray(), function ($element) use ($id) {
+                        return intval($element['id']) == intval($id);
+                    });
+                    $aux1=array_values($aux);
+                    $user=(count($aux1) >0)?$aux1[0]:null;
+                    $perName=($user!=null)?explode(" ",$user['person']['perName'])[0]:'-----';
+                    return ucwords($perName);
+                },
+                'getBussRegimeName'=>function($bussRegime){
+                    if(!$bussRegime) return "";
+                    $a=array("1"=>"ESPECIAL", "2"=>"GENERAL", "3"=>"MYPE");
+                    return $a[$bussRegime];
+                },
+                'getBussFileKindName'=>function($bussFileKind){
+                    if(!$bussFileKind) return "";
+                    $a=array("1"=>"Archivador", "2"=>"Folder");
+                    return $a[$bussFileKind];
+                },
+                'getBussKindBookAccName'=>function($bussKindBookAcc){
+                    if(!$bussKindBookAcc) return "";
+                    $a=array("1"=>"Electronico", "2"=>"Computarizado");
+                    return $a[$bussKindBookAcc];
+                }
+
+
+
+            ];
+
+            $path = base_path('resources/views/v1.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data1 = file_get_contents($path);
+            $pic = 'data:image/' . $type . ';base64,' . base64_encode($data1);
+
+            $path1 = base_path('resources/views/icon.jpg');
+            $type1 = pathinfo($path1, PATHINFO_EXTENSION);
+            $data2 = file_get_contents($path1);
+            $pic1 = 'data:image/' . $type1 . ';base64,' . base64_encode($data2);
+
+            $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->setPaper('A4', 'landscape')->loadView('reports2.reports-tasks-by-sub-period-with-before-month', compact('pic', 'pic1'), $data);
+
+            return $pdf->stream();
+        } catch (Exception $e) {
+            throw $e;
+            return 'Surgio un error, intente más tarde';
+        }
+    }
 
 }

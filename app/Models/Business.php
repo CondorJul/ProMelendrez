@@ -45,6 +45,7 @@ class Business extends Model
         /*Campos añadidos el 16/10/2022 */
         'bussComment',
         'bussCommentColor',
+        'bussConafovClave'
     ];
 
     
@@ -71,5 +72,10 @@ class Business extends Model
         return $this->hasMany(BusinessStates::class, 'bussId', 'bussId'); 
     }
 
+    /*Añadido 19-03-2024 */
+    public function teller()
+    {
+        return $this->belongsTo(Teller::class, 'tellId', 'tellId');
+    }
     
 }

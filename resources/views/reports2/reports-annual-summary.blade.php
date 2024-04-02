@@ -121,26 +121,28 @@
                     $totalArdTaxBase = 0; $totalArdTax = 0;$totalArdTotal = 0;$totalArdFee = 0;
                     @endphp
                     @foreach($e['annualResumeDetails'] as $key => $value)
-                    @php
-                    $totalArdTaxBase += $value['ardTaxBase'];
-                    $totalArdTax += $value['ardTax'];
-                    $totalArdTotal += $value['ardTotal'];
-                    $totalArdFee += $value['ardFee'];
-                    @endphp
-                    @if($loop->index < 12) <tr>
-                        <th style="font-weight: lighter;">{{ $value['nameMonth'] }}</th>
-                        <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
-                        <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardTaxBase']) }}</th>
-                        <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
-                        <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardTax'] )}}</th>
-                        <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
-                        <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardTotal']) }}</th>
-                        <th style="width: 8%; font-weight: lighter;">{{ $evaluateIsset($value['ardPlame']) }}</th>
-                        <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
-                        <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardFee']) }}</th>
-                        </tr>
+                    
+
+                        @if($loop->index < 12) <tr>
+                            @php
+                                $totalArdTaxBase += $value['ardTaxBase'];
+                                $totalArdTax += $value['ardTax'];
+                                $totalArdTotal += $value['ardTotal'];
+                                $totalArdFee += $value['ardFee'];
+                            @endphp 
+                            <th style="font-weight: lighter;">{{ $value['nameMonth'] }}</th>
+                            <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
+                            <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardTaxBase']) }}</th>
+                            <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
+                            <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardTax'] )}}</th>
+                            <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
+                            <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardTotal']) }}</th>
+                            <th style="width: 8%; font-weight: lighter;">{{ $evaluateIsset($value['ardPlame']) }}</th>
+                            <th style="width: 1%; font-weight: lighter; border-right-style: hidden;">&nbspS/</th>
+                            <th style="width: 14%; font-weight: lighter; text-align: right;">{{ $evaluateIsset($value['ardFee']) }}</th>
+                            </tr>
                         @endif
-                        @endforeach
+                    @endforeach
                         <tr>
                             <th>TOTAL {{ $e['period']['prdsNameShort'] }}</th>
                             <th style="width: 1%; border-right-style: hidden;">&nbspS/</th>
@@ -157,7 +159,7 @@
                             <th colspan="10" class="espacio" style="border-left-style: hidden; border-right-style: hidden;"></th>
                         </tr>
                         @foreach($e['annualResumeDetails'] as $key => $val)
-                        @if($loop->index === 13) <tr>
+                        @if($loop->index === 12) <tr>
                             <th colspan="5">BALANCE ANUAL EJERCICIO {{ $e['period']['prdsNameShort'] }}</th>
                             <th style="width: 1%; border-right-style: hidden;">&nbspS/</th>
                             <th></th>

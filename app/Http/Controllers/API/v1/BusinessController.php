@@ -12,6 +12,7 @@ use App\Http\Requests\business\updBussDataRequest;
 use App\Http\Requests\business\updPerDataRequest;
 use Illuminate\Http\Request;
 use App\Models\Business;
+use App\Models\BusinessStates;
 use App\Models\DBusinessPeriod;
 use App\Models\Person;
 use App\Models\ServiceProvided;
@@ -267,6 +268,9 @@ class BusinessController extends Controller
         $afiData->bussSimpleCode = $request->afiliation['bussSimpleCode'];
         $afiData->bussDetractionsPass = $request->afiliation['bussDetractionsPass'];
         $afiData->bussSisClave = $request->afiliation['bussSisClave'];
+        $afiData->bussConafovClave = $request->afiliation['bussConafovClave'];
+
+        
         $afiData->save();
         return response()->json([
             'res' => true,
@@ -348,6 +352,19 @@ class BusinessController extends Controller
             'data' => DB::select('SELECT "tellId", "tellCode", "tellName", users."name", teller."hqId", (SELECT COUNT(*) FROM bussines WHERE bussines."tellId"=teller."tellId") AS "cantBusiness" FROM teller LEFT JOIN users ON teller."userId"=users."id" WHERE teller."hqId"=?  ORDER BY "tellCode" ASC', [$request->hqId])
         ]);
     }
+
+    public function getBusinessForDJAnual (Request $request){
+        return response()->json([
+            'res' => true,
+            'msg' => 'Leido Correctamente',
+            'data' => DB::select('
+                select distinct  on (b."bussId")  b.* from bussines b  
+                inner join d_bussines_periods dbp on b."bussId" =dbp."bussId"
+                inner join done_by_month dbm on dbp."dbpId" = dbm."dbpId"  
+                where dbp."prdsId" =? and (b."tellId"=? or 0=? )
+            ', [$request->prdsId, $request->tellId, $request->tellId])
+        ]);
+    } 
 
     public function getBusinessOfTeller(Request $request)
     {
@@ -443,6 +460,21 @@ class BusinessController extends Controller
             'data' => $a,
         ], 200);
     }
+
+    public function allStates($id, Request $request){
+        $b=Business::select()->where('bussId', $id)->get();
+        $bss=BusinessStates::select()->where('bussId', $id)->orderBy('busssId', 'asc')->get();
+        return response()->json(([
+            'res'=>true, 
+            'msg'=>'Leido correctamente', 
+            'data'=>[
+                'currentState'=>$b, 
+                'states'=>$bss, 
+                'id'=>$id
+            ]
+        ]));
+    }
+
 
 
 }

@@ -174,6 +174,10 @@ Route::get('v1/business/getCantTellerUsers', [BusinessController::class, 'getTel
 Route::get('v1/bussines', [BusinessController::class, 'index']);
 Route::get('v1/bussines/all-summarized', [BusinessController::class, 'allSummarized']);
 Route::get('v1/bussines/all-file-numbers', [BusinessController::class, 'allFileNumbers']);
+Route::get('v1/business/get-business-for-dj-anual', [BusinessController::class, 'getBusinessForDJAnual']);
+
+
+
 
 
 Route::post('v1/business/exist-ruc', [BusinessController::class, 'existRuc']);
@@ -184,6 +188,7 @@ Route::put('v1/business/upd-bussData', [BusinessController::class, 'updateBusine
 Route::put('v1/business/upd-perData', [BusinessController::class, 'updatePersonData'])->middleware(['auth:sanctum']);;
 Route::put('v1/business/upd-afiData', [BusinessController::class, 'updateAfiliationData'])->middleware(['auth:sanctum']);;
 Route::put('v1/business/upd-adiData', [BusinessController::class, 'updateAditionalData'])->middleware(['auth:sanctum']);;
+
 Route::delete('v1/business/{bussId}', [BusinessController::class, 'destroy'])->middleware(['auth:sanctum']);
 
 
@@ -246,11 +251,14 @@ Route::post('/v1/appointments/{token}/qualify-service', [AppointmentController::
 
 /*Modificaciones 22/05/2022 */
 
-/*Business with periods*/
+Route::get('/v1/business/{bussId}/states', [BusinessController::class, 'allStates']);/*Business with periods*/
 Route::get('/v1/business/{bussId}/periods', [BusinessController::class, 'allPeriods']);
 Route::post('/v1/business/{bussId}/periods', [BusinessController::class, 'updPeriod']);
 //Route::put('/v1/business/{bussId}/periods/{prdsId}', [DBusinessPeriodController::class, 'update']);
 Route::delete('/v1/business/{bussId}/periods/{prdsId}', [BusinessController::class, 'delPeriod'])->middleware(['auth:sanctum']);
+
+
+
 
 
 /*Periodos */

@@ -66,6 +66,9 @@
         .espacio2 {
             height: 10px;
         }
+        /*Para el check */
+
+ 
     </style>
 </head>
 
@@ -94,7 +97,7 @@
                 <!--Permite dar salto de pagina -->
                 <div style="page-break-after:always;"></div>
             @endif
-            <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">REGISTRO DE DECLARACIÓN MENSUAL GENERAL</h2>
+            <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">REGISTRO DE DECLARACIÓN MENSUAL GENERAL - {{$valueln['year']}}</h2>
             @php($pageBreak=true)
 
 
@@ -103,6 +106,7 @@
                     <tr>
                         <th colspan="4" style="font-size: 25px; height:30px; font-weight:bold; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$valueln['name']}}</th>
                         <th colspan="5" style="border-top-style: hidden;"></th>
+                        <th colspan="3" style="text-align: center; font-size: 12px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month_before']}}  {{$valueln['year_before'] }}</th>
                         <th colspan="3" style="font-size: 20px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month']}}</th>
                     </tr>
                     <tr>
@@ -115,6 +119,12 @@
                         <th>FECHA</th>
                         <th>TIPO DE <b> LIBRO</th>
                         <th>VENT</th>
+                        
+
+                        <th style="width: 2%;" >PDT<br>621</th>
+                        <th style="width: 2%;">PLAME<br>601</th>
+                        <th style="width: 2%;">LIBROS</th>
+
                         <th>PDT-621</th>
                         <th>PLAME-601</th>
                         <th>LIBROS</th>
@@ -125,6 +135,8 @@
                         @php($countBuss++)
                         @php($business=$value['business'])
                         @php($doneByMonths=$value['doneByMonths'])
+                        @php($doneByMonthsBefore=$value['doneByMonthsBefore'])
+
                         <!--Se obtiene el color que esta en la primera posicion, practica no recomendable-->
                         @php($tellColor=$doneByMonths[0]['tellColor'])
 
@@ -163,6 +175,61 @@
 
                                     -->
                                 <th style="width: 2.5%; font-weight: lighter; text-align: center; background-color: {{ $valuedbm['tellColor'] }}" >{{$valuedbm['tellCode']}}</th>
+                                
+
+
+                                <!-- INICIO DE CODIGO AÑADIDO-->                               
+
+                                @php($dDoneByMonthTasksBefore=$doneByMonthsBefore[0]['dDoneByMonthTasks']??[])
+                                @if(!$dDoneByMonthTasksBefore)
+                                <th colspan="3"><i></i></th>
+                              
+
+                                @endif
+                                @foreach($dDoneByMonthTasksBefore as $keyddbmt =>$valueddbmt)
+
+                                    <th>
+                                        @if($valueddbmt['ddbmtRectified']!=null)
+                                            @switch($valueddbmt['ddbmtRectified'])
+                                                @case(2/* Cerrado*/)
+                                                 
+
+                                                    @if($valueddbmt['ddbmtAmount']!=null/*Si es null entonces deducimos que es la primera opcion*/)
+                                                            {{ ($valueddbmt['ddbmtAmount']>0)?'M':'O'}}
+                                                    @else
+
+                                                        {{'SI'}}
+                                                    @endif
+                                                    @break
+                                                @default
+                                            @endswitch
+                                        @else
+                                            @switch($valueddbmt['ddbmtState'] )
+                                                @case(5/* Cerrado*/)
+                                                 
+
+                                                        @if($valueddbmt['ddbmtAmount']!=null/*Si es null entonces deducimos que es la primera opcion*/)
+                                                            {{ ($valueddbmt['ddbmtAmount']>0)?'M':'O'}}
+                                                        @else
+                                                        {{ 'SI'}}
+                                                        @endif
+                                                    @break
+
+                                                @case(7/*No tiene */)
+                                                    NT
+                                                    @break
+                                                @default
+                                                -
+                                            @endswitch
+                                        @endif
+                                    </th>
+
+                                @endforeach
+                                <!-- FIN DE CODIGO AÑADIDO-->                               
+
+
+
+
                                 @php($dDoneByMonthTasks=$valuedbm['dDoneByMonthTasks'])
                                 @foreach($dDoneByMonthTasks as $keyddbmt =>$valueddbmt)
 

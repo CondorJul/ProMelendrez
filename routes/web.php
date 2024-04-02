@@ -30,6 +30,12 @@ Route::get('/v1/reports/my-format-declaration', [ReportsController::class, 'repo
 Route::get('/v1/reports/tasks', [ReportsController::class, 'reportTasks'])->middleware(['cors']);
 Route::get('/v1/reports/tasks-by-sub-period', [ReportsController::class, 'reportTasksBySubPeriod'])->middleware(['cors']);
 
+Route::get('/v1/reports/tasks-by-sub-period-with-before-month', [ReportsController::class, 'reportTasksBySubPeriodWithBeforeMonth'])->middleware(['cors']);
+
+
+Route::get('/v1/reports/my-format-declaration-by-last-digit', [ReportsController::class, 'reportFormatDeclarationByLastDigit'])->middleware(['cors']);
+
+
 
 Route::get('/mail/test', function () {
     //return redirect()->intended('http:');
