@@ -963,7 +963,19 @@ class ReportsController extends Controller
             //consulta base de datos
             $teller = Teller::select()->with('user.person')->where('tellId', $request->tellId)->first();
 
+            /** */
+            $dbmMonthBefore = 12;
+            $prdsIdBefore=$request->prdsId;
+            $yearBefore = $year;
+            if($month>=2){
+                $dbmMonthBefore = $month-1;
+            }else{
+                $p= Period::select()->where('prdsNameShort',$year-1)->first();
+                $prdsIdBefore = $p->prdsId;
+                $yearBefore =  $p->prdsNameShort;
+            }
 
+      
 
             $params = [$bussState,  $totalMonths,$bussState, $totalMonths, $totalMonths];
 
@@ -1007,8 +1019,52 @@ class ReportsController extends Controller
                         '.$paramsSql, $params)
                     ->orderByRaw(' "_lastDigit" asc, "bussName" asc')
                     ->get();
+
+
+
+                    $dBusinessPeriodBefore=DBusinessPeriod::selectRaw('d_bussines_periods.*, bussines."bussRUC", bussines."bussName", RIGHT("bussRUC",1) as "_lastDigit"')
+                    ->join('bussines', 'bussines.bussId', '=', 'd_bussines_periods.bussId')
+                    ->with([ 'doneByMonths'=>function($query) use($dbmMonthBefore){
+                        $query->where('dbmMonth',$dbmMonthBefore);
+                    },
+                    'doneByMonths.dDoneByMonthTasks'=>function($query3){
+                        $query3->orderBy('tsksId','asc');
+                    } ,
+                    'doneByMonths.dDoneByMonthTasks.task'])
+                    /*->with(['business'=>function($query){
+                        $query->orderByRaw(' RIGHT("bussRUC",1) ASC, "bussName" asc ');
+                    }])*/
+                    ->with('business')
+                    ->where('prdsId',$prdsIdBefore)  
+                    ->whereRaw('(RIGHT("bussRUC",1)=? or -1=?) ', [$ln, $ln])
+                    //->has('doneByMonths')
+                    ->whereHas('doneByMonths', function($query) use ($dbmMonthBefore){
+                        $query->where('dbmMonth',$dbmMonthBefore);
+                    })
+                    /*->whereHas('business', function($query) use ($ln){
+                        $query->whereRaw(' (RIGHT("bussRUC",1)=? or -1=?) ',[$ln,$ln]);
+                    })*/
+                    ->orderByRaw('RIGHT("bussRUC",1) ASC, "bussName" asc ')
+                    ->get();
+
+                    $dBusinessPeriodBeforeArray = $dBusinessPeriodBefore->toArray();
+     
+                    $dBusinessPeriodBeforeArrayC= array_reduce($dBusinessPeriodBeforeArray, function($array, $obj) {
+                          $array['bussRUC_'.$obj['bussRUC']]=$obj; 
+                          return $array;
+                    },[]);
+    
+                    $businesses = $businesses->map(function ($item) use ($dBusinessPeriodBeforeArrayC) {
+                        $item['doneByMonthsBefore'] = $dBusinessPeriodBeforeArrayC['bussRUC_'.$item['bussRUC']]['doneByMonths']??[];
+                        return $item;
+                    });
+
+                   
+               
+
+
+
             
-            //echo json_encode($businesses);
 
             $fecha = Carbon::parse(date('m/d/y'));
             $mes = $nameMonths[($fecha->format('m')) - 1];
@@ -1031,6 +1087,10 @@ class ReportsController extends Controller
                 /*aqui guardamos el nombre de mes para luego plasmarlo en el formato de forma mas facil */
                 $temp['month']= strtoupper($nameMonths[$month - 1]);
 
+                $temp['month_before'] =  strtoupper($nameMonths[$dbmMonthBefore - 1]);
+                $temp['year'] = $year ;
+                $temp['year_before'] =  $yearBefore;
+
                 $dataGrouped["digit-" . $ln] = $temp;
             }
             if($ln==-1){
@@ -1045,18 +1105,27 @@ class ReportsController extends Controller
                     $temp['name'] = 'RUC ' . $i;
                     $temp['values'] = $temp2;
                     $temp['month']= strtoupper($nameMonths[$month - 1]);
+                    
+                    $temp['month_before'] =  strtoupper($nameMonths[$dbmMonthBefore - 1]);
+                    $temp['year'] = $year ;
+                    $temp['year_before'] =  $yearBefore;
     
                     $dataGrouped["digit-" . $i] = $temp;
                 }
             }
+            
 
             
+            $users=User::select('id', 'perId')
+            ->with('person')
+            ->get();
 
             $data = [
                 'teller' => $teller,
                 'businesses' => $businesses,
                 'groupeds' => $dataGrouped,
                 'period' => $period,
+                'users' => $users,
                 'month' => $nameMonths[$request->month - 1],
                 'date' => $f,
                 'substring' => function ($str) {
@@ -1080,6 +1149,15 @@ class ReportsController extends Controller
                    // return \Illuminate\Support\Str::limit($str, 31, $end='');
                     return substr( $str, 0, 31);
                 }, 
+                'getUserName'=>function($users, $id){
+                    $aux = array_filter($users->toArray(), function ($element) use ($id) {
+                        return intval($element['id']) == intval($id);
+                    });
+                    $aux1=array_values($aux);
+                    $user=(count($aux1) >0)?$aux1[0]:null;
+                    $perName=($user!=null)?explode(" ",$user['person']['perName'])[0]:'-----';
+                    return ucwords($perName);
+                },
                 'getBussRegimeName'=>function($bussRegime){
                     if(!$bussRegime) return "";
                     $a=array("1"=>"ESPECIAL", "2"=>"GENERAL", "3"=>"MYPE");

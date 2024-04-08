@@ -294,27 +294,34 @@
                 <!--Permite dar salto de pagina -->
                 <div style="page-break-after:always;"></div>
             @endif
-            <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">REGISTRO DE DECLARACIÓN MENSUAL GENERAL</h2>
+            <h2 style="text-align: center; font-size: 25px; margin-bottom:5px; font-family: Arial, Helvetica, sans-serif; margin-top: 0px;">REGISTRO DE DECLARACIÓN MENSUAL GENERAL - {{$valueln['year']}}</h2>
             @php($pageBreak=true)
 
 
             <div style="font-size: 10px; font-family: Arial, Helvetica, sans-serif;">
                 <table style="width: 100%;" border="1" cellspacing="0">
                     <tr>
-                        <th colspan="4" style="font-size: 25px; height:30px; font-weight:bold; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$valueln['name']}}</th>
-                        <th colspan="5" style="border-top-style: hidden;"></th>
+                        <th colspan="3" style="font-size: 25px; height:30px; font-weight:bold; color: white; letter-spacing: 5px; background-color: #CC0101;">{{$valueln['name']}}</th>
+                        <th colspan="4" style="border-top-style: hidden;"></th>
+                        <th colspan="3" style="text-align: center; font-size: 12px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month_before']}}  {{$valueln['year_before'] }}</th>
                         <th colspan="3" style="font-size: 20px;font-weight:bold; letter-spacing: 3px;">{{$valueln['month']}}</th>
                     </tr>
                     <tr>
                         <th>#</th>
                         <th>NOMBRE / RAZÓN SOCIAL</th>
                         <th>RUC</th>
-                        <th>TIPO</th>
+                        <!--<th>TIPO</th>-->
                         <th>ARCH</th>
                         <th>RÉGIMEN</th>
                         <th>FECHA</th>
-                        <th>TIPO DE <b> LIBRO</th>
+                        <!--<th>TIPO DE <b> LIBRO</th>-->
                         <th>VENT</th>
+
+
+                        <th  style="width: 7%;">PDT<br>621</th>
+                        <th style="width: 6%;">PLAME<br>601</th>
+                        <th style="width: 6%;">LIBROS</th>
+
                         <th>PDT-621</th>
                         <th>PLAME-601</th>
                         <th>LIBROS</th>
@@ -324,6 +331,7 @@
                     
                     @foreach($arrayBusinesses as $key =>$value)
                         @php($countBuss++)
+                        @php($doneByMonthsBefore= $value['doneByMonthsBefore']??[])
                     
                        
 
@@ -332,7 +340,7 @@
                             <th style="width: 28%; font-weight: lighter; text-align: left; padding-left: 7px;">{{$value['bussName']}}</th>
                             <th style="width: 6%; font-weight: lighter; text-align: center;">{{$value['bussRUC']}}</th>
 
-                            <th style="width: 4.3%; font-weight: lighter; text-align: center;">{{ $getBussFileKindName($value['bussFileKind'] ?? '') }}</th>
+                            <!--<th style="width: 4.3%; font-weight: lighter; text-align: center;">{{ $getBussFileKindName($value['bussFileKind'] ?? '') }}</th>-->
                             <th style="width: 2%; font-weight: lighter; text-align: center;">{{$value['bussFileNumber']}}</th>
                             <th style="width: 4.3%; font-weight: lighter; text-align: center;">{{ $getBussRegimeName($value['bussRegime']?? '') }}</th>
 
@@ -352,8 +360,52 @@
                                 @endswitch
 
                             </th>
-                            <th style="width: 5%; font-weight: lighter; text-align: center;">{{$getBussKindBookAccName($value['bussKindBookAcc']??'')}}</th>
+                           <!-- <th style="width: 5%; font-weight: lighter; text-align: center;">{{$getBussKindBookAccName($value['bussKindBookAcc']??'')}}</th>-->
                             <th style="width: 2.5%; font-weight: lighter; text-align: center; " >{{isset($value['teller'])?$value['teller']['tellCode']:''}}</th>
+                            <!-- INICIO DE CODIGO AÑADIDO-->                               
+
+                            @php($dDoneByMonthTasksBefore=$doneByMonthsBefore[0]['dDoneByMonthTasks']??[])
+                                @if(!$dDoneByMonthTasksBefore)
+                                <th colspan="3"><i></i></th>
+                              
+
+                                @endif
+                                @foreach($dDoneByMonthTasksBefore as $keyddbmt =>$valueddbmt)
+
+                                    <th>
+                                    @if($valueddbmt['ddbmtRectified']!=null)
+                                            @switch($valueddbmt['ddbmtRectified'])
+                                                @case(2/* Cerrado*/)
+                                                    {{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+
+                                                    @if($valueddbmt['ddbmtAmount']!=null/*Si es null entonces deducimos que es la primera opcion*/)
+                                                            {{ ($valueddbmt['ddbmtAmount']>0)?'-M':'-O'}}
+                                                        @endif
+                                                    @break
+                                                @default
+                                            @endswitch
+                                        @else
+                                            @switch($valueddbmt['ddbmtState'] )
+                                                @case(5/* Cerrado*/)
+                                                    {{$getUserName($users, $valueddbmt['ddbmtDoneBy'])}}
+
+                                                        @if($valueddbmt['ddbmtAmount']!=null/*Si es null entonces deducimos que es la primera opcion*/)
+                                                            {{ ($valueddbmt['ddbmtAmount']>0)?'-M':'-O'}}
+                                                        @endif
+                                                    @break
+
+                                                @case(7/*No tiene */)
+                                                    NT
+                                                    @break
+                                                @default
+                                                -
+                                            @endswitch
+                                        @endif
+                                    </th>
+
+                                @endforeach
+                                <!-- FIN DE CODIGO AÑADIDO-->   
+
 
                             <th></th>
                             <th></th>
